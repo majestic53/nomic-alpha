@@ -17,6 +17,7 @@
  */
 
 #include "../../include/uuid/manager.h"
+#include "../../include/trace.h"
 #include "./manager_type.h"
 
 namespace nomic {
@@ -26,20 +27,26 @@ namespace nomic {
 		manager::manager(void) :
 			m_id_next(UID_INVALID + 1)
 		{
-			return;
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		manager::~manager(void)
 		{
-			return;
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
 		manager::clear(void)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
 			m_id.clear();
 			m_id_next = (UID_INVALID + 1);
 			m_id_surplus.clear();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		bool 
@@ -47,6 +54,10 @@ namespace nomic {
 			__in uint32_t id
 			)
 		{
+			bool result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
 			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
@@ -57,7 +68,10 @@ namespace nomic {
 				THROW_NOMIC_UUID_MANAGER_EXCEPTION_FORMAT(NOMIC_UUID_MANAGER_EXCEPTION_INVALID, "Id=%x", id);
 			}
 
-			return (m_id.find(id) != m_id.end());
+			result = (m_id.find(id) != m_id.end());
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 
 		size_t 
@@ -66,6 +80,8 @@ namespace nomic {
 			)
 		{
 			size_t result = 0;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
 
 			std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -86,6 +102,7 @@ namespace nomic {
 				result = --iter->second;
 			}
 
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return result;
 		}
 
@@ -96,6 +113,8 @@ namespace nomic {
 		{
 			std::map<uint32_t, size_t>::iterator result;
 
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
 			if(id == UID_INVALID) {
 				THROW_NOMIC_UUID_MANAGER_EXCEPTION_FORMAT(NOMIC_UUID_MANAGER_EXCEPTION_INVALID, "Id=%x", id);
 			}
@@ -105,6 +124,7 @@ namespace nomic {
 				THROW_NOMIC_UUID_MANAGER_EXCEPTION_FORMAT(NOMIC_UUID_MANAGER_EXCEPTION_NOT_FOUND, "Id=%x", id);
 			}
 
+			TRACE_EXIT(LEVEL_VERBOSE);
 			return result;
 		}
 
@@ -112,6 +132,8 @@ namespace nomic {
 		manager::generate(void)
 		{
 			uint32_t result = UID_INVALID;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -139,6 +161,7 @@ namespace nomic {
 
 			m_id.insert(std::make_pair(result, REFERENCE_INIT));
 
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
 		}
 
@@ -147,19 +170,30 @@ namespace nomic {
 			__in uint32_t id
 			)
 		{
+			size_t result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
 			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_UUID_MANAGER_EXCEPTION(NOMIC_UUID_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			return ++find(id)->second;
+			result = ++find(id)->second;
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
+			return result;
 		}
 
 		void 
 		manager::on_uninitialize(void)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
 			clear();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		size_t 
@@ -167,13 +201,20 @@ namespace nomic {
 			__in uint32_t id
 			)
 		{
+			size_t result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
 			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_UUID_MANAGER_EXCEPTION(NOMIC_UUID_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			return find(id)->second;
+			result = find(id)->second;
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
+			return result;
 		}
 
 		std::string 
@@ -182,6 +223,8 @@ namespace nomic {
 			) const
 		{
 			std::stringstream result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
 
 			result << NOMIC_UUID_MANAGER_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
@@ -228,6 +271,7 @@ namespace nomic {
 				}
 			}
 
+			TRACE_EXIT(LEVEL_VERBOSE);
 			return result.str();
 		}
 	}

@@ -22,92 +22,119 @@
 namespace nomic {
 
 	runtime::runtime(void) :
+		m_manager_trace(nomic::trace::acquire()),
 		m_manager_uuid(nomic::uuid::manager::acquire())
 		// TODO
 	{
-		return;
+		m_manager_trace.initialize();
+
+		TRACE_ENTRY(LEVEL_VERBOSE);
+		TRACE_EXIT(LEVEL_VERBOSE);
 	}
 
 	runtime::~runtime(void)
 	{
-
-		// TODO
+		TRACE_ENTRY(LEVEL_VERBOSE);
 
 		m_manager_uuid.release();
+
+		TRACE_EXIT(LEVEL_VERBOSE);
+
+		m_manager_trace.uninitialize();
+		m_manager_trace.release();
 	}
 
 	bool 
 	runtime::active(void)
 	{
+		bool result;
+
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
 		std::lock_guard<std::mutex> lock(m_mutex);
 
-		return nomic::core::thread::active();
+		result = nomic::core::thread::active();
+
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+		return result;
 	}
 
 	bool 
 	runtime::on_initialize(void)
 	{
+		bool result = true;
+
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
 		m_manager_uuid.initialize();
 
 		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
 
-		return true;
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+		return result;
 	}
 
 	bool 
 	runtime::on_run(void)
 	{
+		bool result = true;
+
+		TRACE_ENTRY(LEVEL_VERBOSE);
 
 		while(nomic::core::thread::active()) {
 
 			// TODO
-			std::cout << __FUNCTION__ << std::endl;
-			// ---
+
 		}
 
-		return true;
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+		return result;
 	}
 
 	bool 
 	runtime::on_start(void)
 	{
-		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
+		bool result = true;
 
-		return true;
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
+		// TODO
+
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+		return result;
 	}
 
 	void 
 	runtime::on_stop(void)
 	{
-		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
+		TRACE_ENTRY(LEVEL_VERBOSE);
 
-		return;
+		// TODO
+
+		TRACE_EXIT(LEVEL_VERBOSE);
 	}
 
 	void 
 	runtime::on_uninitialize(void)
 	{
+		TRACE_ENTRY(LEVEL_VERBOSE);
 
 		if(nomic::core::thread::active()) {
 			nomic::core::thread::stop();
 		}
 
 		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
 
 		m_manager_uuid.uninitialize();
+
+		TRACE_EXIT(LEVEL_VERBOSE);
 	}
 
 	void 
 	runtime::run(void)
 	{
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
 		std::lock_guard<std::mutex> lock(m_mutex);
 
 		if(nomic::core::thread::active()) {
@@ -115,16 +142,22 @@ namespace nomic {
 		}
 
 		nomic::core::thread::start(false);
+
+		TRACE_EXIT(LEVEL_VERBOSE);
 	}
 
 	void 
 	runtime::terminate(void)
 	{
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
 		std::lock_guard<std::mutex> lock(m_mutex);
 
 		if(nomic::core::thread::active()) {
 			nomic::core::thread::stop();
 		}
+
+		TRACE_EXIT(LEVEL_VERBOSE);
 	}
 
 	std::string 
@@ -134,6 +167,8 @@ namespace nomic {
 	{
 		std::stringstream result;
 
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
 		result << NOMIC_RUNTIME_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 		if(verbose) {
@@ -141,6 +176,7 @@ namespace nomic {
 				<< ", Thread=" << nomic::core::thread::to_string(verbose);
 		}
 
+		TRACE_EXIT(LEVEL_VERBOSE);
 		return result.str();
 	}
 
@@ -151,21 +187,27 @@ namespace nomic {
 	{
 		std::stringstream result;
 
+		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
+
 		result << NOMIC_VERSION_MAJOR << "." << NOMIC_VERSION_MINOR << "." << NOMIC_VERSION_WEEK << "." << NOMIC_VERSION_REVISION;
 
 		if(verbose) {
 			result << "-" << NOMIC_VERSION_RELEASE;
 		}
 
+		TRACE_EXIT(LEVEL_VERBOSE);
 		return result.str();
 	}
 
 	void 
 	runtime::wait(void)
 	{
+		TRACE_ENTRY(LEVEL_VERBOSE);
 
 		if(nomic::core::thread::active()) {
 			nomic::core::thread::wait();
 		}
+
+		TRACE_EXIT(LEVEL_VERBOSE);
 	}
 }

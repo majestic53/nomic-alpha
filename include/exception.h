@@ -61,8 +61,7 @@ namespace nomic {
 				__in const std::string &file,
 				__in const std::string &function,
 				__in size_t line,
-				__in const char *format,
-				...
+				__in const std::string &format
 				);
 
 			size_t line(void) const;

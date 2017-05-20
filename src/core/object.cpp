@@ -17,6 +17,7 @@
  */
 
 #include "../../include/core/object.h"
+#include "../../include/trace.h"
 #include "./object_type.h"
 
 namespace nomic {
@@ -30,7 +31,8 @@ namespace nomic {
 				m_subtype(subtype),
 				m_type(type)
 		{
-			return;
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", type, subtype);
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		object::object(
@@ -39,12 +41,14 @@ namespace nomic {
 				m_subtype(other.m_subtype),
 				m_type(other.m_type)
 		{
-			return;
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", other.m_type, other.m_subtype);
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		object::~object(void)
 		{
-			return;
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		object &
@@ -52,24 +56,35 @@ namespace nomic {
 			__in const object &other
 			)
 		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", other.m_type, other.m_subtype);
 
 			if(this != &other) {
 				m_subtype = other.m_subtype;
 				m_type = other.m_type;
 			}
 
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
 			return *this;
 		}
 
 		bool 
 		object::has_subtype(void) const
 		{
-			return (m_subtype != SUBTYPE_UNDEFINED);
+			bool result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = (m_subtype != SUBTYPE_UNDEFINED);
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 
 		uint32_t 
 		object::subtype(void) const
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_subtype);
 			return m_subtype;
 		}
 
@@ -79,6 +94,8 @@ namespace nomic {
 			) const
 		{
 			std::stringstream result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
 
 			result << NOMIC_CORE_OBJECT_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
@@ -90,12 +107,15 @@ namespace nomic {
 				}
 			}
 
+			TRACE_EXIT(LEVEL_VERBOSE);
 			return result.str();
 		}
 
 		uint32_t 
 		object::type(void) const
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_type);
 			return m_type;
 		}
 	}

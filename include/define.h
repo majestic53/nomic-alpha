@@ -21,6 +21,7 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -42,18 +43,21 @@ namespace nomic {
 	#define __inout_opt
 #endif // __inout_opt
 
-	#define EXCEPTION_MALFORMED "Malformed exception"
 	#define EXCEPTION_UNKNOWN "Unknown exception"
+
+	#define FORMAT_STRING(_FORMAT_, ...) nomic::utility::format_as_string(_FORMAT_, __VA_ARGS__)
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1720
 
 	#define OBJECT_COUNT 1
+
+	#define QUEUE_MAX 0x1000
 
 	#define REFERENCE_INIT 1
 
@@ -75,11 +79,56 @@ namespace nomic {
 
 	#define THROW_EXCEPTION(_EXCEPT_) THROW_EXCEPTION_FORMAT(_EXCEPT_, "", "")
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
-		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, _FORMAT_, __VA_ARGS__)
+		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 
+#ifndef NDEBUG
+	#define _TRACE(_LEVEL_, _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, ...) { \
+		if((_LEVEL_) <= TRACE) { \
+			nomic::trace &instance = nomic::trace::acquire(); \
+			if(instance.initialized()) { \
+				instance.generate(_LEVEL_, _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, FORMAT_STRING(_FORMAT_, __VA_ARGS__)); \
+				instance.release(); \
+			} \
+		} \
+		}
+#else
+	#define _TRACE(_LEVEL_, _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, ...)
+#endif // NDEBUG
+	#define TRACE_ENTRY(_LEVEL_) \
+		_TRACE(_LEVEL_, "", __FILE__, __FUNCTION__, __LINE__, TRACE_PREFIX_ENTRY "%s", __FUNCTION__, "")
+	#define TRACE_ENTRY_FORMAT(_LEVEL_, _FORMAT_, ...) \
+		_TRACE(_LEVEL_, "", __FILE__, __FUNCTION__, __LINE__, TRACE_PREFIX_ENTRY "%s: " _FORMAT_, __FUNCTION__, __VA_ARGS__)
+	#define TRACE_EXCEPTION(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_) \
+		_TRACE(LEVEL_ERROR, _MESSAGE_, __FILE__, __FUNCTION__, __LINE__, "", "")
+	#define TRACE_EXIT(_LEVEL_) \
+		_TRACE(_LEVEL_, "", __FILE__, __FUNCTION__, __LINE__, TRACE_PREFIX_EXIT "%s", __FUNCTION__, "")
+	#define TRACE_EXIT_FORMAT(_LEVEL_, _FORMAT_, ...) \
+		_TRACE(_LEVEL_, "", __FILE__, __FUNCTION__, __LINE__, TRACE_PREFIX_ENTRY "%s: " _FORMAT_, __FUNCTION__, __VA_ARGS__)
+	#define TRACE_MESSAGE(_LEVEL_, _MESSAGE_) TRACE_MESSAGE_FORMAT(_LEVEL_, _MESSAGE_, "")
+	#define TRACE_MESSAGE_FORMAT(_LEVEL_, _FORMAT_, ...) \
+		_TRACE(_LEVEL_, "", __FILE__, __FUNCTION__, __LINE__, _FORMAT_, __VA_ARGS__)
+	#define TRACE_PREFIX_ENTRY "+"
+	#define TRACE_PREFIX_EXIT "-"
+
 	#define UID_INVALID 0
+
+	class utility {
+
+		public:
+
+			static std::string format_as_string(
+				__in const char *format,
+				...
+				);
+
+			static time_t timestamp(void);
+
+			static std::string timestamp_as_string(
+				__in const time_t &time
+				);
+	};
 }
 
 #endif // NOMIC_DEFINE_H_

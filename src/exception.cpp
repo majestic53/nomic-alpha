@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdarg>
 #include "../include/exception.h"
+#include "../include/trace.h"
 
 namespace nomic {
 
@@ -112,44 +112,24 @@ namespace nomic {
 		__in const std::string &file,
 		__in const std::string &function,
 		__in size_t line,
-		__in const char *format,
-		...
+		__in const std::string &format
 		)
 	{
 		std::stringstream result;
 
 		result << message;
 
-		if(format) {
-			va_list arguments;
-			std::string buffer;
+		if(!format.empty()) {
 
-			va_start(arguments, format);
-			int length = std::vsnprintf(nullptr, 0, format, arguments);
-			va_end(arguments);
-
-			if(length > 0) {
-				buffer.resize(++length);
-				va_start(arguments, format);
-				length = std::vsnprintf(&buffer[0], buffer.size(), format, arguments);
-				va_end(arguments);
+			if(!result.str().empty()) {
+				result << ": ";
 			}
 
-			if(length < 0) {
-				buffer = EXCEPTION_MALFORMED;
-			}
-
-			if(!buffer.empty()) {
-
-				if(!result.str().empty()) {
-					result << " ";
-				}
-
-				result << buffer;
-			}
+			result << format;
 		}
 
-		throw nomic::exception(STRING_CHECK(result.str()), file, function, line);
+		TRACE_EXCEPTION(result.str(), file, function, line);
+		throw nomic::exception(result.str(), file, function, line);
 	}
 
 	size_t 
@@ -180,7 +160,7 @@ namespace nomic {
 			}
 
 			if(!m_file.empty()) {
-				result << m_file << ":";
+				result << m_file << "@";
 			}
 
 			result << m_line << ")";

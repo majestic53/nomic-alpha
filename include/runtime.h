@@ -19,8 +19,8 @@
 #ifndef NOMIC_RUNTIME_H_
 #define NOMIC_RUNTIME_H_
 
-#include "./core/thread.h"
 #include "./uuid/manager.h"
+#include "./trace.h"
 #include "./exception.h"
 
 namespace nomic {
@@ -72,6 +72,8 @@ namespace nomic {
 			void on_stop(void);
 
 			void on_uninitialize(void);
+
+			nomic::trace &m_manager_trace;
 
 			nomic::uuid::manager &m_manager_uuid;
 

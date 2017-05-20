@@ -28,10 +28,10 @@ main(void)
 	int result = EXIT_SUCCESS;
 
 	try {
-
 		// TODO
-		std::cout << NOMIC << " " << nomic::runtime::version(true) << std::endl << NOMIC_COPYRIGHT << std::endl;
 		nomic::runtime &instance = nomic::runtime::acquire();
+		TRACE_MESSAGE_FORMAT(nomic::LEVEL_INFORMATION, NOMIC " %s", STRING_CHECK(nomic::runtime::version(true)));
+		TRACE_MESSAGE(nomic::LEVEL_INFORMATION, NOMIC_COPYRIGHT);
 		instance.initialize();
 		instance.run();
 

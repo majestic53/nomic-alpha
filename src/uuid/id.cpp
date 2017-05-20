@@ -18,6 +18,7 @@
 
 #include "../../include/uuid/id.h"
 #include "../../include/uuid/manager.h"
+#include "../../include/trace.h"
 #include "./id_type.h"
 
 namespace nomic {
@@ -27,7 +28,11 @@ namespace nomic {
 		id::id(void) :
 			m_id(UID_INVALID)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
 			generate();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		id::id(
@@ -35,12 +40,20 @@ namespace nomic {
 			) :
 				m_id(other.m_id)
 		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", other.m_id);
+
 			increment();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		id::~id(void)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
 			decrement();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		id &
@@ -48,6 +61,7 @@ namespace nomic {
 			__in const id &other
 			)
 		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", other.m_id);
 
 			if(this != &other) {
 				decrement();
@@ -55,6 +69,7 @@ namespace nomic {
 				increment();
 			}
 
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
 			return *this;
 		}
 
@@ -63,7 +78,14 @@ namespace nomic {
 			__in const id &other
 			)
 		{
-			return (m_id == other.m_id);
+			bool result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=(%x==%x)", m_id, other.m_id);
+
+			result = (m_id == other.m_id);
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 
 		bool 
@@ -71,12 +93,20 @@ namespace nomic {
 			__in const id &other
 			)
 		{
-			return (m_id != other.m_id);
+			bool result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=(%x!=%x)", m_id, other.m_id);
+
+			result = (m_id != other.m_id);
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 
 		void 
 		id::decrement(void)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::uuid::manager &instance = nomic::uuid::manager::acquire();
 			if(instance.initialized() && instance.contains(m_id)) {
@@ -84,11 +114,14 @@ namespace nomic {
 			}
 
 			instance.release();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
 		id::generate(void)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::uuid::manager &instance = nomic::uuid::manager::acquire();
 			if(instance.initialized()) {
@@ -96,17 +129,22 @@ namespace nomic {
 			}
 
 			instance.release();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		uint32_t 
 		id::get_id(void)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_id);
 			return m_id;
 		}
 
 		void 
 		id::increment(void)
 		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::uuid::manager &instance = nomic::uuid::manager::acquire();
 			if(instance.initialized() && instance.contains(m_id)) {
@@ -114,6 +152,8 @@ namespace nomic {
 			}
 
 			instance.release();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		std::string 
@@ -122,6 +162,8 @@ namespace nomic {
 			) const
 		{
 			std::stringstream result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
 
 			result << NOMIC_UUID_ID_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
@@ -135,13 +177,21 @@ namespace nomic {
 				}
 			}
 
+			TRACE_EXIT(LEVEL_VERBOSE);
 			return result.str();
 		}
 
 		bool 
 		id::valid_id(void)
 		{
-			return (m_id != UID_INVALID);
+			bool result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = (m_id != UID_INVALID);
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 	}
 }

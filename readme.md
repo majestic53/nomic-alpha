@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1720
 ----------------
+*Updated: 5/20/2017*
+
+* Added tracing subsystem
+
 *Updated: 5/19/2017*
 
 * Initial commit
