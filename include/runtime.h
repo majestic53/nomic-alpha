@@ -33,11 +33,22 @@ namespace nomic {
 
 			~runtime(void);
 
-			void run(void);
-
 			bool active(void);
 
+			uint32_t frame_rate(void);
+
+			bool paused(void);
+
+			void run(void);
+
+			void run(
+				__in int argc,
+				__in const char *argv[]
+				);
+
 			void terminate(void);
+
+			uint32_t tick(void);
 
 			std::string to_string(
 				__in_opt bool verbose = false
@@ -63,7 +74,22 @@ namespace nomic {
 				__in const runtime &other
 				) = delete;
 
+			void increment_tick(void);
+
+			bool on_event(void);
+
 			bool on_initialize(void);
+
+			bool on_parse(
+				__in int argc,
+				__in const char *argv[]
+				);
+
+			void on_pause(void);
+
+			void on_render(
+				__in float delta
+				);
 
 			bool on_run(void);
 
@@ -73,11 +99,31 @@ namespace nomic {
 
 			void on_uninitialize(void);
 
+			void on_unpause(void);
+
+			void on_update(void);
+
+			void set_frame_rate(
+				__in uint32_t frame_rate
+				);
+
+			void set_pause(
+				__in bool paused
+				);
+
+			uint32_t m_frame_rate;
+
+			bool m_paused;
+
+			bool m_paused_change;
+
 			nomic::trace &m_manager_trace;
 
 			nomic::uuid::manager &m_manager_uuid;
 
 			std::mutex m_mutex;
+
+			uint32_t m_tick;
 	};
 }
 

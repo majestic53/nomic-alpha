@@ -27,6 +27,11 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <SDL2/SDL.h>
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace nomic {
 
@@ -47,6 +52,8 @@ namespace nomic {
 
 	#define FORMAT_STRING(_FORMAT_, ...) nomic::utility::format_as_string(_FORMAT_, __VA_ARGS__)
 
+	#define MILLISECONDS_PER_SECOND 1000
+
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
@@ -61,11 +68,17 @@ namespace nomic {
 
 	#define REFERENCE_INIT 1
 
+	#define RUNTIME_PAUSE_DELAY 200
+	#define RUNTIME_TICKS_PER_SECOND 25
+	#define RUNTIME_TICK_SKIP 5
+
 	#define SCALAR_AS_HEX(_TYPE_, _VAL_) \
 		std::setw(sizeof(_TYPE_) * 2) << std::setfill('0') << std::hex << (uintptr_t) ((_TYPE_) (_VAL_)) \
 			<< std::dec
 
 	#define SCALAR_INVALID(_TYPE_) ((_TYPE_) -1)
+
+	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
 	#define STRING_EMPTY "<EMPTY>"
 	#define STRING_INVALID "<INVALID>"

@@ -76,6 +76,8 @@ namespace nomic {
 					__in uint32_t id
 					);
 
+				bool on_initialize(void);
+
 				void on_uninitialize(void);
 
 				std::map<uint32_t, size_t> m_id;

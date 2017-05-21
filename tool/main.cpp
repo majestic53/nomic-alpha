@@ -23,26 +23,23 @@
 // ---
 
 int 
-main(void)
+main(
+	__in int argc,
+	__in const char *argv[]
+	)
 {
 	int result = EXIT_SUCCESS;
 
 	try {
-		// TODO
 		nomic::runtime &instance = nomic::runtime::acquire();
 		TRACE_MESSAGE_FORMAT(nomic::LEVEL_INFORMATION, NOMIC " %s", STRING_CHECK(nomic::runtime::version(true)));
 		TRACE_MESSAGE(nomic::LEVEL_INFORMATION, NOMIC_COPYRIGHT);
 		instance.initialize();
-		instance.run();
-
-		usleep(10);
-
-		//instance.wait();
+		instance.run(argc, argv);
+		instance.wait();
 		instance.terminate();
 		instance.uninitialize();
 		instance.release();
-		// ---
-
 	} catch(nomic::exception &exc) {
 		std::cerr << exc.to_string(true) << std::endl;
 		result = EXIT_FAILURE;

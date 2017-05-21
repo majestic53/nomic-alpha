@@ -186,12 +186,26 @@ namespace nomic {
 			return result;
 		}
 
+		bool 
+		manager::on_initialize(void)
+		{
+			bool result = true;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Uuid manager initialized");
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
 		void 
 		manager::on_uninitialize(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			clear();
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Uuid manager uninitialized");
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
