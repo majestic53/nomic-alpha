@@ -28,6 +28,7 @@ Version 0.1.1720
 ----------------
 *Updated: 5/20-21/2017*
 
+* Added session manager
 * Added runtime loop and event handlers
 * Added runtime tracing
 

@@ -19,6 +19,7 @@
 #ifndef NOMIC_RUNTIME_H_
 #define NOMIC_RUNTIME_H_
 
+#include "./session/manager.h"
 #include "./uuid/manager.h"
 #include "./trace.h"
 #include "./exception.h"
@@ -116,6 +117,8 @@ namespace nomic {
 			bool m_paused;
 
 			bool m_paused_change;
+
+			nomic::session::manager &m_manager_session;
 
 			nomic::trace &m_manager_trace;
 

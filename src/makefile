@@ -21,9 +21,11 @@ DIR_BIN=./../bin/
 DIR_BUILD=./../build/
 DIR_INC=./../include/
 DIR_INC_CORE=./../include/core/
+DIR_INC_SESSION=./../include/session/
 DIR_INC_UUID=./../include/uuid/
 DIR_SRC=./
 DIR_SRC_CORE=./core/
+DIR_SRC_SESSION=./session/
 DIR_SRC_UUID=./uuid/
 LIB=libnomic.a
 
@@ -34,11 +36,12 @@ archive:
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o $(DIR_BUILD)base_utility.o \
 		$(DIR_BUILD)core_object.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
+		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)uuid_id.o $(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_core build_uuid
+build: build_base build_core build_session build_uuid
 
 ### BASE ###
 
@@ -68,6 +71,13 @@ core_signal.o: $(DIR_SRC_CORE)signal.cpp $(DIR_INC_CORE)signal.h
 
 core_thread.o: $(DIR_SRC_CORE)thread.cpp $(DIR_INC_CORE)thread.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)thread.cpp -o $(DIR_BUILD)core_thread.o
+
+### SESSION ###
+
+build_session: session_manager.o
+
+session_manager.o: $(DIR_SRC_SESSION)manager.cpp $(DIR_INC_SESSION)manager.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SESSION)manager.cpp -o $(DIR_BUILD)session_manager.o
 
 ### UUID ###
 

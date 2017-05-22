@@ -25,6 +25,7 @@ namespace nomic {
 		m_frame_rate(0),
 		m_paused(false),
 		m_paused_change(false),
+		m_manager_session(nomic::session::manager::acquire()),
 		m_manager_trace(nomic::trace::acquire()),
 		m_manager_uuid(nomic::uuid::manager::acquire()),
 		// TODO: acquire managers
@@ -43,6 +44,7 @@ namespace nomic {
 
 		// TODO: release managers
 
+		m_manager_session.release();
 		m_manager_uuid.release();
 
 		TRACE_EXIT(LEVEL_VERBOSE);
@@ -231,7 +233,7 @@ namespace nomic {
 	{
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
-		// TODO: handle pause event
+		m_manager_session.pause();
 
 		TRACE_EXIT(LEVEL_VERBOSE);
 	}
@@ -243,7 +245,7 @@ namespace nomic {
 	{
 		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
 
-		// TODO: handle render event
+		m_manager_session.render(delta);
 
 		TRACE_EXIT(LEVEL_VERBOSE);
 	}
@@ -258,6 +260,7 @@ namespace nomic {
 
 		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime loop entered");
 
+		m_manager_session.initialize();
 		duration = (MILLISECONDS_PER_SECOND / RUNTIME_TICKS_PER_SECOND);
 		frame = 0;
 		next = SDL_GetTicks();
@@ -307,6 +310,8 @@ namespace nomic {
 			}
 		}
 
+		m_manager_session.uninitialize();
+
 		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime loop exited");
 
 		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -326,8 +331,6 @@ namespace nomic {
 
 		TRACE_MESSAGE(LEVEL_INFORMATION, "SDL runtime initialized");
 
-		// TODO: initialize gl managers
-
 		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
@@ -337,17 +340,13 @@ namespace nomic {
 	{
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
-		// TODO: uninitialize gl managers
-
 		SDL_Quit();
 		TRACE_MESSAGE(LEVEL_INFORMATION, "SDL runtime uninitialized");
 
-		// TODO: reset runtime member variables
 		m_frame_rate = 0;
 		m_paused = false;
 		m_paused_change = false;
 		m_tick = 0;
-		// ---
 
 		TRACE_EXIT(LEVEL_VERBOSE);
 	}
@@ -374,7 +373,7 @@ namespace nomic {
 	{
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
-		// TODO: handle unpause event
+		m_manager_session.unpause();
 
 		TRACE_EXIT(LEVEL_VERBOSE);
 	}
@@ -384,7 +383,7 @@ namespace nomic {
 	{
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
-		// TODO: handle update event
+		m_manager_session.update();
 
 		TRACE_EXIT(LEVEL_VERBOSE);
 	}
