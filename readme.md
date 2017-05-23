@@ -24,6 +24,12 @@ make release
 Changelog
 =========
 
+Version 0.1.1721
+----------------
+*Updated: 5/22/2017*
+
+* Added display manager
+
 Version 0.1.1720
 ----------------
 *Updated: 5/20-21/2017*

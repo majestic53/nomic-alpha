@@ -16,28 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_SESSION_MANAGER_H_
-#define NOMIC_SESSION_MANAGER_H_
+#ifndef NOMIC_GRAPHIC_DISPLAY_H_
+#define NOMIC_GRAPHIC_DISPLAY_H_
 
 #include "../core/singleton.h"
-#include "../graphic/display.h"
 
 namespace nomic {
 
-	namespace session {
+	namespace graphic {
 
-		class manager :
-				public SINGLETON_CLASS(nomic::session::manager) {
+		class display :
+				public SINGLETON_CLASS(nomic::graphic::display) {
 
 			public:
 
-				~manager(void);
+				~display(void);
 
-				void render(
-					__in float delta
-					);
+				void clear(void);
 
-				void pause(void);
+				void render(void);
 
 				void set_dimensions(
 					__in const uint32_t width,
@@ -52,39 +49,33 @@ namespace nomic {
 					__in const std::string &title
 					);
 
-				void set_vsync(
-					__in bool vsync
-					);
-
 				std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
-				void unpause(void);
-
-				void update(void);
-
 			protected:
 
-				SINGLETON_CLASS_BASE(nomic::session::manager);
+				SINGLETON_CLASS_BASE(nomic::graphic::display);
 
-				manager(void);
+				display(void);
 
-				manager(
-					__in const manager &other
+				display(
+					__in const display &other
 					) = delete;
 
-				manager &operator=(
-					__in const manager &other
+				display &operator=(
+					__in const display &other
 					) = delete;
 
 				bool on_initialize(void);
 
 				void on_uninitialize(void);
 
-				nomic::graphic::display &m_manager_display;
+				SDL_Window *m_window;
+
+				SDL_GLContext m_window_context;
 		};
 	}
 }
 
-#endif // NOMIC_SESSION_MANAGER_H_
+#endif // NOMIC_GRAPHIC_DISPLAY_H_

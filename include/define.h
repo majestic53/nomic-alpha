@@ -48,9 +48,49 @@ namespace nomic {
 	#define __inout_opt
 #endif // __inout_opt
 
+	#define CHANNEL_MAX UINT8_MAX
+
+	#define DISPLAY_DEFAULT_ALPHA (255 / (float) CHANNEL_MAX)
+	#define DISPLAY_DEFAULT_BLUE (122 / (float) CHANNEL_MAX)
+	#define DISPLAY_DEFAULT_FULLSCREEN false
+	#define DISPLAY_DEFAULT_GREEN (78 / (float) CHANNEL_MAX)
+	#define DISPLAY_DEFAULT_HEIGHT 480
+	#define DISPLAY_DEFAULT_RED (49 / (float) CHANNEL_MAX)
+	#define DISPLAY_DEFAULT_TITLE NOMIC " " STRING_CONCAT(NOMIC_VERSION_MAJOR) "." STRING_CONCAT(NOMIC_VERSION_MINOR) \
+		"." STRING_CONCAT(NOMIC_VERSION_WEEK) "." STRING_CONCAT(NOMIC_VERSION_REVISION)
+	#define DISPLAY_DEFAULT_VSYNC false
+	#define DISPLAY_DEFAULT_WIDTH 640
+	#define DISPLAY_FLAGS_CLEAR (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+	#define DISPLAY_FLAGS_DEFAULT (SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_OPENGL)
+	#define DISPLAY_MOUSE_RELATIVE SDL_TRUE
+
 	#define EXCEPTION_UNKNOWN "Unknown exception"
 
 	#define FORMAT_STRING(_FORMAT_, ...) nomic::utility::format_as_string(_FORMAT_, __VA_ARGS__)
+
+	#define GL_ATTRIBUTE_ACCELERATE_VISUAL 1
+	#define GL_ATTRIBUTE_COLOR_SIZE 8
+	#define GL_ATTRIBUTE_DEPTH_SIZE 24
+	#define GL_ATTRIBUTE_DOUBLEBUFFER 1
+	#define GL_ATTRIBUTE_MAJOR_VERSION 3
+	#define GL_ATTRIBUTE_MINOR_VERSION 3
+
+#ifndef NDEBUG
+	#define _GL_CHECK_ERROR(_LEVEL_, _COMMAND_) { \
+		GLenum err = glGetError(); \
+		while(err != GL_NO_ERROR) { \
+			TRACE_MESSAGE_FORMAT(_LEVEL_, "%s failed! Error=%x(%s)", _COMMAND_, err, GL_ERROR_AS_STRING(err)); \
+			err = glGetError(); \
+		} \
+		}
+	#define GL_CHECK(_LEVEL_, _COMMAND_, ...) _COMMAND_(__VA_ARGS__); _GL_CHECK_ERROR(_LEVEL_, _COMMAND_)
+	#define GL_CHECK_ERROR(_LEVEL_, _COMMAND_, _RESULT_, ...) _RESULT_ = _COMMAND_(__VA_ARGS__); _GL_CHECK_ERROR(_LEVEL_, _COMMAND_)
+#else
+	#define GL_CHECK(_LEVEL_, _COMMAND_, ...) _COMMAND_(__VA_ARGS__)
+	#define GL_CHECK_ERROR(_LEVEL_, _COMMAND_, _RESULT_, ...) _RESULT_ = _COMMAND_(__VA_ARGS__)
+#endif // NDEBUG
+	#define GL_ERROR_AS_STRING(_ERROR_) gluErrorString(_ERROR_)
+	#define GL_FLUSH_ERROR() while(glGetError() != GL_NO_ERROR)
 
 	#define MILLISECONDS_PER_SECOND 1000
 
@@ -59,7 +99,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1720
 
 	#define OBJECT_COUNT 1
@@ -85,6 +125,9 @@ namespace nomic {
 	#define STRING_UNKNOWN "<UNKNOWN>"
 
 	#define STRING_CHECK(_STR_) (_STR_.empty() ? STRING_EMPTY : _STR_.c_str())
+
+	#define _STRING_CONCAT(_STRING_) # _STRING_
+	#define STRING_CONCAT(_STRING_) _STRING_CONCAT(_STRING_)
 
 	#define SUBTYPE_UNDEFINED SCALAR_INVALID(uint32_t)
 
