@@ -21,11 +21,13 @@ DIR_BIN=./../bin/
 DIR_BUILD=./../build/
 DIR_INC=./../include/
 DIR_INC_CORE=./../include/core/
+DIR_INC_EVENT=./../include/event/
 DIR_INC_GRAPHIC=./../include/graphic/
 DIR_INC_SESSION=./../include/session/
 DIR_INC_UUID=./../include/uuid/
 DIR_SRC=./
 DIR_SRC_CORE=./core/
+DIR_SRC_EVENT=./event/
 DIR_SRC_GRAPHIC=./graphic/
 DIR_SRC_SESSION=./session/
 DIR_SRC_UUID=./uuid/
@@ -37,14 +39,15 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o $(DIR_BUILD)base_utility.o \
-		$(DIR_BUILD)core_object.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
+		$(DIR_BUILD)core_event.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
+		$(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)graphic_display.o \
 		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)uuid_id.o $(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_core build_graphic build_session build_uuid
+build: build_base build_core build_event build_graphic build_session build_uuid
 
 ### BASE ###
 
@@ -64,7 +67,10 @@ base_utility.o: $(DIR_SRC)utility.cpp
 
 ### CORE ###
 
-build_core: core_object.o core_signal.o core_thread.o
+build_core: core_event.o core_object.o core_signal.o core_thread.o
+
+core_event.o: $(DIR_SRC_CORE)event.cpp $(DIR_INC_CORE)event.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)event.cpp -o $(DIR_BUILD)core_event.o
 
 core_object.o: $(DIR_SRC_CORE)object.cpp $(DIR_INC_CORE)object.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)object.cpp -o $(DIR_BUILD)core_object.o
@@ -74,6 +80,16 @@ core_signal.o: $(DIR_SRC_CORE)signal.cpp $(DIR_INC_CORE)signal.h
 
 core_thread.o: $(DIR_SRC_CORE)thread.cpp $(DIR_INC_CORE)thread.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)thread.cpp -o $(DIR_BUILD)core_thread.o
+
+### EVENT ###
+
+build_event: event_manager.o event_queue.o
+
+event_manager.o: $(DIR_SRC_EVENT)manager.cpp $(DIR_INC_EVENT)manager.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)manager.cpp -o $(DIR_BUILD)event_manager.o
+
+event_queue.o: $(DIR_SRC_EVENT)queue.cpp $(DIR_INC_EVENT)queue.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)queue.cpp -o $(DIR_BUILD)event_queue.o
 
 ### GRAPHIC ###
 

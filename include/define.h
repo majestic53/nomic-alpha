@@ -99,7 +99,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1721
 
 	#define OBJECT_COUNT 1
@@ -169,6 +169,17 @@ namespace nomic {
 	#define TRACE_PREFIX_EXIT "-"
 
 	#define UID_INVALID 0
+
+	enum {
+		EVENT_INPUT = 0,
+	};
+
+	enum {
+		INPUT_BUTTON = 0,
+		INPUT_KEY,
+		INPUT_MOTION,
+		INPUT_WHEEL,
+	};
 
 	class utility {
 
