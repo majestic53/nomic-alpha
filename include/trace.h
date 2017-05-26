@@ -88,8 +88,6 @@ namespace nomic {
 
 			bool on_run(void);
 
-			void on_stop(void);
-
 			void on_uninitialize(void);
 
 			std::recursive_mutex m_mutex;

@@ -25,7 +25,7 @@ namespace nomic {
 	namespace core {
 
 		event::event(
-			__in uint32_t type,
+			__in_opt uint32_t type,
 			__in_opt uint32_t subtype,
 			__in_opt const std::vector<uint8_t> &data
 			) :

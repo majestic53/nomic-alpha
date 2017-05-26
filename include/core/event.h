@@ -31,8 +31,8 @@ namespace nomic {
 
 			public:
 
-				event(
-					__in uint32_t type,
+				explicit event(
+					__in_opt uint32_t type = EVENT_UNDEFINED,
 					__in_opt uint32_t subtype = SUBTYPE_UNDEFINED,
 					__in_opt const std::vector<uint8_t> &data = std::vector<uint8_t>()
 					);

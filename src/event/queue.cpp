@@ -17,6 +17,7 @@
  */
 
 #include "../../include/event/queue.h"
+#include "../../include/event/manager.h"
 #include "../../include/trace.h"
 #include "./queue_type.h"
 
@@ -76,7 +77,7 @@ namespace nomic {
 
 		void 
 		queue::receive_event(
-			__in nomic::core::event &event
+			__in const nomic::core::event &event
 			)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -105,8 +106,12 @@ namespace nomic {
 				THROW_NOMIC_EVENT_QUEUE_EXCEPTION_FORMAT(NOMIC_EVENT_QUEUE_EXCEPTION_DUPLICATE, "Id=%x", id);
 			}
 
-			// TODO: register event with manager
+			nomic::event::manager &instance = nomic::event::manager::acquire();
+			if(instance.initialized()) {
+				instance.register_id(id, this);
+			}
 
+			instance.release();
 			m_id.insert(id);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -210,7 +215,12 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,"Id=%x", id);
 
-			// TODO: unregister id from manager
+			nomic::event::manager &instance = nomic::event::manager::acquire();
+			if(instance.initialized()) {
+				instance.unregister_id(id, this);
+			}
+
+			instance.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

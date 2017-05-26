@@ -201,12 +201,6 @@ namespace nomic {
 	}
 
 	void 
-	trace::on_stop(void)
-	{
-		flush();
-	}
-
-	void 
 	trace::on_uninitialize(void)
 	{
 

@@ -42,7 +42,7 @@ namespace nomic {
 					);
 
 				void receive_event(
-					__in nomic::core::event &event
+					__in const nomic::core::event &event
 					);
 
 				void register_for_event(

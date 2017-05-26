@@ -25,10 +25,10 @@ namespace nomic {
 		m_frame_rate(0),
 		m_paused(false),
 		m_paused_change(false),
+		m_manager_event(nomic::event::manager::acquire()),
 		m_manager_session(nomic::session::manager::acquire()),
 		m_manager_trace(nomic::trace::acquire()),
 		m_manager_uuid(nomic::uuid::manager::acquire()),
-		// TODO: acquire managers
 		m_tick(0)
 	{
 		m_manager_trace.initialize();
@@ -42,8 +42,7 @@ namespace nomic {
 	{
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
-		// TODO: release managers
-
+		m_manager_event.release();
 		m_manager_session.release();
 		m_manager_uuid.release();
 
@@ -203,8 +202,7 @@ namespace nomic {
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
 		m_manager_uuid.initialize();
-
-		// TODO: initialize managers
+		m_manager_event.initialize();
 
 		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime initialized");
 
@@ -360,8 +358,7 @@ namespace nomic {
 			nomic::core::thread::stop();
 		}
 
-		// TODO: uninitialize managers
-
+		m_manager_event.uninitialize();
 		m_manager_uuid.uninitialize();
 		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime uninitialized");
 

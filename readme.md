@@ -26,7 +26,7 @@ Changelog
 
 Version 0.1.1721
 ----------------
-*Updated: 5/24/2017*
+*Updated: 5/24-25/2017*
 
 * Added event queue/manager
 

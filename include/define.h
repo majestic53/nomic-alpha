@@ -99,7 +99,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_REVISION 3
 	#define NOMIC_VERSION_WEEK 1721
 
 	#define OBJECT_COUNT 1
@@ -119,6 +119,14 @@ namespace nomic {
 	#define SCALAR_INVALID(_TYPE_) ((_TYPE_) -1)
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
+
+	#define SEND_EVENT(_EVENT_) { \
+		nomic::event::manager &instance = nomic::event::manager::acquire(); \
+		if(instance.initialized()) { \
+			instance.receive(_EVENT_); \
+		} \
+		instance.release(); \
+		}
 
 	#define STRING_EMPTY "<EMPTY>"
 	#define STRING_INVALID "<INVALID>"
@@ -145,8 +153,8 @@ namespace nomic {
 			nomic::trace &instance = nomic::trace::acquire(); \
 			if(instance.initialized()) { \
 				instance.generate(_LEVEL_, _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, FORMAT_STRING(_FORMAT_, __VA_ARGS__)); \
-				instance.release(); \
 			} \
+			instance.release(); \
 		} \
 		}
 #else
@@ -171,7 +179,8 @@ namespace nomic {
 	#define UID_INVALID 0
 
 	enum {
-		EVENT_INPUT = 0,
+		EVENT_UNDEFINED = 0,
+		EVENT_INPUT,
 	};
 
 	enum {
