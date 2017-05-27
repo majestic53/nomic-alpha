@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1721
 ----------------
+*Updated: 5/28/2017*
+
+* Added core transform/uniform classes
+
 *Updated: 5/26/2017*
 
 * User input event integration

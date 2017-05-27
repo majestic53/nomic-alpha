@@ -99,7 +99,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 4
+	#define NOMIC_VERSION_REVISION 5
 	#define NOMIC_VERSION_WEEK 1721
 
 	#define OBJECT_COUNT 1
@@ -176,7 +176,13 @@ namespace nomic {
 	#define TRACE_PREFIX_ENTRY "+"
 	#define TRACE_PREFIX_EXIT "-"
 
+	#define TRANSFORM_POSITION_DEFAULT glm::vec4(0.f, 0.f, 0.f, 0.f)
+	#define TRANSFORM_ROTATION_DEFAULT glm::vec4(0.f, 0.f, glm::pi<GLfloat>(), 0.f)
+	#define TRANSFORM_UP_DEFAULT glm::vec4(0.f, 1.f, 0.f, 0.f)
+
 	#define UID_INVALID 0
+
+	#define UNIFORM_MATRIX_DEFAULT glm::mat4(1.f)
 
 	enum {
 		EVENT_UNDEFINED = 0,

@@ -39,7 +39,8 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o $(DIR_BUILD)base_utility.o \
-		$(DIR_BUILD)core_event.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
+		$(DIR_BUILD)core_event.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o \
+			$(DIR_BUILD)core_uniform.o \
 		$(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)graphic_display.o \
 		$(DIR_BUILD)session_manager.o \
@@ -67,7 +68,7 @@ base_utility.o: $(DIR_SRC)utility.cpp
 
 ### CORE ###
 
-build_core: core_event.o core_object.o core_signal.o core_thread.o
+build_core: core_event.o core_object.o core_signal.o core_thread.o core_transform.o core_uniform.o
 
 core_event.o: $(DIR_SRC_CORE)event.cpp $(DIR_INC_CORE)event.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)event.cpp -o $(DIR_BUILD)core_event.o
@@ -80,6 +81,12 @@ core_signal.o: $(DIR_SRC_CORE)signal.cpp $(DIR_INC_CORE)signal.h
 
 core_thread.o: $(DIR_SRC_CORE)thread.cpp $(DIR_INC_CORE)thread.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)thread.cpp -o $(DIR_BUILD)core_thread.o
+
+core_transform.o: $(DIR_SRC_CORE)transform.cpp $(DIR_INC_CORE)transform.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)transform.cpp -o $(DIR_BUILD)core_transform.o
+
+core_uniform.o: $(DIR_SRC_CORE)uniform.cpp $(DIR_INC_CORE)uniform.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)uniform.cpp -o $(DIR_BUILD)core_uniform.o
 
 ### EVENT ###
 
