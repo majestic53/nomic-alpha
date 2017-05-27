@@ -26,6 +26,11 @@ Changelog
 
 Version 0.1.1721
 ----------------
+*Updated: 5/26/2017*
+
+* User input event integration
+* Event queue/manager testing
+
 *Updated: 5/24-25/2017*
 
 * Added event queue/manager

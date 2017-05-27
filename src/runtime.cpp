@@ -106,53 +106,59 @@ namespace nomic {
 		if(!m_paused) {
 
 			while(SDL_PollEvent(&event) && result) {
+				bool send = true;
+				uint8_t *data = nullptr;
+				uint32_t length = 0, subtype = 0;
 
 				switch(event.type) {
 					case SDL_KEYDOWN:
 					case SDL_KEYUP:
 
 						if(!event.key.repeat) {
-							TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE, "Encountered key event=(%s, %s, Code=%x)",
+							TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE, "Encountered key event=(Mode=%s, State=%s, Code=%x)",
 								(event.key.type == SDL_KEYDOWN) ? "Down" : "Up",
 								(event.key.state == SDL_PRESSED) ? "Press" : "Release",
 								event.key.keysym.scancode);
-
-							// TODO: handle keyboard input
+							data = (uint8_t *) &event.key;
+							length = sizeof(SDL_KeyboardEvent);
+							subtype = INPUT_KEY;
 						}
 						break;
 					case SDL_MOUSEBUTTONDOWN:
 					case SDL_MOUSEBUTTONUP:
 						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE,
-							"Encountered mouse button event=(%s, %s, Code=%x, Position={%i, %i}, Click=%u)",
-							(event.button.type == SDL_KEYDOWN) ? "Down" : "Up",
+							"Encountered mouse button event=(Mode=%s, State=%s, Code=%x, Position={%i, %i}, Click=%u)",
+							(event.button.type == SDL_MOUSEBUTTONDOWN) ? "Down" : "Up",
 							(event.button.state == SDL_PRESSED) ? "Press" : "Release",
 							event.button.button, event.button.x, event.button.y, event.button.clicks);
-
-						// TODO: handle mouse button input
-
+						data = (uint8_t *) &event.button;
+						length = sizeof(SDL_MouseButtonEvent);
+						subtype = INPUT_BUTTON;
 						break;
 					case SDL_MOUSEMOTION:
 						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE,
 							"Encountered mouse motion event=(State=%x, Position={%i, %i}, Relative={%i, %i})",
 							event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
-
-						// TODO: handle mouse motion input
-
+						data = (uint8_t *) &event.motion;
+						length = sizeof(SDL_MouseMotionEvent);
+						subtype = INPUT_MOTION;
 						break;
 					case SDL_MOUSEWHEEL:
-						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE, "Encountered mouse wheel event=(%s, Position={%i, %i})",
+						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE, "Encountered mouse wheel event=(Mode=%s, Position={%i, %i})",
 							(event.wheel.direction == SDL_MOUSEWHEEL_NORMAL) ? "Normal" : "Flip",
 							event.wheel.x, event.wheel.y);
-
-						// TODO: handle mouse wheel input
-
+						data = (uint8_t *) &event.wheel;
+						length = sizeof(SDL_MouseWheelEvent);
+						subtype = INPUT_WHEEL;
 						break;
 					case SDL_QUIT:
 						TRACE_MESSAGE(LEVEL_INFORMATION, "Encountered quit event");
+						send = false;
 						result = false;
 						break;
 					case SDL_WINDOWEVENT:
 						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE, "Encountered window event=%x", event.window.event);
+						send = false;
 
 						switch(event.window.event) {
 							case SDL_WINDOWEVENT_FOCUS_LOST:
@@ -162,7 +168,12 @@ namespace nomic {
 						}
 						break;
 					default:
+						send = false;
 						break;
+				}
+
+				if(send) {
+					SEND_EVENT(nomic::core::event(EVENT_INPUT, subtype, std::vector<uint8_t>(data, data + length)));
 				}
 			}
 		} else {

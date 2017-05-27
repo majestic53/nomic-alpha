@@ -99,7 +99,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1721
 
 	#define OBJECT_COUNT 1
@@ -123,7 +123,7 @@ namespace nomic {
 	#define SEND_EVENT(_EVENT_) { \
 		nomic::event::manager &instance = nomic::event::manager::acquire(); \
 		if(instance.initialized()) { \
-			instance.receive(_EVENT_); \
+			instance.receive_event(_EVENT_); \
 		} \
 		instance.release(); \
 		}

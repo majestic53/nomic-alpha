@@ -53,6 +53,10 @@ namespace nomic {
 					__in uint32_t id
 					);
 
+				void send_event(
+					__in const nomic::core::event &event
+					);
+
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;

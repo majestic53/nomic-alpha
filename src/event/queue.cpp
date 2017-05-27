@@ -134,6 +134,23 @@ namespace nomic {
 			return result;
 		}
 
+		void 
+		queue::send_event(
+			__in const nomic::core::event &event
+			)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::event::manager &instance = nomic::event::manager::acquire();
+			if(instance.initialized()) {
+				instance.receive_event(event);
+			}
+
+			instance.release();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		std::string 
 		queue::to_string(
 			__in_opt bool verbose
@@ -177,9 +194,12 @@ namespace nomic {
 
 			std::lock_guard<std::mutex> lock(m_mutex);
 
-			for(std::set<uint32_t>::iterator iter = m_id.begin(); iter != m_id.end(); ++iter) {
-				unregister_event_id(*iter);
+			nomic::event::manager &instance = nomic::event::manager::acquire();
+			if(instance.initialized()) {
+				instance.unregister_all_ids(this);
 			}
+
+			instance.release();
 
 			m_id.clear();
 

@@ -37,7 +37,7 @@ namespace nomic {
 		}
 
 		std::map<uint32_t, std::set<nomic::event::queue *>>::iterator 
-		manager::find(
+		manager::find_id(
 			__in uint32_t id
 			)
 		{
@@ -55,16 +55,16 @@ namespace nomic {
 		}
 
 		void 
-		manager::flush(void)
+		manager::flush_events(void)
 		{
 			nomic::core::event event;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			while(poll(event)) {
+			while(poll_event(event)) {
 
 				if(nomic::core::thread::active()) {
-					send(event);
+					send_event(event);
 				}
 			}
 
@@ -93,8 +93,8 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			while(poll(event)) {
-				send(event);
+			while(poll_event(event)) {
+				send_event(event);
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -117,7 +117,7 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			if(nomic::core::thread::active()) {
-				flush();
+				flush_events();
 				nomic::core::thread::stop();
 			}
 
@@ -127,7 +127,7 @@ namespace nomic {
 		}
 
 		bool 
-		manager::poll(
+		manager::poll_event(
 			__inout nomic::core::event &event
 			)
 		{
@@ -148,7 +148,7 @@ namespace nomic {
 		}
 
 		void 
-		manager::receive(
+		manager::receive_event(
 			__in const nomic::core::event &event
 			)
 		{
@@ -237,7 +237,7 @@ namespace nomic {
 		}
 
 		void 
-		manager::send(
+		manager::send_event(
 			__in nomic::core::event &event
 			)
 		{
@@ -355,7 +355,7 @@ namespace nomic {
 			}
 
 			for(std::set<uint32_t>::iterator iter = cleanup.begin(); iter != cleanup.end(); ++iter) {
-				m_id.erase(find(*iter));
+				m_id.erase(find_id(*iter));
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

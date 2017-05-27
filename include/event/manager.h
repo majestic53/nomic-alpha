@@ -38,9 +38,9 @@ namespace nomic {
 
 				~manager(void);
 
-				void flush(void);
+				void flush_events(void);
 
-				void receive(
+				void receive_event(
 					__in const nomic::core::event &event
 					);
 
@@ -81,7 +81,7 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
-				std::map<uint32_t, std::set<nomic::event::queue *>>::iterator find(
+				std::map<uint32_t, std::set<nomic::event::queue *>>::iterator find_id(
 					__in uint32_t id
 					);
 
@@ -93,11 +93,11 @@ namespace nomic {
 
 				void on_uninitialize(void);
 
-				bool poll(
+				bool poll_event(
 					__inout nomic::core::event &event
 					);
 
-				void send(
+				void send_event(
 					__in nomic::core::event &event
 					);
 
