@@ -84,13 +84,16 @@ namespace nomic {
 		} \
 		}
 	#define GL_CHECK(_LEVEL_, _COMMAND_, ...) _COMMAND_(__VA_ARGS__); _GL_CHECK_ERROR(_LEVEL_, _COMMAND_)
-	#define GL_CHECK_ERROR(_LEVEL_, _COMMAND_, _RESULT_, ...) _RESULT_ = _COMMAND_(__VA_ARGS__); _GL_CHECK_ERROR(_LEVEL_, _COMMAND_)
+	#define GL_CHECK_RESULT(_LEVEL_, _COMMAND_, _RESULT_, ...) (_RESULT_) = _COMMAND_(__VA_ARGS__); _GL_CHECK_ERROR(_LEVEL_, _COMMAND_)
 #else
 	#define GL_CHECK(_LEVEL_, _COMMAND_, ...) _COMMAND_(__VA_ARGS__)
-	#define GL_CHECK_ERROR(_LEVEL_, _COMMAND_, _RESULT_, ...) _RESULT_ = _COMMAND_(__VA_ARGS__)
+	#define GL_CHECK_RESULT(_LEVEL_, _COMMAND_, _RESULT_, ...) (_RESULT_) = _COMMAND_(__VA_ARGS__)
 #endif // NDEBUG
 	#define GL_ERROR_AS_STRING(_ERROR_) gluErrorString(_ERROR_)
 	#define GL_FLUSH_ERROR() while(glGetError() != GL_NO_ERROR)
+
+	#define HANDLE_COUNT 1
+	#define HANDLE_INVALID 0
 
 	#define MILLISECONDS_PER_SECOND 1000
 
@@ -194,6 +197,13 @@ namespace nomic {
 		INPUT_KEY,
 		INPUT_MOTION,
 		INPUT_WHEEL,
+	};
+
+	enum {
+		PRIMITIVE_PROGRAM = 0,
+		PRIMITIVE_SHADER,
+		PRIMITIVE_VAO,
+		PRIMITIVE_VBO,
 	};
 
 	class utility {

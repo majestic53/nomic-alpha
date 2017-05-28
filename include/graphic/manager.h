@@ -16,58 +16,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_SESSION_MANAGER_H_
-#define NOMIC_SESSION_MANAGER_H_
+#ifndef NOMIC_GRAPHIC_MANAGER_H_
+#define NOMIC_GRAPHIC_MANAGER_H_
 
+#include <map>
+#include <tuple>
 #include "../core/singleton.h"
-#include "../graphic/display.h"
-#include "../graphic/manager.h"
 
 namespace nomic {
 
-	namespace session {
+	namespace graphic {
 
 		class manager :
-				public SINGLETON_CLASS(nomic::session::manager) {
+				public SINGLETON_CLASS(nomic::graphic::manager) {
 
 			public:
 
 				~manager(void);
 
-				void render(
-					__in float delta
+				bool contains(
+					__in GLuint handle
 					);
 
-				void pause(void);
-
-				void set_dimensions(
-					__in const uint32_t width,
-					__in const uint32_t height
+				size_t decrement(
+					__in GLuint handle
 					);
 
-				void set_fullscreen(
-					__in bool fullscreen
+				GLuint generate(
+					__in uint32_t type,
+					__in_opt GLenum subtype = SUBTYPE_UNDEFINED
 					);
 
-				void set_title(
-					__in const std::string &title
+				size_t increment(
+					__in GLuint handle
 					);
 
-				void set_vsync(
-					__in bool vsync
+				size_t references(
+					__in GLuint handle
 					);
 
 				std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
-				void unpause(void);
-
-				void update(void);
-
 			protected:
 
-				SINGLETON_CLASS_BASE(nomic::session::manager);
+				SINGLETON_CLASS_BASE(nomic::graphic::manager);
 
 				manager(void);
 
@@ -79,15 +73,21 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
+				void destroy(
+					__in std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator iter
+					);
+
+				std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator find(
+					__in GLuint handle
+					);
+
 				bool on_initialize(void);
 
 				void on_uninitialize(void);
 
-				nomic::graphic::display &m_manager_display;
-
-				nomic::graphic::manager &m_manager_graphic;
+				std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>> m_handle;
 		};
 	}
 }
 
-#endif // NOMIC_SESSION_MANAGER_H_
+#endif // NOMIC_GRAPHIC_MANAGER_H_

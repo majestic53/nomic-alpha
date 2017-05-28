@@ -37,7 +37,8 @@ namespace nomic {
 			};
 
 		manager::manager(void) :
-			m_manager_display(nomic::graphic::display::acquire())
+			m_manager_display(nomic::graphic::display::acquire()),
+			m_manager_graphic(nomic::graphic::manager::acquire())
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -48,6 +49,7 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			m_manager_display.release();
+			m_manager_graphic.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -70,9 +72,6 @@ namespace nomic {
 			}
 
 			m_manager_display.initialize();
-
-			// TODO: initialize gl managers
-
 			glewExperimental = GL_TRUE;
 
 			err = glewInit();
@@ -95,6 +94,10 @@ namespace nomic {
 					"SDL_SetRelativeMouseMode(%x) failed! Error=%s", DISPLAY_MOUSE_RELATIVE, SDL_GetError());
 			}
 
+			// TODO: initialize gl managers
+
+			m_manager_graphic.initialize();
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initialized");
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -108,6 +111,7 @@ namespace nomic {
 
 			// TODO: uninitialize gl managers
 
+			m_manager_graphic.uninitialize();
 			m_manager_display.uninitialize();
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager uninitialized");

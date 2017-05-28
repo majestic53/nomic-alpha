@@ -26,8 +26,9 @@ Changelog
 
 Version 0.1.1721
 ----------------
-*Updated: 5/28/2017*
+*Updated: 5/28-29/2017*
 
+* Added graphic manager/primitive classes
 * Added core transform/uniform classes
 
 *Updated: 5/26/2017*

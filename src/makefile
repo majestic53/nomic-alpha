@@ -39,10 +39,10 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o $(DIR_BUILD)base_utility.o \
-		$(DIR_BUILD)core_event.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o \
-			$(DIR_BUILD)core_uniform.o \
+		$(DIR_BUILD)core_event.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_primitive.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
+			$(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
 		$(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
-		$(DIR_BUILD)graphic_display.o \
+		$(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o\
 		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)uuid_id.o $(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
@@ -68,13 +68,16 @@ base_utility.o: $(DIR_SRC)utility.cpp
 
 ### CORE ###
 
-build_core: core_event.o core_object.o core_signal.o core_thread.o core_transform.o core_uniform.o
+build_core: core_event.o core_object.o core_primitive.o core_signal.o core_thread.o core_transform.o core_uniform.o
 
 core_event.o: $(DIR_SRC_CORE)event.cpp $(DIR_INC_CORE)event.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)event.cpp -o $(DIR_BUILD)core_event.o
 
 core_object.o: $(DIR_SRC_CORE)object.cpp $(DIR_INC_CORE)object.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)object.cpp -o $(DIR_BUILD)core_object.o
+
+core_primitive.o: $(DIR_SRC_CORE)primitive.cpp $(DIR_INC_CORE)primitive.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)primitive.cpp -o $(DIR_BUILD)core_primitive.o
 
 core_signal.o: $(DIR_SRC_CORE)signal.cpp $(DIR_INC_CORE)signal.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)signal.cpp -o $(DIR_BUILD)core_signal.o
@@ -100,10 +103,13 @@ event_queue.o: $(DIR_SRC_EVENT)queue.cpp $(DIR_INC_EVENT)queue.h
 
 ### GRAPHIC ###
 
-build_graphic: graphic_display.o
+build_graphic: graphic_display.o graphic_manager.o
 
 graphic_display.o: $(DIR_SRC_GRAPHIC)display.cpp $(DIR_INC_GRAPHIC)display.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)display.cpp -o $(DIR_BUILD)graphic_display.o
+
+graphic_manager.o: $(DIR_SRC_GRAPHIC)manager.cpp $(DIR_INC_GRAPHIC)manager.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)manager.cpp -o $(DIR_BUILD)graphic_manager.o
 
 ### SESSION ###
 
