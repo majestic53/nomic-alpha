@@ -102,7 +102,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 5
+	#define NOMIC_VERSION_REVISION 6
 	#define NOMIC_VERSION_WEEK 1721
 
 	#define OBJECT_COUNT 1
