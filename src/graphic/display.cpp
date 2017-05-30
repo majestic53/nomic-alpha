@@ -61,6 +61,8 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Display manager initializing...");
+
 			m_window = SDL_CreateWindow(DISPLAY_DEFAULT_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, DISPLAY_DEFAULT_WIDTH,
 				DISPLAY_DEFAULT_HEIGHT, DISPLAY_FLAGS_DEFAULT);
 
@@ -94,6 +96,8 @@ namespace nomic {
 		display::on_uninitialize(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Display manager uninitializing...");
 
 			if(m_window_context) {
 				SDL_GL_DeleteContext(m_window_context);

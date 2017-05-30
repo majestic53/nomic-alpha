@@ -84,8 +84,8 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::graphic::manager &instance = nomic::graphic::manager::acquire();
-			if(instance.initialized() && instance.contains(m_handle)) {
-				instance.decrement(m_handle);
+			if(instance.initialized() && instance.contains(m_type, m_handle)) {
+				instance.decrement(m_type, m_handle);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -118,8 +118,8 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::graphic::manager &instance = nomic::graphic::manager::acquire();
-			if(instance.initialized() && instance.contains(m_handle)) {
-				instance.increment(m_handle);
+			if(instance.initialized() && instance.contains(m_type, m_handle)) {
+				instance.increment(m_type, m_handle);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

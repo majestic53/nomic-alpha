@@ -20,7 +20,6 @@
 #define NOMIC_GRAPHIC_MANAGER_H_
 
 #include <map>
-#include <tuple>
 #include "../core/singleton.h"
 
 namespace nomic {
@@ -35,10 +34,12 @@ namespace nomic {
 				~manager(void);
 
 				bool contains(
+					__in uint32_t type,
 					__in GLuint handle
 					);
 
 				size_t decrement(
+					__in uint32_t type,
 					__in GLuint handle
 					);
 
@@ -48,10 +49,12 @@ namespace nomic {
 					);
 
 				size_t increment(
+					__in uint32_t type,
 					__in GLuint handle
 					);
 
 				size_t references(
+					__in uint32_t type,
 					__in GLuint handle
 					);
 
@@ -74,10 +77,12 @@ namespace nomic {
 					) = delete;
 
 				void destroy(
-					__in std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator iter
+					__in uint32_t type,
+					__in std::map<GLuint, std::pair<size_t, GLenum>>::iterator iter
 					);
 
-				std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator find(
+				std::map<GLuint, std::pair<size_t, GLenum>>::iterator find(
+					__in uint32_t type,
 					__in GLuint handle
 					);
 
@@ -85,7 +90,7 @@ namespace nomic {
 
 				void on_uninitialize(void);
 
-				std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>> m_handle;
+				std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>> m_handle;
 		};
 	}
 }

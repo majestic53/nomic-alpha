@@ -28,7 +28,7 @@ Version 0.1.1721
 ----------------
 *Updated: 5/28-29/2017*
 
-* Added graphic manager/primitive classes
+* Refactored graphic manager/primitive classes
 	* Added vao/vbo child classes
 * Added core transform/uniform classes
 

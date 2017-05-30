@@ -62,6 +62,8 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initializing...");
+
 			for(std::map<SDL_GLattr, GLint>::const_iterator iter = DISPLAY_ATTRIBUTE.begin(); iter != DISPLAY_ATTRIBUTE.end();
 					++iter) {
 
@@ -109,6 +111,8 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager uninitializing...");
+
 			// TODO: uninitialize gl managers
 
 			m_manager_graphic.uninitialize();
@@ -123,6 +127,8 @@ namespace nomic {
 		manager::pause(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager pausing...");
 
 			// TODO: handle pause event
 
@@ -242,6 +248,8 @@ namespace nomic {
 		manager::unpause(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager unpausing...");
 
 			// TODO: handle unpause event
 

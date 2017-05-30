@@ -24,12 +24,6 @@ namespace nomic {
 
 	namespace graphic {
 
-		enum {
-			HANDLE_REFERENCES = 0,
-			HANDLE_SUBTYPE,
-			HANDLE_TYPE,
-		};
-
 		manager::manager(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -44,14 +38,28 @@ namespace nomic {
 
 		bool 
 		manager::contains(
+			__in uint32_t type,
 			__in GLuint handle
 			)
 		{
 			bool result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%x", handle);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
 
-			result = (m_handle.find(handle) != m_handle.end());
+			if(!m_initialized) {
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(handle == HANDLE_INVALID) {
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_HANDLE, "Handle=%x", handle);
+			}
+
+			std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter = m_handle.find(type);
+
+			result = (iter != m_handle.end());
+			if(result) {
+				result = (iter->second.find(handle) != iter->second.end());
+			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -59,23 +67,33 @@ namespace nomic {
 
 		size_t 
 		manager::decrement(
+			__in uint32_t type,
 			__in GLuint handle
 			)
 		{
 			size_t result = 0;
+			std::map<GLuint, std::pair<size_t, GLenum>>::iterator iter_handle;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%x", handle);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator iter = find(handle);
-			if(std::get<HANDLE_REFERENCES>(iter->second) <= REFERENCE_INIT) {
-				destroy(iter);
-				m_handle.erase(iter);
+			iter_handle = find(type, handle);
+			if(iter_handle->second.first <= REFERENCE_INIT) {
+				destroy(type, iter_handle);
+
+				std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter_type = m_handle.find(type);
+				if(iter_type != m_handle.end()) {
+					iter_type->second.erase(iter_handle);
+
+					if(iter_type->second.empty()) {
+						m_handle.erase(iter_type);
+					}
+				}
 			} else {
-				result = --std::get<HANDLE_REFERENCES>(iter->second);
+				result = --iter_handle->second.first;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
@@ -84,16 +102,12 @@ namespace nomic {
 
 		void 
 		manager::destroy(
-			__in std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator iter
+			__in uint32_t type,
+			__in std::map<GLuint, std::pair<size_t, GLenum>>::iterator iter
 			)
 		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
 
-			if(iter == m_handle.end()) {
-				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_HANDLE, "Handle=%x", iter->first);
-			}
-
-			uint32_t type = std::get<HANDLE_TYPE>(iter->second);
 			switch(type) {
 				case PRIMITIVE_PROGRAM:
 					GL_CHECK(LEVEL_WARNING, glDeleteProgram, iter->first);
@@ -114,18 +128,28 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
-		std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator 
+		std::map<GLuint, std::pair<size_t, GLenum>>::iterator 
 		manager::find(
+			__in uint32_t type,
 			__in GLuint handle
 			)
 		{
-			std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator result;
+			std::map<GLuint, std::pair<size_t, GLenum>>::iterator result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%x", handle);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
 
-			result = m_handle.find(handle);
-			if(result == m_handle.end()) {
-				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_NOT_FOUND, "Handle=%x", handle);
+			if(handle == HANDLE_INVALID) {
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_HANDLE, "Handle=%x", handle);
+			}
+
+			std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter = m_handle.find(type);
+			if(iter == m_handle.end()) {
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_TYPE_NOT_FOUND, "Type=%x", type);
+			}
+
+			result = iter->second.find(handle);
+			if(result == iter->second.end()) {
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_HANDLE_NOT_FOUND, "Handle=%x", handle);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -138,13 +162,10 @@ namespace nomic {
 			__in_opt GLenum subtype
 			)
 		{
-			GLuint result;
+			GLuint result = HANDLE_INVALID;
+			std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", type, subtype);
-
-			if(!m_initialized) {
-				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
-			}
 
 			switch(type) {
 				case PRIMITIVE_PROGRAM:
@@ -163,7 +184,20 @@ namespace nomic {
 					THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_TYPE, "Type=%x", type);
 			}
 
-			m_handle.insert(std::make_pair(result, std::make_tuple(REFERENCE_INIT, subtype, type)));
+			if(result == HANDLE_INVALID) {
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_HANDLE, "Handle=%x", result);
+			}
+
+			if(m_handle.find(type) == m_handle.end()) {
+				m_handle.insert(std::make_pair(type, std::map<GLuint, std::pair<size_t, GLenum>>()));
+			}
+
+			iter = m_handle.find(type);
+			if(iter->second.find(result) != iter->second.end()) {
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_DUPLICATE_HANDLE, "Handle=%x", result);
+			}
+
+			iter->second.insert(std::make_pair(result, std::make_pair(REFERENCE_INIT, subtype)));
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -171,18 +205,19 @@ namespace nomic {
 
 		size_t 
 		manager::increment(
+			__in uint32_t type,
 			__in GLuint handle
 			)
 		{
 			size_t result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%x", handle);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			result = ++std::get<HANDLE_REFERENCES>(find(handle)->second);
+			result = ++find(type, handle)->second.first;
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return result;
@@ -195,9 +230,10 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Graphic manager initializing...");
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Graphic manager initialized");
 
-			TRACE_EXIT(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
 		}
 
@@ -206,9 +242,17 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			for(std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::iterator iter = m_handle.begin(); iter != m_handle.end();
-					++iter) {
-				destroy(iter);
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Graphic manager uninitializing...");
+
+			for(std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter_type = m_handle.begin();
+					iter_type != m_handle.end(); ++iter_type) {
+
+				for(std::map<GLuint, std::pair<size_t, GLenum>>::iterator iter_handle = iter_type->second.begin();
+						iter_handle != iter_type->second.end(); ++iter_handle) {
+					destroy(iter_type->first, iter_handle);
+				}
+
+				iter_type->second.clear();
 			}
 
 			m_handle.clear();
@@ -220,18 +264,19 @@ namespace nomic {
 
 		size_t 
 		manager::references(
+			__in uint32_t type,
 			__in GLuint handle
 			)
 		{
 			size_t result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%x", handle);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			result = std::get<HANDLE_REFERENCES>(find(handle)->second);
+			result = find(type, handle)->second.first;
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return result;
@@ -255,17 +300,35 @@ namespace nomic {
 				if(!m_handle.empty()) {
 					result << "={";
 
-					for(std::map<GLuint, std::tuple<size_t, GLenum, uint32_t>>::const_iterator iter = m_handle.begin();
-							iter != m_handle.end(); ++iter) {
+					for(std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::const_iterator iter_type = m_handle.begin();
+							iter_type != m_handle.end(); ++iter_type) {
 
-						if(iter != m_handle.begin()) {
+						if(iter_type != m_handle.begin()) {
 							result << ", ";
 						}
 
-						result << "(" << SCALAR_AS_HEX(GLuint, iter->first)
-							<< ", Type=" << SCALAR_AS_HEX(uint32_t, std::get<HANDLE_TYPE>(iter->second))
-							<< ", Subtype=" << SCALAR_AS_HEX(GLenum, std::get<HANDLE_SUBTYPE>(iter->second))
-							<< ", References=" << std::get<HANDLE_REFERENCES>(iter->second) << ")";
+						result << "(" << SCALAR_AS_HEX(uint32_t, iter_type->first) << "[" << iter_type->second.size() << "]";
+
+						if(!iter_type->second.empty()) {
+							result << "={";
+
+							for(std::map<GLuint, std::pair<size_t, GLenum>>::const_iterator iter_handle
+									= iter_type->second.begin(); iter_handle != iter_type->second.end();
+									++iter_handle) {
+
+								if(iter_handle != iter_type->second.begin()) {
+									result << ", ";
+								}
+
+								result << "(Handle=" << SCALAR_AS_HEX(GLuint, iter_handle->first)
+									<< ", Enum=" << SCALAR_AS_HEX(GLenum, iter_handle->second.second)
+									<< ", Reference=" << iter_handle->second.first << ")";
+							}
+
+							result << "}";
+						}
+
+						result << ")";
 					}
 
 					result << "}";

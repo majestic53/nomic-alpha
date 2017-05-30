@@ -17,6 +17,7 @@
  */
 
 #include <cstdarg>
+#include <fstream>
 #include "../include/define.h"
 #include "./utility_type.h"
 
@@ -51,6 +52,38 @@ namespace nomic {
 				result = NOMIC_UTILITY_EXCEPTION_STRING(NOMIC_UTILITY_EXCEPTION_FORMAT_MALFORMED);
 			}
 		}
+
+		return result;
+	}
+
+	std::string 
+	utility::read_file(
+		__in const std::string &path
+		)
+	{
+		size_t length;
+		std::string result;
+		std::ifstream file;
+
+		if(path.empty()) {
+			THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_PATH_MALFORMED, "Path[%u]=%p", path.size(), &path[0]);
+		}
+
+		file = std::ifstream(path.c_str(), std::ios::in);
+		if(!file) {
+			THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_PATH_MALFORMED, "Path[%u]=%s", path.size(), STRING_CHECK(path));
+		}
+
+		file.seekg(0, std::ios::end);
+		length = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		if(length) {
+			result.resize(length, 0);
+			file.read(&result[0], result.size());
+		}
+
+		file.close();
 
 		return result;
 	}

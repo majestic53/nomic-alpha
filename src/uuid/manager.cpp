@@ -193,6 +193,7 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Uuid manager initializing...");
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Uuid manager initialized");
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -204,7 +205,10 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Uuid manager uninitializing...");
+
 			clear();
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Uuid manager uninitialized");
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -257,7 +261,7 @@ namespace nomic {
 								result << ", ";
 							}
 
-							result << "(" << SCALAR_AS_HEX(uint32_t, iter->first) << ", Ref=" << iter->second << ")";
+							result << "(" << SCALAR_AS_HEX(uint32_t, iter->first) << ", Reference=" << iter->second << ")";
 						}
 
 						result << "}";

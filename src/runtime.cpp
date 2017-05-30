@@ -212,6 +212,8 @@ namespace nomic {
 
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
+		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime initializing...");
+
 		m_manager_uuid.initialize();
 		m_manager_event.initialize();
 
@@ -273,7 +275,7 @@ namespace nomic {
 		duration = (MILLISECONDS_PER_SECOND / RUNTIME_TICKS_PER_SECOND);
 		frame = 0;
 		next = SDL_GetTicks();
-		TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Ticks/second=%u (%u ms)", RUNTIME_TICKS_PER_SECOND, duration);
+		TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Runtime ticks/second=%u (%u ms)", RUNTIME_TICKS_PER_SECOND, duration);
 
 		while(nomic::core::thread::active()) {
 
@@ -350,6 +352,7 @@ namespace nomic {
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
 		SDL_Quit();
+
 		TRACE_MESSAGE(LEVEL_INFORMATION, "SDL runtime uninitialized");
 
 		m_frame_rate = 0;
@@ -365,12 +368,15 @@ namespace nomic {
 	{
 		TRACE_ENTRY(LEVEL_VERBOSE);
 
+		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime uninitializing...");
+
 		if(nomic::core::thread::active()) {
 			nomic::core::thread::stop();
 		}
 
 		m_manager_event.uninitialize();
 		m_manager_uuid.uninitialize();
+
 		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime uninitialized");
 
 		TRACE_EXIT(LEVEL_VERBOSE);

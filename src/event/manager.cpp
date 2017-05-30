@@ -78,7 +78,10 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Event manager initializing...");
+
 			nomic::core::thread::start(true);
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Event manager initialized");
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -115,6 +118,8 @@ namespace nomic {
 		manager::on_uninitialize(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Event manager uninitializing...");
 
 			if(nomic::core::thread::active()) {
 				flush_events();

@@ -54,12 +54,12 @@ namespace nomic {
 	#define DISPLAY_DEFAULT_BLUE (122 / (float) CHANNEL_MAX)
 	#define DISPLAY_DEFAULT_FULLSCREEN false
 	#define DISPLAY_DEFAULT_GREEN (78 / (float) CHANNEL_MAX)
-	#define DISPLAY_DEFAULT_HEIGHT 480
+	#define DISPLAY_DEFAULT_HEIGHT 768
 	#define DISPLAY_DEFAULT_RED (49 / (float) CHANNEL_MAX)
 	#define DISPLAY_DEFAULT_TITLE NOMIC " " STRING_CONCAT(NOMIC_VERSION_MAJOR) "." STRING_CONCAT(NOMIC_VERSION_MINOR) \
 		"." STRING_CONCAT(NOMIC_VERSION_WEEK) "." STRING_CONCAT(NOMIC_VERSION_REVISION)
 	#define DISPLAY_DEFAULT_VSYNC false
-	#define DISPLAY_DEFAULT_WIDTH 640
+	#define DISPLAY_DEFAULT_WIDTH 1024
 	#define DISPLAY_FLAGS_CLEAR (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 	#define DISPLAY_FLAGS_DEFAULT (SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_OPENGL)
 	#define DISPLAY_MOUSE_RELATIVE SDL_TRUE
@@ -102,7 +102,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 6
+	#define NOMIC_VERSION_REVISION 7
 	#define NOMIC_VERSION_WEEK 1721
 
 	#define OBJECT_COUNT 1
@@ -213,6 +213,10 @@ namespace nomic {
 			static std::string format_as_string(
 				__in const char *format,
 				...
+				);
+
+			static std::string read_file(
+				__in const std::string &path
 				);
 
 			static time_t timestamp(void);
