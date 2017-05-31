@@ -45,7 +45,7 @@ namespace nomic {
 					__in const primitive &other
 					);
 
-				GLuint handle(void);
+				GLuint handle(void) const;
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false

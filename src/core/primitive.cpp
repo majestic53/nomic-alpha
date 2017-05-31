@@ -105,7 +105,7 @@ namespace nomic {
 		}
 
 		GLuint 
-		primitive::handle(void)
+		primitive::handle(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_handle);

@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1721
 ----------------
+*Updated: 5/30/2017*
+
+* Added program primitive class
+
 *Updated: 5/28-29/2017*
 
 * Refactored graphic manager/primitive classes
