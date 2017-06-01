@@ -16,14 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../include/uuid/id.h"
+#include "../../include/core/id.h"
 #include "../../include/uuid/manager.h"
 #include "../../include/trace.h"
 #include "./id_type.h"
 
 namespace nomic {
 
-	namespace uuid {
+	namespace core {
 
 		id::id(void) :
 			m_id(UID_INVALID)
@@ -165,7 +165,7 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
 
-			result << NOMIC_UUID_ID_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
+			result << NOMIC_CORE_ID_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
 				result << " Id=";

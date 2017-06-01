@@ -21,12 +21,14 @@ DIR_BIN=./../bin/
 DIR_BUILD=./../build/
 DIR_INC=./../include/
 DIR_INC_CORE=./../include/core/
+DIR_INC_ENTITY=./../include/entity/
 DIR_INC_EVENT=./../include/event/
 DIR_INC_GRAPHIC=./../include/graphic/
 DIR_INC_SESSION=./../include/session/
 DIR_INC_UUID=./../include/uuid/
 DIR_SRC=./
 DIR_SRC_CORE=./core/
+DIR_SRC_ENTITY=./entity/
 DIR_SRC_EVENT=./event/
 DIR_SRC_GRAPHIC=./graphic/
 DIR_SRC_SESSION=./session/
@@ -39,17 +41,18 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o $(DIR_BUILD)base_utility.o \
-		$(DIR_BUILD)core_event.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_primitive.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
-			$(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
-		$(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
+		$(DIR_BUILD)core_entity.o $(DIR_BUILD)core_event.o $(DIR_BUILD)core_id.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_primitive.o \
+			$(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
+		$(DIR_BUILD)entity_manager.o \
+		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o \
 			$(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
 		$(DIR_BUILD)session_manager.o \
-		$(DIR_BUILD)uuid_id.o $(DIR_BUILD)uuid_manager.o
+		$(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_core build_event build_graphic build_session build_uuid
+build: build_base build_core build_entity build_event build_graphic build_session build_uuid
 
 ### BASE ###
 
@@ -69,10 +72,16 @@ base_utility.o: $(DIR_SRC)utility.cpp
 
 ### CORE ###
 
-build_core: core_event.o core_object.o core_primitive.o core_signal.o core_thread.o core_transform.o core_uniform.o
+build_core: core_entity.o core_event.o core_id.o core_object.o core_primitive.o core_signal.o core_thread.o core_transform.o core_uniform.o
+
+core_entity.o: $(DIR_SRC_CORE)entity.cpp $(DIR_INC_CORE)entity.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)entity.cpp -o $(DIR_BUILD)core_entity.o
 
 core_event.o: $(DIR_SRC_CORE)event.cpp $(DIR_INC_CORE)event.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)event.cpp -o $(DIR_BUILD)core_event.o
+
+core_id.o: $(DIR_SRC_CORE)id.cpp $(DIR_INC_CORE)id.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)id.cpp -o $(DIR_BUILD)core_id.o
 
 core_object.o: $(DIR_SRC_CORE)object.cpp $(DIR_INC_CORE)object.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)object.cpp -o $(DIR_BUILD)core_object.o
@@ -92,9 +101,19 @@ core_transform.o: $(DIR_SRC_CORE)transform.cpp $(DIR_INC_CORE)transform.h
 core_uniform.o: $(DIR_SRC_CORE)uniform.cpp $(DIR_INC_CORE)uniform.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)uniform.cpp -o $(DIR_BUILD)core_uniform.o
 
+### ENTITY ###
+
+build_entity: entity_manager.o
+
+entity_manager.o: $(DIR_SRC_ENTITY)manager.cpp $(DIR_INC_ENTITY)manager.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)manager.cpp -o $(DIR_BUILD)entity_manager.o
+
 ### EVENT ###
 
-build_event: event_manager.o event_queue.o
+build_event: event_input.o event_manager.o event_queue.o
+
+event_input.o: $(DIR_SRC_EVENT)input.cpp $(DIR_INC_EVENT)input.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)input.cpp -o $(DIR_BUILD)event_input.o
 
 event_manager.o: $(DIR_SRC_EVENT)manager.cpp $(DIR_INC_EVENT)manager.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)manager.cpp -o $(DIR_BUILD)event_manager.o
@@ -133,10 +152,7 @@ session_manager.o: $(DIR_SRC_SESSION)manager.cpp $(DIR_INC_SESSION)manager.h
 
 ### UUID ###
 
-build_uuid: uuid_id.o uuid_manager.o
-
-uuid_id.o: $(DIR_SRC_UUID)id.cpp $(DIR_INC_UUID)id.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_UUID)id.cpp -o $(DIR_BUILD)uuid_id.o
+build_uuid: uuid_manager.o
 
 uuid_manager.o: $(DIR_SRC_UUID)manager.cpp $(DIR_INC_UUID)manager.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_UUID)manager.cpp -o $(DIR_BUILD)uuid_manager.o

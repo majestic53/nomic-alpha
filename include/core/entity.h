@@ -16,46 +16,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_UUID_ID_H_
-#define NOMIC_UUID_ID_H_
+#ifndef NOMIC_CORE_ENTITY_H_
+#define NOMIC_CORE_ENTITY_H_
 
-#include "../define.h"
+#include "./id.h"
+#include "./object.h"
 
 namespace nomic {
 
-	namespace uuid {
+	namespace core {
 
-		class id {
+		class entity :
+				public nomic::core::id,
+				public nomic::core::object {
 
 			public:
 
-				id(void);
-
-				id(
-					__in const id &other
+				entity(
+					__in uint32_t type,
+					__in uint32_t subtype = SUBTYPE_UNDEFINED
 					);
 
-				virtual ~id(void);
-
-				id &operator=(
-					__in const id &other
+				entity(
+					__in const entity &other
 					);
 
-				bool operator==(
-					__in const id &other
+				virtual ~entity(void);
+
+				entity &operator=(
+					__in const entity &other
 					);
 
-				bool operator!=(
-					__in const id &other
+				virtual void render(
+					__in float delta
 					);
-
-				uint32_t get_id(void);
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
-				bool valid_id(void);
+				virtual void update(void);
 
 			protected:
 
@@ -64,10 +64,8 @@ namespace nomic {
 				void generate(void);
 
 				void increment(void);
-
-				uint32_t m_id;
 		};
 	}
 }
 
-#endif // NOMIC_UUID_ID_H_
+#endif // NOMIC_CORE_ENTITY_H_

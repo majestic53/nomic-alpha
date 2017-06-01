@@ -24,6 +24,13 @@ make release
 Changelog
 =========
 
+Version 0.1.1722
+----------------
+*Updated: 5/31/2017*
+
+* Added entity/manager class (incomplete)
+* Added input event class
+
 Version 0.1.1721
 ----------------
 *Updated: 5/30/2017*
@@ -48,18 +55,6 @@ Version 0.1.1721
 *Updated: 5/22/2017*
 
 * Added display manager
-
-Version 0.1.1720
-----------------
-*Updated: 5/20-21/2017*
-
-* Added session manager
-* Added runtime loop and event handlers
-* Added runtime tracing
-
-*Updated: 5/19/2017*
-
-* Initial commit
 
 *Changelog truncated (see file history for full log)*
 
