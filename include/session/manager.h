@@ -19,7 +19,7 @@
 #ifndef NOMIC_SESSION_MANAGER_H_
 #define NOMIC_SESSION_MANAGER_H_
 
-#include "../core/singleton.h"
+#include "../entity/manager.h"
 #include "../graphic/display.h"
 #include "../graphic/manager.h"
 
@@ -84,6 +84,8 @@ namespace nomic {
 				void on_uninitialize(void);
 
 				nomic::graphic::display &m_manager_display;
+
+				nomic::entity::manager &m_manager_entity;
 
 				nomic::graphic::manager &m_manager_graphic;
 		};

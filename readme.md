@@ -26,9 +26,9 @@ Changelog
 
 Version 0.1.1722
 ----------------
-*Updated: 5/31/2017*
+*Updated: 5/31-6/1/2017*
 
-* Added entity/manager class (incomplete)
+* Added entity/manager class <s>(incomplete)</s>
 * Added input event class
 
 Version 0.1.1721

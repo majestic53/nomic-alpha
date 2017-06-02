@@ -32,7 +32,7 @@ namespace nomic {
 
 			public:
 
-				entity(
+				explicit entity(
 					__in uint32_t type,
 					__in uint32_t subtype = SUBTYPE_UNDEFINED
 					);
@@ -47,9 +47,11 @@ namespace nomic {
 					__in const entity &other
 					);
 
-				virtual void render(
-					__in float delta
+				void enable(
+					__in bool state
 					);
+
+				bool enabled(void) const;
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
@@ -59,11 +61,11 @@ namespace nomic {
 
 			protected:
 
-				void decrement(void);
+				void add(void);
 
-				void generate(void);
+				void remove(void);
 
-				void increment(void);
+				bool m_enabled;
 		};
 	}
 }

@@ -49,7 +49,7 @@ namespace nomic {
 					__in const id &other
 					);
 
-				uint32_t get_id(void);
+				uint32_t get_id(void) const;
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
