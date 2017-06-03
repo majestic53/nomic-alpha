@@ -26,10 +26,12 @@ namespace nomic {
 
 		uniform::uniform(
 			__in_opt const glm::mat4 &model,
-			__in_opt const glm::mat4 &projection
+			__in_opt const glm::mat4 &projection,
+			__in_opt const glm::mat4 &view
 			) :
 				m_model(model),
-				m_projection(projection)
+				m_projection(projection),
+				m_view(view)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE); 
@@ -39,7 +41,8 @@ namespace nomic {
 			__in const uniform &other
 			) :
 				m_model(other.m_model),
-				m_projection(other.m_projection)
+				m_projection(other.m_projection),
+				m_view(other.m_view)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -61,6 +64,7 @@ namespace nomic {
 			if(this != &other) {
 				m_model = other.m_model;
 				m_projection = other.m_projection;
+				m_view = other.m_view;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
@@ -90,6 +94,7 @@ namespace nomic {
 
 			m_model = UNIFORM_MATRIX_DEFAULT;
 			m_projection = UNIFORM_MATRIX_DEFAULT;
+			m_view = UNIFORM_MATRIX_DEFAULT;
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -106,24 +111,21 @@ namespace nomic {
 			result << NOMIC_CORE_UNIFORM_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
-				result << " Base=" << nomic::core::transform::to_string(verbose);
+				result << " Model=" << SCALAR_AS_HEX(uintptr_t, &m_model)
+					<< ", Projection=" << SCALAR_AS_HEX(uintptr_t, &m_projection)
+					<< ", View=" << SCALAR_AS_HEX(uintptr_t, &m_view);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 			return result.str();
 		}
 
-		glm::mat4 
+		glm::mat4 &
 		uniform::view(void)
 		{
-			glm::mat4 result;
-
 			TRACE_ENTRY(LEVEL_VERBOSE);
-
-			result = glm::lookAt(m_position, m_position + m_rotation, m_up);
-
 			TRACE_EXIT(LEVEL_VERBOSE);
-			return result;
+			return m_view;
 		}
 	}
 }

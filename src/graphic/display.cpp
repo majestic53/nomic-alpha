@@ -115,36 +115,18 @@ namespace nomic {
 		}
 
 		void 
-		display::render(void)
-		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
-
-			if(!m_initialized) {
-				THROW_NOMIC_GRAPHIC_DISPLAY_EXCEPTION(NOMIC_GRAPHIC_DISPLAY_EXCEPTION_UNINITIALIZED);
-			}
-
-			GL_CHECK(LEVEL_WARNING, glClearColor, DISPLAY_DEFAULT_RED, DISPLAY_DEFAULT_GREEN, DISPLAY_DEFAULT_BLUE,
-				DISPLAY_DEFAULT_ALPHA);
-			GL_CHECK(LEVEL_WARNING, glClear, DISPLAY_FLAGS_CLEAR);
-			SDL_GL_SwapWindow(m_window);
-
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		void 
 		display::set_dimensions(
-			__in const uint32_t width,
-			__in const uint32_t height
+			__in const glm::uvec2 &dimension
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", width, height);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimension.x, dimension.y);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_DISPLAY_EXCEPTION(NOMIC_GRAPHIC_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			SDL_SetWindowSize(m_window, width, height);
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display dimesions={%u, %u}", width, height);
+			SDL_SetWindowSize(m_window, dimension.x, dimension.y);
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display dimesions={%u, %u}", dimension.x, dimension.y);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -187,6 +169,20 @@ namespace nomic {
 
 			SDL_SetWindowTitle(m_window, title.c_str());
 			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display title[%u]=%s", title.size(), STRING_CHECK(title));
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		display::show(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_initialized) {
+				THROW_NOMIC_GRAPHIC_DISPLAY_EXCEPTION(NOMIC_GRAPHIC_DISPLAY_EXCEPTION_UNINITIALIZED);
+			}
+
+			SDL_GL_SwapWindow(m_window);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

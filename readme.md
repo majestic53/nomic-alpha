@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1722
 ----------------
+*Updated: 6/3/2017*
+
+* Added camera class
+
 *Updated: 5/31-6/1/2017*
 
 * Added entity/manager class <s>(incomplete)</s>

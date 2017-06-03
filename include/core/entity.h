@@ -21,6 +21,7 @@
 
 #include "./id.h"
 #include "./object.h"
+#include "./transform.h"
 
 namespace nomic {
 
@@ -28,13 +29,17 @@ namespace nomic {
 
 		class entity :
 				public nomic::core::id,
-				public nomic::core::object {
+				public nomic::core::object,
+				public nomic::core::transform {
 
 			public:
 
 				explicit entity(
 					__in uint32_t type,
-					__in uint32_t subtype = SUBTYPE_UNDEFINED
+					__in uint32_t subtype = SUBTYPE_UNDEFINED,
+					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
+					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
+					__in_opt const glm::vec3 &up = TRANSFORM_UP_DEFAULT
 					);
 
 				entity(

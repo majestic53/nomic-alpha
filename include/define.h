@@ -48,6 +48,19 @@ namespace nomic {
 	#define __inout_opt
 #endif // __inout_opt
 
+	#define CAMERA_CLIP_MAX 1000.f
+	#define CAMERA_CLIP_MIN 0.1f
+	#define CAMERA_FOV_DEFAULT 45.f
+	#define CAMERA_FOV_MAX 90.f
+	#define CAMERA_FOV_MIN 10.f
+	#define CAMERA_PITCH_MAX 89.f
+	#define CAMERA_PITCH_MIN -CAMERA_PITCH_MAX
+	#define CAMERA_SENSITIVITY 0.55f
+	#define CAMERA_SPEED 0.35f
+	#define CAMERA_STRAFE 0.35f
+	#define CAMERA_YAW_MAX 360.f
+	#define CAMERA_YAW_MIN 0.f
+
 	#define CHANNEL_MAX UINT8_MAX
 
 	#define DISPLAY_DEFAULT_ALPHA (255 / (float) CHANNEL_MAX)
@@ -102,7 +115,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1722
 
 	#define OBJECT_COUNT 1
@@ -179,17 +192,28 @@ namespace nomic {
 	#define TRACE_PREFIX_ENTRY "+"
 	#define TRACE_PREFIX_EXIT "-"
 
-	#define TRANSFORM_POSITION_DEFAULT glm::vec4(0.f, 0.f, 0.f, 0.f)
-	#define TRANSFORM_ROTATION_DEFAULT glm::vec4(0.f, 0.f, glm::pi<GLfloat>(), 0.f)
-	#define TRANSFORM_UP_DEFAULT glm::vec4(0.f, 1.f, 0.f, 0.f)
+	#define TRANSFORM_POSITION_DEFAULT glm::vec3(0.f, 0.f, 0.f)
+	#define TRANSFORM_ROTATION_DEFAULT glm::vec3(0.f, 0.f, -1.f)
+	#define TRANSFORM_UP_DEFAULT glm::vec3(0.f, 1.f, 0.f)
 
 	#define UID_INVALID 0
 
 	#define UNIFORM_MATRIX_DEFAULT glm::mat4(1.f)
 
 	enum {
+		ENTITY_CAMERA = 0,
+	};
+
+	enum {
 		EVENT_UNDEFINED = 0,
 		EVENT_INPUT,
+	};
+
+	enum {
+		KEY_BACKWARD = 22,
+		KEY_FORWARD = 26,
+		KEY_LEFT = 4,
+		KEY_RIGHT = 7,
 	};
 
 	enum {

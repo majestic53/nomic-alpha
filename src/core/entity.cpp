@@ -27,9 +27,13 @@ namespace nomic {
 
 		entity::entity(
 			__in uint32_t type,
-			__in uint32_t subtype
+			__in uint32_t subtype,
+			__in_opt const glm::vec3 &position,
+			__in_opt const glm::vec3 &rotation,
+			__in_opt const glm::vec3 &up
 			) :
 				nomic::core::object(type, subtype),
+				nomic::core::transform(position, rotation, up),
 				m_enabled(true)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", type, subtype);
@@ -44,6 +48,7 @@ namespace nomic {
 			) :
 				nomic::core::id(other),
 				nomic::core::object(other),
+				nomic::core::transform(other),
 				m_enabled(other.m_enabled)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -73,6 +78,7 @@ namespace nomic {
 				remove();
 				nomic::core::id::operator=(other);
 				nomic::core::object::operator=(other);
+				nomic::core::transform::operator=(other);
 				m_enabled = other.m_enabled;
 				add();
 			}
@@ -143,7 +149,8 @@ namespace nomic {
 			result << NOMIC_CORE_ENTITY_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
-				result << " Base=" << nomic::core::object::to_string(verbose)
+				result << " Object=" << nomic::core::object::to_string(verbose)
+					<< ", Transform=" << nomic::core::transform::to_string(verbose)
 					<< ", Id=" << nomic::core::id::to_string(verbose)
 					<< ", State=" << (m_enabled ? "Enabled" : "Disabled");
 			}

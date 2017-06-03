@@ -25,14 +25,14 @@ namespace nomic {
 
 	namespace core {
 
-		class uniform :
-				public nomic::core::transform {
+		class uniform {
 
 			public:
 
 				explicit uniform(
 					__in_opt const glm::mat4 &model = UNIFORM_MATRIX_DEFAULT,
-					__in_opt const glm::mat4 &projection = UNIFORM_MATRIX_DEFAULT
+					__in_opt const glm::mat4 &projection = UNIFORM_MATRIX_DEFAULT,
+					__in_opt const glm::mat4 &view = UNIFORM_MATRIX_DEFAULT
 					);
 
 				uniform(
@@ -55,13 +55,15 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
-				glm::mat4 view(void);
+				glm::mat4 &view(void);
 
 			protected:
 
 				glm::mat4 m_model;
 
 				glm::mat4 m_projection;
+
+				glm::mat4 m_view;
 		};
 	}
 }

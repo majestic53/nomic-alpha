@@ -71,7 +71,7 @@ namespace nomic {
 
 		file = std::ifstream(path.c_str(), std::ios::in);
 		if(!file) {
-			THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_PATH_MALFORMED, "Path[%u]=%s", path.size(), STRING_CHECK(path));
+			THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_PATH_NOT_FOUND, "Path[%u]=%s", path.size(), STRING_CHECK(path));
 		}
 
 		file.seekg(0, std::ios::end);

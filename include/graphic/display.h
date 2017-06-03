@@ -34,11 +34,8 @@ namespace nomic {
 
 				void clear(void);
 
-				void render(void);
-
 				void set_dimensions(
-					__in const uint32_t width,
-					__in const uint32_t height
+					__in const glm::uvec2 &dimension
 					);
 
 				void set_fullscreen(
@@ -48,6 +45,8 @@ namespace nomic {
 				void set_title(
 					__in const std::string &title
 					);
+
+				void show(void);
 
 				std::string to_string(
 					__in_opt bool verbose = false

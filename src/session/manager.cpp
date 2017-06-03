@@ -37,6 +37,7 @@ namespace nomic {
 			};
 
 		manager::manager(void) :
+			m_camera(nullptr),
 			m_manager_display(nomic::graphic::display::acquire()),
 			m_manager_entity(nomic::entity::manager::acquire()),
 			m_manager_graphic(nomic::graphic::manager::acquire())
@@ -103,6 +104,12 @@ namespace nomic {
 
 			// TODO: initialize gl managers
 
+			m_camera = new nomic::graphic::camera(glm::uvec2(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT));
+			if(!m_camera) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
+					"Failed to allocate camera, Address=%p", m_camera);
+			}
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initialized");
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -115,6 +122,11 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager uninitializing...");
+
+			if(m_camera) {
+				delete m_camera;
+				m_camera = nullptr;
+			}
 
 			// TODO: uninitialize gl managers
 
@@ -148,26 +160,39 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
 
+			if(!m_camera) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
+					"Camera is not allocated, Address=%p", m_camera);
+			}
+
+			m_camera->render(delta);
+			m_manager_display.clear();
+
 			// TODO: handle render event
 
-			m_manager_display.render();
+			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
 		manager::set_dimensions(
-			__in const uint32_t width,
-			__in const uint32_t height
+			__in const glm::uvec2 &dimension
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", width, height);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimension.x, dimension.y);
 
 			if(!m_initialized) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_manager_display.set_dimensions(width, height);
+			if(!m_camera) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
+					"Camera is not allocated, Address=%p", m_camera);
+			}
+
+			m_manager_display.set_dimensions(dimension);
+			m_camera->set_dimensions(dimension);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
