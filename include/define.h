@@ -118,7 +118,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 5
+	#define NOMIC_VERSION_REVISION 6
 	#define NOMIC_VERSION_WEEK 1722
 
 	#define OBJECT_COUNT 1
@@ -126,6 +126,14 @@ namespace nomic {
 	#define QUEUE_MAX 0x1000
 
 	#define REFERENCE_INIT 1
+
+	#define RENDERER_BLEND_DEFAULT true
+	#define RENDERER_BLEND_DFACTOR_DEFAULT GL_ONE_MINUS_SRC_ALPHA
+	#define RENDERER_BLEND_SFACTOR_DEFAULT GL_SRC_ALPHA
+	#define RENDERER_CULL_DEFAULT true
+	#define RENDERER_CULL_MODE_DEFAULT GL_BACK
+	#define RENDERER_DEPTH_DEFAULT true
+	#define RENDERER_DEPTH_MODE_DEFAULT GL_LESS
 
 	#define RUNTIME_PAUSE_DELAY 200
 	#define RUNTIME_TICKS_PER_SECOND 25
@@ -202,6 +210,10 @@ namespace nomic {
 	#define UID_INVALID 0
 
 	#define UNIFORM_MATRIX_DEFAULT glm::mat4(1.f)
+
+	#define UNIFORM_MODEL "model"
+	#define UNIFORM_PROJECTION "projection"
+	#define UNIFORM_VIEW "view"
 
 	enum {
 		ENTITY_CAMERA = 0,

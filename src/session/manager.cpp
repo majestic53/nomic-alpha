@@ -22,7 +22,7 @@
 #include "./manager_type.h"
 
 // TODO: DEBUG
-#include "../../include/graphic/program.h"
+#include "../../include/core/renderer.h"
 #include "../../include/graphic/vao.h"
 
 #define CURSOR_RATIO (DISPLAY_DEFAULT_HEIGHT / (float) DISPLAY_DEFAULT_WIDTH)
@@ -52,7 +52,7 @@ const float AXIS_VERTEX[] = {
 
 GLint model_id = 0, projection_id = 0, view_id = 0;
 nomic::graphic::vao *vao_axis = nullptr, *vao_cursor = nullptr;
-nomic::graphic::program *prog_axis = nullptr, *prog_cursor = nullptr;
+nomic::core::renderer *prog_axis = nullptr, *prog_cursor = nullptr;
 // ---
 
 namespace nomic {
@@ -145,8 +145,6 @@ namespace nomic {
 			}
 
 // TODO: DEBUG
-			GL_CHECK(LEVEL_WARNING, glEnable, GL_DEPTH_TEST);
-			GL_CHECK(LEVEL_WARNING, glDepthFunc, GL_LESS);
 
 			vao_axis = new nomic::graphic::vao;
 			if(!vao_axis) {
@@ -161,16 +159,12 @@ namespace nomic {
 				((uint8_t *) &AXIS_VERTEX[0]) + (54 * sizeof(GLfloat))), GL_STATIC_DRAW), 1, 3, GL_FLOAT);
 			vao_axis->enable(1);
 
-			prog_axis = new nomic::graphic::program;
+			prog_axis = new nomic::core::renderer;
 			if(!prog_axis) {
 				THROW_EXCEPTION("Allocation failed!");
 			}
 
-			prog_axis->add_shader(nomic::graphic::shader(GL_VERTEX_SHADER, "./res/vert_axis.glsl"));
-			prog_axis->add_shader(nomic::graphic::shader(GL_FRAGMENT_SHADER, "./res/frag_axis.glsl"));
-			prog_axis->link();
-			projection_id = prog_axis->uniform_location("projection");
-			view_id = prog_axis->uniform_location("view");
+			prog_axis->set_shaders("./res/vert_axis.glsl", "./res/frag_axis.glsl");
 
 			vao_cursor = new nomic::graphic::vao;
 			if(!vao_cursor) {
@@ -185,14 +179,12 @@ namespace nomic {
 				((uint8_t *) &CURSOR_VERTEX[0]) + (12 * sizeof(GLfloat))), GL_STATIC_DRAW), 1, 3, GL_FLOAT);
 			vao_cursor->enable(1);
 
-			prog_cursor = new nomic::graphic::program;
+			prog_cursor = new nomic::core::renderer;
 			if(!prog_cursor) {
 				THROW_EXCEPTION("Allocation failed!");
 			}
 
-			prog_cursor->add_shader(nomic::graphic::shader(GL_VERTEX_SHADER, "./res/vert_cursor.glsl"));
-			prog_cursor->add_shader(nomic::graphic::shader(GL_FRAGMENT_SHADER, "./res/frag_cursor.glsl"));
-			prog_cursor->link();
+			prog_cursor->set_shaders("./res/vert_cursor.glsl", "./res/frag_cursor.glsl");
 // ---
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initialized");
@@ -218,15 +210,11 @@ namespace nomic {
 // TODO: DEBUG
 
 			if(prog_axis) {
-				prog_axis->remove_all_attributes();
-				prog_axis->remove_all_shaders();
 				delete prog_axis;
 				prog_axis = nullptr;
 			}
 
 			if(prog_cursor) {
-				prog_cursor->remove_all_attributes();
-				prog_cursor->remove_all_shaders();
 				delete prog_cursor;
 				prog_cursor = nullptr;
 			}
@@ -293,10 +281,8 @@ namespace nomic {
 			vao_cursor->bind();
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, 4);
 
-			prog_axis->use();
+			prog_axis->use(m_camera->projection(), m_camera->view());
 			vao_axis->bind();
-			prog_axis->set_uniform(projection_id, m_camera->projection());
-			prog_axis->set_uniform(view_id, m_camera->view());
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, 18);
 // ---
 

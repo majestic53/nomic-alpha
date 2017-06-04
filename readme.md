@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1722
 ----------------
+*Updated: 6/4/2017*
+
+* Added core renderer class (incomplete)
+
 *Updated: 6/3/2017*
 
 * Added camera class
