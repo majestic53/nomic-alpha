@@ -37,9 +37,9 @@ namespace nomic {
 
 				explicit camera(
 					__in const glm::uvec2 &dimension,
-					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
-					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
-					__in_opt const glm::vec3 &up = TRANSFORM_UP_DEFAULT,
+					__in_opt const glm::vec3 &position = CAMERA_POSITION_DEFAULT,
+					__in_opt const glm::vec3 &rotation = CAMERA_ROTATION_DEFAULT,
+					__in_opt const glm::vec3 &up = CAMERA_UP_DEFAULT,
 					__in_opt float fov = CAMERA_FOV_DEFAULT
 					);
 

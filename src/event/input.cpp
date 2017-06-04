@@ -116,30 +116,42 @@ namespace nomic {
 				switch(event.subtype()) {
 					case INPUT_BUTTON: {
 
-							SDL_MouseButtonEvent *data = (SDL_MouseButtonEvent *) &event.data()[0];
-							if(data) {
-								on_button(data->button, data->state, data->clicks, data->x, data->y);
+							if(event.data().size() == sizeof(SDL_MouseButtonEvent)) {
+
+								SDL_MouseButtonEvent *data = (SDL_MouseButtonEvent *) &event.data()[0];
+								if(data) {
+									on_button(data->button, data->state, data->clicks, data->x, data->y);
+								}
 							}
 						} break;
 					case INPUT_KEY: {
 
-							SDL_KeyboardEvent *data = (SDL_KeyboardEvent *) &event.data()[0];
-							if(data) {
-								on_key(data->keysym.scancode, data->keysym.mod, data->state);
+							if(event.data().size() == sizeof(SDL_KeyboardEvent)) {
+
+								SDL_KeyboardEvent *data = (SDL_KeyboardEvent *) &event.data()[0];
+								if(data) {
+									on_key(data->keysym.scancode, data->keysym.mod, data->state);
+								}
 							}
 						} break;
 					case INPUT_MOTION: {
 
-							SDL_MouseMotionEvent *data = (SDL_MouseMotionEvent *) &event.data()[0];
-							if(data) {
-								on_motion(data->state, data->x, data->y, data->xrel, data->yrel);
+							if(event.data().size() == sizeof(SDL_MouseMotionEvent)) {
+
+								SDL_MouseMotionEvent *data = (SDL_MouseMotionEvent *) &event.data()[0];
+								if(data) {
+									on_motion(data->state, data->x, data->y, data->xrel, data->yrel);
+								}
 							}
 						} break;
 					case INPUT_WHEEL: {
 
-							SDL_MouseWheelEvent *data = (SDL_MouseWheelEvent *) &event.data()[0];
-							if(data) {
-								on_wheel(data->direction, data->x, data->y);
+							if(event.data().size() == sizeof(SDL_MouseWheelEvent)) {
+
+								SDL_MouseWheelEvent *data = (SDL_MouseWheelEvent *) &event.data()[0];
+								if(data) {
+									on_wheel(data->direction, data->x, data->y);
+								}
 							}
 						} break;
 					default:

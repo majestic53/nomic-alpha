@@ -83,10 +83,16 @@ namespace nomic {
 					"SDL_GL_MakeCurrent(%p, %p) failed! Error=%s", m_window, m_window_context, SDL_GetError());
 			}
 
+			if(DISPLAY_DEFAULT_FULLSCREEN && SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN)) {
+				THROW_NOMIC_GRAPHIC_DISPLAY_EXCEPTION_FORMAT(NOMIC_GRAPHIC_DISPLAY_EXCEPTION_EXTERNAL,
+					"SDL_SetWindowFullscreen(%p, %x) failed! Error=%s", m_window, SDL_WINDOW_FULLSCREEN, SDL_GetError());
+			}
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Display manager initialized");
 			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display title[%u]=%s", std::string(DISPLAY_DEFAULT_TITLE).size(),
 				STRING_CHECK(std::string(DISPLAY_DEFAULT_TITLE)));
 			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display dimesions={%u, %u}", DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT);
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display state=%s", (DISPLAY_DEFAULT_FULLSCREEN ? "Fullscreen" : "Windowed"));
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;

@@ -21,6 +21,40 @@
 #include "../../include/trace.h"
 #include "./manager_type.h"
 
+// TODO: DEBUG
+#include "../../include/graphic/program.h"
+#include "../../include/graphic/vao.h"
+
+#define CURSOR_RATIO (DISPLAY_DEFAULT_HEIGHT / (float) DISPLAY_DEFAULT_WIDTH)
+#define CURSOR_WIDTH 0.04f
+
+const float CURSOR_COLOR[] = {
+	0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
+	0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
+	};
+
+const float CURSOR_VERTEX[] = {
+	-CURSOR_WIDTH * CURSOR_RATIO, 0.f, 0.f, CURSOR_WIDTH * CURSOR_RATIO, 0.f, 0.f, // horizontal
+	0.0f, -CURSOR_WIDTH, 0.f, 0.f, CURSOR_WIDTH, 0.f,  // vertical
+	};
+
+const float AXIS_COLOR[] = {
+	1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, // red x
+	0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, // green y
+	0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, // blue z
+	};
+
+const float AXIS_VERTEX[] = {
+	0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.75f, 0.25f, 0.f, 1.f, 0.f, 0.f, 0.75f, -0.25f, 0.f, // x
+	0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, 0.f, // y
+	0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, // z
+	};
+
+GLint model_id = 0, projection_id = 0, view_id = 0;
+nomic::graphic::vao *vao_axis = nullptr, *vao_cursor = nullptr;
+nomic::graphic::program *prog_axis = nullptr, *prog_cursor = nullptr;
+// ---
+
 namespace nomic {
 
 	namespace session {
@@ -110,6 +144,57 @@ namespace nomic {
 					"Failed to allocate camera, Address=%p", m_camera);
 			}
 
+// TODO: DEBUG
+			GL_CHECK(LEVEL_WARNING, glEnable, GL_DEPTH_TEST);
+			GL_CHECK(LEVEL_WARNING, glDepthFunc, GL_LESS);
+
+			vao_axis = new nomic::graphic::vao;
+			if(!vao_axis) {
+				THROW_EXCEPTION("Allocation failed!");
+			}
+
+			vao_axis->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_COLOR[0],
+				((uint8_t *) &AXIS_COLOR[0]) + (54 * sizeof(GLfloat))), GL_STATIC_DRAW), 0, 3, GL_FLOAT);
+			vao_axis->enable(0);
+
+			vao_axis->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_VERTEX[0],
+				((uint8_t *) &AXIS_VERTEX[0]) + (54 * sizeof(GLfloat))), GL_STATIC_DRAW), 1, 3, GL_FLOAT);
+			vao_axis->enable(1);
+
+			prog_axis = new nomic::graphic::program;
+			if(!prog_axis) {
+				THROW_EXCEPTION("Allocation failed!");
+			}
+
+			prog_axis->add_shader(nomic::graphic::shader(GL_VERTEX_SHADER, "./res/vert_axis.glsl"));
+			prog_axis->add_shader(nomic::graphic::shader(GL_FRAGMENT_SHADER, "./res/frag_axis.glsl"));
+			prog_axis->link();
+			projection_id = prog_axis->uniform_location("projection");
+			view_id = prog_axis->uniform_location("view");
+
+			vao_cursor = new nomic::graphic::vao;
+			if(!vao_cursor) {
+				THROW_EXCEPTION("Allocation failed!");
+			}
+
+			vao_cursor->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &CURSOR_COLOR[0],
+				((uint8_t *) &CURSOR_COLOR[0]) + (12 * sizeof(GLfloat))), GL_STATIC_DRAW), 0, 3, GL_FLOAT);
+			vao_cursor->enable(0);
+
+			vao_cursor->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &CURSOR_VERTEX[0],
+				((uint8_t *) &CURSOR_VERTEX[0]) + (12 * sizeof(GLfloat))), GL_STATIC_DRAW), 1, 3, GL_FLOAT);
+			vao_cursor->enable(1);
+
+			prog_cursor = new nomic::graphic::program;
+			if(!prog_cursor) {
+				THROW_EXCEPTION("Allocation failed!");
+			}
+
+			prog_cursor->add_shader(nomic::graphic::shader(GL_VERTEX_SHADER, "./res/vert_cursor.glsl"));
+			prog_cursor->add_shader(nomic::graphic::shader(GL_FRAGMENT_SHADER, "./res/frag_cursor.glsl"));
+			prog_cursor->link();
+// ---
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initialized");
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -129,6 +214,39 @@ namespace nomic {
 			}
 
 			// TODO: uninitialize gl managers
+
+// TODO: DEBUG
+
+			if(prog_axis) {
+				prog_axis->remove_all_attributes();
+				prog_axis->remove_all_shaders();
+				delete prog_axis;
+				prog_axis = nullptr;
+			}
+
+			if(prog_cursor) {
+				prog_cursor->remove_all_attributes();
+				prog_cursor->remove_all_shaders();
+				delete prog_cursor;
+				prog_cursor = nullptr;
+			}
+
+			if(vao_axis) {
+				vao_axis->disable_all();
+				delete vao_axis;
+				vao_axis = nullptr;
+			}
+
+			if(vao_cursor) {
+				vao_cursor->disable_all();
+				delete vao_cursor;
+				vao_cursor = nullptr;
+			}
+
+			model_id = 0;
+			projection_id = 0;
+			view_id = 0;
+// ---
 
 			m_manager_entity.uninitialize();
 			m_manager_graphic.uninitialize();
@@ -169,6 +287,18 @@ namespace nomic {
 			m_manager_display.clear();
 
 			// TODO: handle render event
+
+// TODO: DEBUG
+			prog_cursor->use();
+			vao_cursor->bind();
+			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, 4);
+
+			prog_axis->use();
+			vao_axis->bind();
+			prog_axis->set_uniform(projection_id, m_camera->projection());
+			prog_axis->set_uniform(view_id, m_camera->view());
+			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, 18);
+// ---
 
 			m_manager_display.show();
 

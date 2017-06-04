@@ -34,6 +34,7 @@ namespace nomic {
 				nomic::core::entity(ENTITY_CAMERA, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_dimension(dimension),
 				m_fov(fov),
+				m_rotation_previous(rotation.x, rotation.y),
 				m_wheel(0)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimensions={%u, %u}, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}, fov=%f",

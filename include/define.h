@@ -55,20 +55,23 @@ namespace nomic {
 	#define CAMERA_FOV_MIN 10.f
 	#define CAMERA_PITCH_MAX 89.f
 	#define CAMERA_PITCH_MIN -CAMERA_PITCH_MAX
+	#define CAMERA_POSITION_DEFAULT glm::vec3(2.f, 2.f, -8.f)
+	#define CAMERA_ROTATION_DEFAULT glm::vec3(0.f, 0.f, 0.f)
 	#define CAMERA_SENSITIVITY 0.55f
 	#define CAMERA_SPEED 0.35f
 	#define CAMERA_STRAFE 0.35f
+	#define CAMERA_UP_DEFAULT glm::vec3(0.f, 1.f, 0.f)
 	#define CAMERA_YAW_MAX 360.f
 	#define CAMERA_YAW_MIN 0.f
 
 	#define CHANNEL_MAX UINT8_MAX
 
-	#define DISPLAY_DEFAULT_ALPHA (255 / (float) CHANNEL_MAX)
-	#define DISPLAY_DEFAULT_BLUE (122 / (float) CHANNEL_MAX)
+	#define DISPLAY_DEFAULT_ALPHA CHANNEL_MAX
+	#define DISPLAY_DEFAULT_BLUE 0
 	#define DISPLAY_DEFAULT_FULLSCREEN false
-	#define DISPLAY_DEFAULT_GREEN (78 / (float) CHANNEL_MAX)
+	#define DISPLAY_DEFAULT_GREEN 0
 	#define DISPLAY_DEFAULT_HEIGHT 768
-	#define DISPLAY_DEFAULT_RED (49 / (float) CHANNEL_MAX)
+	#define DISPLAY_DEFAULT_RED 0
 	#define DISPLAY_DEFAULT_TITLE NOMIC " " STRING_CONCAT(NOMIC_VERSION_MAJOR) "." STRING_CONCAT(NOMIC_VERSION_MINOR) \
 		"." STRING_CONCAT(NOMIC_VERSION_WEEK) "." STRING_CONCAT(NOMIC_VERSION_REVISION)
 	#define DISPLAY_DEFAULT_VSYNC false
@@ -92,7 +95,7 @@ namespace nomic {
 	#define _GL_CHECK_ERROR(_LEVEL_, _COMMAND_) { \
 		GLenum err = glGetError(); \
 		while(err != GL_NO_ERROR) { \
-			TRACE_MESSAGE_FORMAT(_LEVEL_, "%s failed! Error=%x(%s)", _COMMAND_, err, GL_ERROR_AS_STRING(err)); \
+			TRACE_MESSAGE_FORMAT(_LEVEL_, "%s failed! Error=%x(%s)", STRING_CONCAT(_COMMAND_), err, GL_ERROR_AS_STRING(err)); \
 			err = glGetError(); \
 		} \
 		}
@@ -115,7 +118,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 4
+	#define NOMIC_VERSION_REVISION 5
 	#define NOMIC_VERSION_WEEK 1722
 
 	#define OBJECT_COUNT 1
