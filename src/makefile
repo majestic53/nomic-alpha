@@ -24,6 +24,7 @@ DIR_INC_CORE=./../include/core/
 DIR_INC_ENTITY=./../include/entity/
 DIR_INC_EVENT=./../include/event/
 DIR_INC_GRAPHIC=./../include/graphic/
+DIR_INC_RENDER=./../include/render/
 DIR_INC_SESSION=./../include/session/
 DIR_INC_UUID=./../include/uuid/
 DIR_SRC=./
@@ -31,6 +32,7 @@ DIR_SRC_CORE=./core/
 DIR_SRC_ENTITY=./entity/
 DIR_SRC_EVENT=./event/
 DIR_SRC_GRAPHIC=./graphic/
+DIR_SRC_RENDER=./render/
 DIR_SRC_SESSION=./session/
 DIR_SRC_UUID=./uuid/
 LIB=libnomic.a
@@ -48,12 +50,13 @@ archive:
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)graphic_camera.o $(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o \
 			$(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
+		$(DIR_BUILD)render_manager.o \
 		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_core build_entity build_event build_graphic build_session build_uuid
+build: build_base build_core build_entity build_event build_graphic build_render build_session build_uuid
 
 ### BASE ###
 
@@ -150,6 +153,13 @@ graphic_vao.o: $(DIR_SRC_GRAPHIC)vao.cpp $(DIR_INC_GRAPHIC)vao.h
 
 graphic_vbo.o: $(DIR_SRC_GRAPHIC)vbo.cpp $(DIR_INC_GRAPHIC)vbo.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)vbo.cpp -o $(DIR_BUILD)graphic_vbo.o
+
+### RENDER ###
+
+build_render: render_manager.o
+
+render_manager.o: $(DIR_SRC_RENDER)manager.cpp $(DIR_INC_RENDER)manager.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_RENDER)manager.cpp -o $(DIR_BUILD)render_manager.o
 
 ### SESSION ###
 

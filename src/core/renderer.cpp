@@ -17,6 +17,7 @@
  */
 
 #include "../../include/core/renderer.h"
+#include "../../include/render/manager.h"
 #include "../../include/trace.h"
 #include "./renderer_type.h"
 
@@ -119,7 +120,12 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			// TODO: add to manager
+			nomic::render::manager &instance = nomic::render::manager::acquire();
+			if(instance.initialized()) {
+				instance.add(this);
+			}
+
+			instance.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -148,12 +154,30 @@ namespace nomic {
 			return m_depth;
 		}
 
+		GLuint 
+		renderer::get_id(void)
+		{
+			GLuint result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = nomic::graphic::program::handle();
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
 		void 
 		renderer::remove(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			// TODO: remove from manager
+			nomic::render::manager &instance = nomic::render::manager::acquire();
+			if(instance.initialized() && instance.contains(m_handle)) {
+				instance.remove(this);
+			}
+
+			instance.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

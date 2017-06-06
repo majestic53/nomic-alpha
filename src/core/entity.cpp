@@ -34,7 +34,8 @@ namespace nomic {
 			) :
 				nomic::core::object(type, subtype),
 				nomic::core::transform(position, rotation, up),
-				m_enabled(true)
+				m_enabled(true),
+				m_shown(true)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", type, subtype);
 
@@ -49,7 +50,8 @@ namespace nomic {
 				nomic::core::id(other),
 				nomic::core::object(other),
 				nomic::core::transform(other),
-				m_enabled(other.m_enabled)
+				m_enabled(other.m_enabled),
+				m_shown(other.m_shown)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
@@ -80,6 +82,7 @@ namespace nomic {
 				nomic::core::object::operator=(other);
 				nomic::core::transform::operator=(other);
 				m_enabled = other.m_enabled;
+				m_shown = other.m_shown;
 				add();
 			}
 
@@ -137,6 +140,35 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		void 
+		entity::render(
+			__in float delta
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		entity::show(
+			__in bool state
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "State=%x", state);
+
+			m_shown = state;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		bool 
+		entity::shown(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_shown);
+			return m_shown;
+		}
+
 		std::string 
 		entity::to_string(
 			__in_opt bool verbose
@@ -152,7 +184,7 @@ namespace nomic {
 				result << " Object=" << nomic::core::object::to_string(verbose)
 					<< ", Transform=" << nomic::core::transform::to_string(verbose)
 					<< ", Id=" << nomic::core::id::to_string(verbose)
-					<< ", State=" << (m_enabled ? "Enabled" : "Disabled");
+					<< ", State=" << (m_enabled ? "Enabled" : "Disabled") << "/" << (m_shown ? "Shown" : "Hidden");
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

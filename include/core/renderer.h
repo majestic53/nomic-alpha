@@ -56,6 +56,8 @@ namespace nomic {
 
 				bool depth(void);
 
+				GLuint get_id(void);
+
 				void set_blend(
 					__in bool blend,
 					__in_opt GLenum sfactor = RENDERER_BLEND_SFACTOR_DEFAULT,

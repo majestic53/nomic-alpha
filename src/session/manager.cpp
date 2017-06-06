@@ -50,7 +50,6 @@ const float AXIS_VERTEX[] = {
 	0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, // z
 	};
 
-GLint model_id = 0, projection_id = 0, view_id = 0;
 nomic::graphic::vao *vao_axis = nullptr, *vao_cursor = nullptr;
 nomic::core::renderer *prog_axis = nullptr, *prog_cursor = nullptr;
 // ---
@@ -74,7 +73,8 @@ namespace nomic {
 			m_camera(nullptr),
 			m_manager_display(nomic::graphic::display::acquire()),
 			m_manager_entity(nomic::entity::manager::acquire()),
-			m_manager_graphic(nomic::graphic::manager::acquire())
+			m_manager_graphic(nomic::graphic::manager::acquire()),
+			m_manager_render(nomic::render::manager::acquire())
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -87,6 +87,7 @@ namespace nomic {
 			m_manager_display.release();
 			m_manager_entity.release();
 			m_manager_graphic.release();
+			m_manager_render.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -134,6 +135,7 @@ namespace nomic {
 			}
 
 			m_manager_graphic.initialize();
+			m_manager_render.initialize();
 			m_manager_entity.initialize();
 
 			// TODO: initialize gl managers
@@ -230,13 +232,10 @@ namespace nomic {
 				delete vao_cursor;
 				vao_cursor = nullptr;
 			}
-
-			model_id = 0;
-			projection_id = 0;
-			view_id = 0;
 // ---
 
 			m_manager_entity.uninitialize();
+			m_manager_render.uninitialize();
 			m_manager_graphic.uninitialize();
 			m_manager_display.uninitialize();
 
@@ -273,8 +272,7 @@ namespace nomic {
 
 			m_camera->render(delta);
 			m_manager_display.clear();
-
-			// TODO: handle render event
+			//m_manager_render->render(m_camera->projection(), m_camera->view(), delta);
 
 // TODO: DEBUG
 			prog_cursor->use();

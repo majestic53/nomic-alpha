@@ -24,11 +24,17 @@ make release
 Changelog
 =========
 
+Version 0.1.1723
+----------------
+*Updated: 6/5/2017*
+
+* Added render singleton class (incomplete)
+
 Version 0.1.1722
 ----------------
 *Updated: 6/4/2017*
 
-* Added core renderer class (incomplete)
+* Added core renderer class <s>(incomplete)</s>
 
 *Updated: 6/3/2017*
 
@@ -38,31 +44,6 @@ Version 0.1.1722
 
 * Added entity/manager class <s>(incomplete)</s>
 * Added input event class
-
-Version 0.1.1721
-----------------
-*Updated: 5/30/2017*
-
-* Added program primitive class
-
-*Updated: 5/28-29/2017*
-
-* Refactored graphic manager/primitive classes
-	* Added vao/vbo child classes
-* Added core transform/uniform classes
-
-*Updated: 5/26/2017*
-
-* User input event integration
-* Event queue/manager testing
-
-*Updated: 5/24-25/2017*
-
-* Added event queue/manager
-
-*Updated: 5/22/2017*
-
-* Added display manager
 
 *Changelog truncated (see file history for full log)*
 

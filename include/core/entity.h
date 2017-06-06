@@ -58,6 +58,16 @@ namespace nomic {
 
 				bool enabled(void) const;
 
+				virtual void render(
+					__in float delta
+					);
+
+				void show(
+					__in bool state
+					);
+
+				bool shown(void) const;
+
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
@@ -71,6 +81,8 @@ namespace nomic {
 				void remove(void);
 
 				bool m_enabled;
+
+				bool m_shown;
 		};
 	}
 }

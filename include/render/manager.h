@@ -16,46 +16,70 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_ENTITY_MANAGER_H_
-#define NOMIC_ENTITY_MANAGER_H_
+#ifndef NOMIC_RENDER_MANAGER_H_
+#define NOMIC_RENDER_MANAGER_H_
 
 #include <map>
 #include <set>
 #include "../core/entity.h"
+#include "../core/renderer.h"
 #include "../core/singleton.h"
 
 namespace nomic {
 
-	namespace entity {
+	namespace render {
 
 		class manager :
-				public SINGLETON_CLASS(nomic::entity::manager) {
+				public SINGLETON_CLASS(nomic::render::manager) {
 
 			public:
 
 				~manager(void);
 
 				void add(
-					__in nomic::core::entity *handle
+					__in nomic::core::renderer *handle
 					);
 
 				bool contains(
-					__in uint32_t id
+					__in GLuint id
+					);
+
+				bool contains_registration(
+					__in nomic::core::entity *handle,
+					__in GLuint id
 					);
 
 				void remove(
-					__in nomic::core::entity *handle
+					__in nomic::core::renderer *handle
+					);
+
+				void register_entity(
+					__in nomic::core::entity *handle,
+					__in GLuint id
+					);
+
+				void render(
+					__in glm::mat4 &projection,
+					__in glm::mat4 &view,
+					__in float delta
 					);
 
 				std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
-				void update(void);
+				void unregister_all_entities(
+					__in GLuint id
+					);
+
+				void unregister_entity(
+					__in nomic::core::entity *handle,
+					__in GLuint id
+					);
 
 			protected:
 
-				SINGLETON_CLASS_BASE(nomic::entity::manager);
+				SINGLETON_CLASS_BASE(nomic::render::manager);
 
 				manager(void);
 
@@ -67,22 +91,21 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
-				std::set<nomic::core::entity *>::iterator find_handle(
-					__in nomic::core::entity *handle,
-					__in std::map<uint32_t, std::set<nomic::core::entity *>>::iterator iter
+				std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>::iterator find_handle(
+					__in nomic::core::renderer *handle
 					);
 
-				std::map<uint32_t, std::set<nomic::core::entity *>>::iterator find_id(
-					__in uint32_t id
+				std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator find_id(
+					__in GLuint id
 					);
 
 				bool on_initialize(void);
 
 				void on_uninitialize(void);
 
-				std::map<uint32_t, std::set<nomic::core::entity *>> m_id;
+				std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>> m_id;
 		};
 	}
 }
 
-#endif // NOMIC_ENTITY_MANAGER_H_
+#endif // NOMIC_RENDER_MANAGER_H_

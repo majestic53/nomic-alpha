@@ -23,6 +23,7 @@
 #include "../graphic/camera.h"
 #include "../graphic/display.h"
 #include "../graphic/manager.h"
+#include "../render/manager.h"
 
 namespace nomic {
 
@@ -90,6 +91,8 @@ namespace nomic {
 				nomic::entity::manager &m_manager_entity;
 
 				nomic::graphic::manager &m_manager_graphic;
+
+				nomic::render::manager &m_manager_render;
 		};
 	}
 }
