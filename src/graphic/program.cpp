@@ -74,12 +74,12 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Index=%x, Name[%u]=%s", index, name.size(), STRING_CHECK(name));
 
 			if(name.empty()) {
-				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_INVALID_ATTRIBUTE, "Index=%x, Name[%u]=%s",
+				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_ATTRIBUTE_INVALID, "Index=%x, Name[%u]=%s",
 					index, name.size(), STRING_CHECK(name));
 			}
 
 			if(m_attribute.find(index) != m_attribute.end()) {
-				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_DUPLICATE_ATTRIBUTE, "Index=%x, Name[%u]=%s",
+				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_ATTRIBUTE_DUPLICATE, "Index=%x, Name[%u]=%s",
 					index, name.size(), STRING_CHECK(name));
 			}
 
@@ -98,7 +98,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%x", handle);
 
 			if(m_shader.find(handle) != m_shader.end()) {
-				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_DUPLICATE_SHADER, "Handle=%x", handle);
+				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_SHADER_DUPLICATE, "Handle=%x", handle);
 			}
 
 			m_shader.insert(std::make_pair(handle, shader));
@@ -525,7 +525,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Name[%u]=%s", name.size(), STRING_CHECK(name));
 
 			if(name.empty()) {
-				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_INVALID_LOCATION, "Name[%u]=%s",
+				THROW_NOMIC_GRAPHIC_PROGRAM_EXCEPTION_FORMAT(NOMIC_GRAPHIC_PROGRAM_LOCATION_INVALID, "Name[%u]=%s",
 					name.size(), STRING_CHECK(name));
 			}
 

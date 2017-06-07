@@ -118,7 +118,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1723
 
 	#define OBJECT_COUNT 1

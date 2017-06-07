@@ -19,6 +19,7 @@
 #ifndef NOMIC_CORE_ENTITY_H_
 #define NOMIC_CORE_ENTITY_H_
 
+#include <set>
 #include "./id.h"
 #include "./object.h"
 #include "./transform.h"
@@ -58,6 +59,14 @@ namespace nomic {
 
 				bool enabled(void) const;
 
+				void register_renderer(
+					__in GLuint id
+					);
+
+				bool registered(
+					__in GLuint id
+					) const;
+
 				virtual void render(
 					__in float delta
 					);
@@ -72,15 +81,27 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
+				void unregsiter_all_renderers(void);
+
+				void unregister_renderer(
+					__in GLuint id
+					);
+
 				virtual void update(void);
 
 			protected:
 
 				void add(void);
 
+				void register_renderers(
+					__in const std::set<GLuint> &renderer
+					);
+
 				void remove(void);
 
 				bool m_enabled;
+
+				std::set<GLuint> m_renderer;
 
 				bool m_shown;
 		};

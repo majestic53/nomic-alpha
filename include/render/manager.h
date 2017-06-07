@@ -104,6 +104,8 @@ namespace nomic {
 				void on_uninitialize(void);
 
 				std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>> m_id;
+
+				std::mutex m_mutex;
 		};
 	}
 }

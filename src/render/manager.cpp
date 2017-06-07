@@ -41,13 +41,41 @@ namespace nomic {
 			__in nomic::core::renderer *handle
 			)
 		{
+			GLuint id;
+			std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator iter_id;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%p", handle);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_RENDER_MANAGER_EXCEPTION(NOMIC_RENDER_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			// TODO
+			if(!handle) {
+				THROW_NOMIC_RENDER_MANAGER_EXCEPTION_FORMAT(NOMIC_RENDER_MANAGER_EXCEPTION_HANDLE_INVALID, "Handle=%p", handle);
+			}
+
+			id = handle->get_id();
+
+			iter_id = m_id.find(id);
+			if(iter_id != m_id.end()) {
+
+				if(iter_id->second.find(handle) != iter_id->second.end()) {
+					THROW_NOMIC_RENDER_MANAGER_EXCEPTION_FORMAT(NOMIC_RENDER_MANAGER_EXCEPTION_HANDLE_DUPLICATE,
+						"Handle=%p", handle);
+				}
+			} else {
+				m_id.insert(std::make_pair(id, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>()));
+
+				iter_id = m_id.find(id);
+				if(iter_id == m_id.end()) {
+					THROW_NOMIC_RENDER_MANAGER_EXCEPTION_FORMAT(NOMIC_RENDER_MANAGER_EXCEPTION_HANDLE_NOT_FOUND,
+						"Handle=%p", handle);
+				}
+			}
+
+			iter_id->second.insert(std::make_pair(handle, std::set<nomic::core::entity *>()));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -60,6 +88,8 @@ namespace nomic {
 			bool result;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_RENDER_MANAGER_EXCEPTION(NOMIC_RENDER_MANAGER_EXCEPTION_UNINITIALIZED);
@@ -85,6 +115,8 @@ namespace nomic {
 			std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator iter_id;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%p, Id=%x", handle, id);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_RENDER_MANAGER_EXCEPTION(NOMIC_RENDER_MANAGER_EXCEPTION_UNINITIALIZED);
@@ -198,13 +230,34 @@ namespace nomic {
 			__in GLuint id
 			)
 		{
+			std::set<nomic::core::entity *>::iterator iter_entity;
+			std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator iter_id;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%p, Id=%x", handle, id);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_RENDER_MANAGER_EXCEPTION(NOMIC_RENDER_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			// TODO
+			if(!handle) {
+				THROW_NOMIC_RENDER_MANAGER_EXCEPTION_FORMAT(NOMIC_RENDER_MANAGER_EXCEPTION_ENTITY_HANDLE_INVALID, "Handle=%p", handle);
+			}
+
+			iter_id = find_id(id);
+
+			for(std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>::iterator iter_handle = iter_id->second.begin();
+					iter_handle != iter_id->second.end(); ++iter_handle) {
+
+				iter_entity = iter_handle->second.find(handle);
+				if(iter_entity != iter_handle->second.end()) {
+					THROW_NOMIC_RENDER_MANAGER_EXCEPTION_FORMAT(NOMIC_RENDER_MANAGER_EXCEPTION_ENTITY_HANDLE_DUPLICATE,
+						"Handle=%p", handle);
+				}
+
+				iter_handle->second.insert(handle);
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -214,13 +267,24 @@ namespace nomic {
 			__in nomic::core::renderer *handle
 			)
 		{
+			std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>::iterator iter_handle;
+			std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator iter_id;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%p", handle);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_RENDER_MANAGER_EXCEPTION(NOMIC_RENDER_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			// TODO
+			iter_handle = find_handle(handle);
+			iter_id = find_id(handle->get_id());
+			iter_id->second.erase(iter_handle);
+
+			if(iter_id->second.empty()) {
+				m_id.erase(iter_id);
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -233,6 +297,8 @@ namespace nomic {
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p, Delta=%f", &projection, &view, delta);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			for(std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator iter_id = m_id.begin();
 					iter_id != m_id.end(); ++iter_id) {
@@ -338,11 +404,13 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
 
+			std::lock_guard<std::mutex> lock(m_mutex);
+
 			if(!m_initialized) {
 				THROW_NOMIC_RENDER_MANAGER_EXCEPTION(NOMIC_RENDER_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			// TODO
+			m_id.erase(find_id(id));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -353,13 +421,31 @@ namespace nomic {
 			__in GLuint id
 			)
 		{
+			std::set<nomic::core::entity *>::iterator iter_entity;
+			std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator iter_id;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%p, Id=%x", handle, id);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_RENDER_MANAGER_EXCEPTION(NOMIC_RENDER_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			// TODO
+			if(!handle) {
+				THROW_NOMIC_RENDER_MANAGER_EXCEPTION_FORMAT(NOMIC_RENDER_MANAGER_EXCEPTION_ENTITY_HANDLE_INVALID, "Handle=%p", handle);
+			}
+
+			iter_id = find_id(id);
+
+			for(std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>::iterator iter_handle = iter_id->second.begin();
+					iter_handle != iter_id->second.end(); ++iter_handle) {
+
+				iter_entity = iter_handle->second.find(handle);
+				if(iter_entity != iter_handle->second.end()) {
+					iter_handle->second.erase(iter_entity);
+				}
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

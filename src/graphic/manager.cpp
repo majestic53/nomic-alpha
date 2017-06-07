@@ -46,12 +46,14 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
 
+			std::lock_guard<std::mutex> lock(m_mutex);
+
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
 			if(handle == HANDLE_INVALID) {
-				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_HANDLE, "Handle=%x", handle);
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_HANDLE_INVALID, "Handle=%x", handle);
 			}
 
 			std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter = m_handle.find(type);
@@ -75,6 +77,8 @@ namespace nomic {
 			std::map<GLuint, std::pair<size_t, GLenum>>::iterator iter_handle;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
@@ -122,7 +126,7 @@ namespace nomic {
 					GL_CHECK(LEVEL_WARNING, glDeleteBuffers, HANDLE_COUNT, &iter->first);
 					break;
 				default:
-					THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_TYPE, "Type=%x", type);
+					THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_TYPE_INVALID, "Type=%x", type);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -139,7 +143,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
 
 			if(handle == HANDLE_INVALID) {
-				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_HANDLE, "Handle=%x", handle);
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_HANDLE_INVALID, "Handle=%x", handle);
 			}
 
 			std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter = m_handle.find(type);
@@ -167,6 +171,8 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", type, subtype);
 
+			std::lock_guard<std::mutex> lock(m_mutex);
+
 			switch(type) {
 				case PRIMITIVE_PROGRAM:
 					GL_CHECK_RESULT(LEVEL_WARNING, glCreateProgram, result);
@@ -181,11 +187,11 @@ namespace nomic {
 					GL_CHECK(LEVEL_WARNING, glGenBuffers, HANDLE_COUNT, &result);
 					break;
 				default:
-					THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_TYPE, "Type=%x", type);
+					THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_TYPE_INVALID, "Type=%x", type);
 			}
 
 			if(result == HANDLE_INVALID) {
-				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_INVALID_HANDLE, "Handle=%x", result);
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_HANDLE_INVALID, "Handle=%x", result);
 			}
 
 			if(m_handle.find(type) == m_handle.end()) {
@@ -194,7 +200,7 @@ namespace nomic {
 
 			iter = m_handle.find(type);
 			if(iter->second.find(result) != iter->second.end()) {
-				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_DUPLICATE_HANDLE, "Handle=%x", result);
+				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION_FORMAT(NOMIC_GRAPHIC_MANAGER_EXCEPTION_HANDLE_DUPLICATE, "Handle=%x", result);
 			}
 
 			iter->second.insert(std::make_pair(result, std::make_pair(REFERENCE_INIT, subtype)));
@@ -212,6 +218,8 @@ namespace nomic {
 			size_t result;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);
@@ -271,6 +279,8 @@ namespace nomic {
 			size_t result;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Handle=%x", type, handle);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_MANAGER_EXCEPTION(NOMIC_GRAPHIC_MANAGER_EXCEPTION_UNINITIALIZED);

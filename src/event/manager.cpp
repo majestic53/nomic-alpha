@@ -197,7 +197,7 @@ namespace nomic {
 			if(iter != m_id.end()) {
 
 				if(iter->second.find(handle) != iter->second.end()) {
-					THROW_NOMIC_EVENT_MANAGER_EXCEPTION_FORMAT(NOMIC_EVENT_MANAGER_EXCEPTION_DUPLICATE, "Handle=%p", handle);
+					THROW_NOMIC_EVENT_MANAGER_EXCEPTION_FORMAT(NOMIC_EVENT_MANAGER_EXCEPTION_HANDLE_DUPLICATE, "Handle=%p", handle);
 				}
 
 				iter->second.insert(handle);

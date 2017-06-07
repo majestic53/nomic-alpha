@@ -46,6 +46,8 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%p", handle);
 
+			std::lock_guard<std::mutex> lock(m_mutex);
+
 			if(!m_initialized) {
 				THROW_NOMIC_ENTITY_MANAGER_EXCEPTION(NOMIC_ENTITY_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
@@ -63,7 +65,7 @@ namespace nomic {
 			if(iter != m_id.end()) {
 
 				if(iter->second.find(handle) != iter->second.end()) {
-					THROW_NOMIC_ENTITY_MANAGER_EXCEPTION_FORMAT(NOMIC_ENTITY_MANAGER_EXCEPTION_DUPLICATE_HANDLE,
+					THROW_NOMIC_ENTITY_MANAGER_EXCEPTION_FORMAT(NOMIC_ENTITY_MANAGER_EXCEPTION_HANDLE_DUPLICATE,
 						"Handle=%p", handle);
 				}
 			} else {
@@ -84,6 +86,8 @@ namespace nomic {
 			bool result;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_ENTITY_MANAGER_EXCEPTION(NOMIC_ENTITY_MANAGER_EXCEPTION_UNINITIALIZED);
@@ -182,6 +186,8 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Handle=%p", handle);
 
+			std::lock_guard<std::mutex> lock(m_mutex);
+
 			if(!m_initialized) {
 				THROW_NOMIC_ENTITY_MANAGER_EXCEPTION(NOMIC_ENTITY_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
@@ -254,6 +260,8 @@ namespace nomic {
 		manager::update(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(!m_initialized) {
 				THROW_NOMIC_ENTITY_MANAGER_EXCEPTION(NOMIC_ENTITY_MANAGER_EXCEPTION_UNINITIALIZED);

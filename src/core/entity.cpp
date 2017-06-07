@@ -18,6 +18,7 @@
 
 #include "../../include/core/entity.h"
 #include "../../include/entity/manager.h"
+#include "../../include/render/manager.h"
 #include "../../include/trace.h"
 #include "./entity_type.h"
 
@@ -56,6 +57,7 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			add();
+			register_renderers(other.m_renderer);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -64,6 +66,7 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			unregsiter_all_renderers();
 			remove();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -77,6 +80,7 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			if(this != &other) {
+				unregsiter_all_renderers();
 				remove();
 				nomic::core::id::operator=(other);
 				nomic::core::object::operator=(other);
@@ -84,6 +88,7 @@ namespace nomic {
 				m_enabled = other.m_enabled;
 				m_shown = other.m_shown;
 				add();
+				register_renderers(other.m_renderer);
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", this);
@@ -123,6 +128,61 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_enabled);
 			return m_enabled;
+		}
+
+		bool 
+		entity::registered(
+			__in GLuint id
+			) const
+		{
+			bool result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			result = (m_renderer.find(id) != m_renderer.end());
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		void 
+		entity::register_renderer(
+			__in GLuint id
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			if(id == HANDLE_INVALID) {
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_INVALID, "Id=%x", id);
+			}
+
+			if(m_renderer.find(id) != m_renderer.end()) {
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_DUPLICATE, "Id=%x", id);
+			}
+
+			nomic::render::manager &instance = nomic::render::manager::acquire();
+			if(instance.initialized()) {
+				instance.register_entity(this, id);
+			}
+
+			instance.release();
+			m_renderer.insert(id);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		entity::register_renderers(
+			__in const std::set<GLuint> &renderer
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer[%u]=%p", renderer.size(), &renderer);
+
+			for(std::set<GLuint>::const_iterator iter = renderer.begin(); iter != renderer.end(); ++iter) {
+				register_renderer(*iter);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -184,11 +244,76 @@ namespace nomic {
 				result << " Object=" << nomic::core::object::to_string(verbose)
 					<< ", Transform=" << nomic::core::transform::to_string(verbose)
 					<< ", Id=" << nomic::core::id::to_string(verbose)
-					<< ", State=" << (m_enabled ? "Enabled" : "Disabled") << "/" << (m_shown ? "Shown" : "Hidden");
+					<< ", State=" << (m_enabled ? "Enabled" : "Disabled") << "/" << (m_shown ? "Shown" : "Hidden")
+					<< ", Renderer[" << m_renderer.size() << "]";
+
+				if(!m_renderer.empty()) {
+					result << "={";
+
+					for(std::set<GLuint>::iterator iter = m_renderer.begin(); iter != m_renderer.end(); ++iter) {
+
+						if(iter != m_renderer.begin()) {
+							result << ", ";
+						}
+
+						result << SCALAR_AS_HEX(GLuint, *iter);
+					}
+
+					result << "}";
+				}
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 			return result.str();
+		}
+
+		void 
+		entity::unregsiter_all_renderers(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::render::manager &instance = nomic::render::manager::acquire();
+
+			for(std::set<GLuint>::iterator iter = m_renderer.begin(); iter != m_renderer.end(); ++iter) {
+
+				if(instance.initialized() && instance.contains_registration(this, *iter)) {
+					instance.unregister_entity(this, *iter);
+				}
+			}
+
+			instance.release();
+			m_renderer.clear();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		entity::unregister_renderer(
+			__in GLuint id
+			)
+		{
+			std::set<GLuint>::iterator result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			if(id == HANDLE_INVALID) {
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_INVALID, "Id=%x", id);
+			}
+
+			result = m_renderer.find(id);
+			if(result == m_renderer.end()) {
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_UNREGISTERED, "Id=%x", id);
+			}
+
+			nomic::render::manager &instance = nomic::render::manager::acquire();
+			if(instance.initialized() && instance.contains_registration(this, id)) {
+				instance.unregister_entity(this, id);
+			}
+
+			instance.release();
+			m_renderer.erase(result);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 

@@ -81,6 +81,8 @@ namespace nomic {
 				void on_uninitialize(void);
 
 				std::map<uint32_t, std::set<nomic::core::entity *>> m_id;
+
+				std::mutex m_mutex;
 		};
 	}
 }

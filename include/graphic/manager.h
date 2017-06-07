@@ -91,6 +91,8 @@ namespace nomic {
 				void on_uninitialize(void);
 
 				std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>> m_handle;
+
+				std::mutex m_mutex;
 		};
 	}
 }
