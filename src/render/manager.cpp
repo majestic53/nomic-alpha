@@ -319,7 +319,7 @@ namespace nomic {
 							continue;
 						}
 
-						(*iter_entity)->render(delta);
+						(*iter_entity)->on_render(delta);
 					}
 				}
 			}

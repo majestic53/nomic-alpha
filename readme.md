@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1723
 ----------------
+*Updated: 6/7/2017*
+
+* Added entity object base class
+
 *Updated: 6/5-6/2017*
 
 * Added render singleton class <s>(incomplete)</s>

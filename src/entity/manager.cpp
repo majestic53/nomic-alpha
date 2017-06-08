@@ -277,7 +277,7 @@ namespace nomic {
 						continue;
 					}
 
-					(*iter_handle)->update();
+					(*iter_handle)->on_update();
 				}
 			}
 

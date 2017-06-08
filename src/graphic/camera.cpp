@@ -31,7 +31,7 @@ namespace nomic {
 			__in_opt const glm::vec3 &up,
 			__in_opt float fov
 			) :
-				nomic::core::entity(ENTITY_CAMERA, SUBTYPE_UNDEFINED, position, rotation, up),
+				nomic::entity::object(ENTITY_CAMERA, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_dimension(dimension),
 				m_fov(fov),
 				m_rotation_previous(rotation.x, rotation.y),
@@ -49,8 +49,7 @@ namespace nomic {
 		camera::camera(
 			__in const camera &other
 			) :
-				nomic::core::entity(other),
-				nomic::core::uniform(other),
+				nomic::entity::object(other),
 				m_dimension(other.m_dimension),
 				m_fov(other.m_fov),
 				m_key(other.m_key),
@@ -82,8 +81,7 @@ namespace nomic {
 				other.m_up.x, other.m_up.y, other.m_up.z, other.m_fov);
 
 			if(this != &other) {
-				nomic::core::entity::operator=(other);
-				nomic::core::uniform::operator=(other);
+				nomic::entity::object::operator=(other);
 				m_dimension = other.m_dimension;
 				m_fov = other.m_fov;
 				m_key = other.m_key;
@@ -264,7 +262,8 @@ namespace nomic {
 			result << NOMIC_GRAPHIC_CAMERA_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
-				result << " Dimension={" << m_dimension.x << ", " << m_dimension.y << "}"
+				result << " Base=" << nomic::entity::object::to_string(verbose)
+					<< ", Dimension={" << m_dimension.x << ", " << m_dimension.y << "}"
 					<< ", FOV=" << m_fov;
 			}
 

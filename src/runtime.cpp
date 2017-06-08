@@ -265,6 +265,7 @@ namespace nomic {
 	runtime::on_run(void)
 	{
 		bool result = false;
+		float delta, delta_previous = 0.f;
 		uint32_t duration, frame, next, skip;
 
 		TRACE_ENTRY(LEVEL_VERBOSE);
@@ -297,7 +298,7 @@ namespace nomic {
 
 					if(!(m_tick % RUNTIME_TICKS_PER_SECOND)) {
 						set_frame_rate(frame);
-						TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Runtime frames/sec=%u", frame);
+						TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Runtime framerate=%u", frame);
 						frame = 0;
 					}
 
@@ -307,8 +308,12 @@ namespace nomic {
 					increment_tick();
 				}
 
-				on_render((SDL_GetTicks() + duration - next) / (float) duration);
-				++frame;
+				delta = ((SDL_GetTicks() + duration - next) / (float) duration);
+				if(delta != delta_previous) {
+					delta_previous = delta;
+					on_render(delta);
+					++frame;
+				}
 			} else {
 
 				if(m_paused_change) {

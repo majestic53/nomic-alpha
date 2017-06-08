@@ -86,7 +86,7 @@ namespace nomic {
 
 	#define GL_ATTRIBUTE_ACCELERATE_VISUAL 1
 	#define GL_ATTRIBUTE_COLOR_SIZE 8
-	#define GL_ATTRIBUTE_DEPTH_SIZE 24
+	#define GL_ATTRIBUTE_DEPTH_SIZE 16
 	#define GL_ATTRIBUTE_DOUBLEBUFFER 1
 	#define GL_ATTRIBUTE_MAJOR_VERSION 3
 	#define GL_ATTRIBUTE_MINOR_VERSION 3
@@ -118,7 +118,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_REVISION 3
 	#define NOMIC_VERSION_WEEK 1723
 
 	#define OBJECT_COUNT 1
@@ -216,7 +216,9 @@ namespace nomic {
 	#define UNIFORM_VIEW "view"
 
 	enum {
-		ENTITY_CAMERA = 0,
+		ENTITY_AXIS = 0,
+		ENTITY_CAMERA,
+		ENTITY_RETICLE,
 	};
 
 	enum {

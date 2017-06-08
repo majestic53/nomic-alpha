@@ -20,8 +20,7 @@
 #define NOMIC_GRAPHIC_CAMERA_H_
 
 #include <map>
-#include "../core/entity.h"
-#include "../core/uniform.h"
+#include "../entity/object.h"
 #include "../event/input.h"
 
 namespace nomic {
@@ -29,8 +28,7 @@ namespace nomic {
 	namespace graphic {
 
 		class camera :
-				public nomic::core::entity,
-				public nomic::core::uniform,
+				public nomic::entity::object,
 				protected nomic::event::input {
 
 			public:
@@ -69,8 +67,6 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
-				void update_perspective(void);
-
 			protected:
 
 				void on_key(
@@ -92,6 +88,8 @@ namespace nomic {
 					__in int32_t x,
 					__in int32_t y
 					);
+
+				void update_perspective(void);
 
 				glm::uvec2 m_dimension;
 

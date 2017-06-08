@@ -130,6 +130,22 @@ namespace nomic {
 			return m_enabled;
 		}
 
+		void 
+		entity::on_render(
+			__in float delta
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		entity::on_update(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		bool 
 		entity::registered(
 			__in GLuint id
@@ -197,15 +213,6 @@ namespace nomic {
 
 			instance.release();
 
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		void 
-		entity::render(
-			__in float delta
-			)
-		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -313,13 +320,6 @@ namespace nomic {
 			instance.release();
 			m_renderer.erase(result);
 
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		void 
-		entity::update(void)
-		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 	}

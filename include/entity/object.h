@@ -16,48 +16,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_CORE_ENTITY_H_
-#define NOMIC_CORE_ENTITY_H_
+#ifndef NOMIC_ENTITY_OBJECT_H_
+#define NOMIC_ENTITY_OBJECT_H_
 
-#include <set>
-#include "./id.h"
-#include "./object.h"
-#include "./transform.h"
+#include "../core/entity.h"
+#include "../core/uniform.h"
+#include "../graphic/vao.h"
 
 namespace nomic {
 
-	namespace core {
+	namespace entity {
 
-		class entity :
-				public nomic::core::id,
-				public nomic::core::object,
-				public nomic::core::transform {
+		class object :
+				public nomic::core::entity,
+				public nomic::core::uniform {
 
 			public:
 
-				explicit entity(
+				object(
 					__in uint32_t type,
 					__in uint32_t subtype = SUBTYPE_UNDEFINED,
 					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
 					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
-					__in_opt const glm::vec3 &up = TRANSFORM_UP_DEFAULT
+					__in_opt const glm::vec3 &up = TRANSFORM_UP_DEFAULT,
+					__in_opt const glm::mat4 &model = UNIFORM_MATRIX_DEFAULT,
+					__in_opt const glm::mat4 &projection = UNIFORM_MATRIX_DEFAULT,
+					__in_opt const glm::mat4 &view = UNIFORM_MATRIX_DEFAULT
 					);
 
-				entity(
-					__in const entity &other
+				object(
+					__in const object &other
 					);
 
-				virtual ~entity(void);
+				virtual ~object(void);
 
-				entity &operator=(
-					__in const entity &other
+				object &operator=(
+					__in const object &other
 					);
-
-				void enable(
-					__in bool state
-					);
-
-				bool enabled(void) const;
 
 				virtual void on_render(
 					__in float delta
@@ -65,47 +60,17 @@ namespace nomic {
 
 				virtual void on_update(void);
 
-				void register_renderer(
-					__in GLuint id
-					);
-
-				bool registered(
-					__in GLuint id
-					) const;
-
-				void show(
-					__in bool state
-					);
-
-				bool shown(void) const;
-
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
-				void unregsiter_all_renderers(void);
-
-				void unregister_renderer(
-					__in GLuint id
-					);
+				nomic::graphic::vao &vertex_array(void);
 
 			protected:
 
-				void add(void);
-
-				void register_renderers(
-					__in const std::set<GLuint> &renderer
-					);
-
-				void remove(void);
-
-				bool m_enabled;
-
-				std::set<GLuint> m_renderer;
-
-				bool m_shown;
+				nomic::graphic::vao m_vao;
 		};
 	}
 }
 
-#endif // NOMIC_CORE_ENTITY_H_
+#endif // NOMIC_ENTITY_OBJECT_H_

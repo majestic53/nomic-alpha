@@ -146,6 +146,9 @@ namespace nomic {
 					"Failed to allocate camera, Address=%p", m_camera);
 			}
 
+			m_camera->enable(false);
+			m_camera->show(false);
+
 // TODO: DEBUG
 
 			vao_axis = new nomic::graphic::vao;
@@ -272,7 +275,7 @@ namespace nomic {
 
 			m_camera->render(delta);
 			m_manager_display.clear();
-			//m_manager_render->render(m_camera->projection(), m_camera->view(), delta);
+			m_manager_render.render(m_camera->projection(), m_camera->view(), delta);
 
 // TODO: DEBUG
 			prog_cursor->use();
