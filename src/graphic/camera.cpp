@@ -17,6 +17,7 @@
  */
 
 #include "../../include/graphic/camera.h"
+#include "../../include/session/manager.h"
 #include "../../include/trace.h"
 #include "./camera_type.h"
 
@@ -169,6 +170,16 @@ namespace nomic {
 					case KEY_BACKWARD:
 						m_position -= (m_rotation * speed);
 						break;
+					case KEY_DEBUG: {
+
+							nomic::session::manager &instance = nomic::session::manager::acquire();
+							if(instance.initialized()) {
+								instance.toggle_debug();
+							}
+
+							instance.release();
+							iter->second = false;
+						} break;
 					case KEY_FORWARD:
 						m_position += (m_rotation * speed);
 						break;

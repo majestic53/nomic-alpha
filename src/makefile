@@ -46,7 +46,7 @@ archive:
 		$(DIR_BUILD)core_entity.o $(DIR_BUILD)core_event.o $(DIR_BUILD)core_id.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_primitive.o \
 			$(DIR_BUILD)core_renderer.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o \
 			$(DIR_BUILD)core_uniform.o \
-		$(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_object.o \
+		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_object.o $(DIR_BUILD)entity_reticle.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)graphic_camera.o $(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o \
 			$(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
@@ -111,13 +111,19 @@ core_uniform.o: $(DIR_SRC_CORE)uniform.cpp $(DIR_INC_CORE)uniform.h
 
 ### ENTITY ###
 
-build_entity: entity_manager.o entity_object.o
+build_entity: entity_axis.o entity_manager.o entity_object.o entity_reticle.o
+
+entity_axis.o: $(DIR_SRC_ENTITY)axis.cpp $(DIR_INC_ENTITY)axis.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)axis.cpp -o $(DIR_BUILD)entity_axis.o
 
 entity_manager.o: $(DIR_SRC_ENTITY)manager.cpp $(DIR_INC_ENTITY)manager.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)manager.cpp -o $(DIR_BUILD)entity_manager.o
 
 entity_object.o: $(DIR_SRC_ENTITY)object.cpp $(DIR_INC_ENTITY)object.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)object.cpp -o $(DIR_BUILD)entity_object.o
+
+entity_reticle.o: $(DIR_SRC_ENTITY)reticle.cpp $(DIR_INC_ENTITY)reticle.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)reticle.cpp -o $(DIR_BUILD)entity_reticle.o
 
 ### EVENT ###
 

@@ -19,6 +19,7 @@
 #ifndef NOMIC_SESSION_MANAGER_H_
 #define NOMIC_SESSION_MANAGER_H_
 
+#include <vector>
 #include "../entity/manager.h"
 #include "../graphic/camera.h"
 #include "../graphic/display.h"
@@ -42,6 +43,10 @@ namespace nomic {
 
 				void pause(void);
 
+				void set_debug(
+					__in bool debug
+					);
+
 				void set_dimensions(
 					__in const glm::uvec2 &dimension
 					);
@@ -61,6 +66,8 @@ namespace nomic {
 				std::string to_string(
 					__in_opt bool verbose = false
 					) const;
+
+				void toggle_debug(void);
 
 				void unpause(void);
 
@@ -85,6 +92,12 @@ namespace nomic {
 				void on_uninitialize(void);
 
 				nomic::graphic::camera *m_camera;
+
+				bool m_debug;
+
+				std::vector<nomic::entity::object *> m_debug_object;
+
+				std::vector<nomic::core::renderer *> m_debug_renderer;
 
 				nomic::graphic::display &m_manager_display;
 

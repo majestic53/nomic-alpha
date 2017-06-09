@@ -18,59 +18,47 @@
 
 #include <map>
 #include "../../include/session/manager.h"
+#include "../../include/core/renderer.h"
+#include "../../include/entity/axis.h"
+#include "../../include/entity/reticle.h"
+#include "../../include/graphic/vao.h"
 #include "../../include/trace.h"
 #include "./manager_type.h"
-
-// TODO: DEBUG
-#include "../../include/core/renderer.h"
-#include "../../include/graphic/vao.h"
-
-#define CURSOR_RATIO (DISPLAY_DEFAULT_HEIGHT / (float) DISPLAY_DEFAULT_WIDTH)
-#define CURSOR_WIDTH 0.04f
-
-const float CURSOR_COLOR[] = {
-	0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
-	0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
-	};
-
-const float CURSOR_VERTEX[] = {
-	-CURSOR_WIDTH * CURSOR_RATIO, 0.f, 0.f, CURSOR_WIDTH * CURSOR_RATIO, 0.f, 0.f, // horizontal
-	0.0f, -CURSOR_WIDTH, 0.f, 0.f, CURSOR_WIDTH, 0.f,  // vertical
-	};
-
-const float AXIS_COLOR[] = {
-	1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, // red x
-	0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, // green y
-	0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, // blue z
-	};
-
-const float AXIS_VERTEX[] = {
-	0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.75f, 0.25f, 0.f, 1.f, 0.f, 0.f, 0.75f, -0.25f, 0.f, // x
-	0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, 0.f, // y
-	0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, // z
-	};
-
-nomic::graphic::vao *vao_axis = nullptr, *vao_cursor = nullptr;
-nomic::core::renderer *prog_axis = nullptr, *prog_cursor = nullptr;
-// ---
 
 namespace nomic {
 
 	namespace session {
 
-		static const std::map<SDL_GLattr, GLint> DISPLAY_ATTRIBUTE = {
-			std::pair<SDL_GLattr, GLint>(SDL_GL_ACCELERATED_VISUAL, GL_ATTRIBUTE_ACCELERATE_VISUAL),
-			std::pair<SDL_GLattr, GLint>(SDL_GL_BLUE_SIZE, GL_ATTRIBUTE_COLOR_SIZE),
-			std::pair<SDL_GLattr, GLint>(SDL_GL_CONTEXT_MAJOR_VERSION, GL_ATTRIBUTE_MAJOR_VERSION),
-			std::pair<SDL_GLattr, GLint>(SDL_GL_CONTEXT_MINOR_VERSION, GL_ATTRIBUTE_MINOR_VERSION),
-			std::pair<SDL_GLattr, GLint>(SDL_GL_DEPTH_SIZE, GL_ATTRIBUTE_DEPTH_SIZE),
-			std::pair<SDL_GLattr, GLint>(SDL_GL_DOUBLEBUFFER, GL_ATTRIBUTE_DOUBLEBUFFER),
-			std::pair<SDL_GLattr, GLint>(SDL_GL_GREEN_SIZE, GL_ATTRIBUTE_COLOR_SIZE),
-			std::pair<SDL_GLattr, GLint>(SDL_GL_RED_SIZE, GL_ATTRIBUTE_COLOR_SIZE),
+		enum {
+			DEBUG_OBJECT_AXIS = 0,
+			DEBUG_OBJECT_RETICLE,
+		};
+
+		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_RETICLE
+
+		static const std::vector<std::pair<std::string, std::string>> DEBUG_RENDERER_SHADER = {
+			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl" },
+			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl" },
+			};
+
+		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
+			{ SDL_GL_ACCELERATED_VISUAL, GL_ATTRIBUTE_ACCELERATE_VISUAL },
+			{ SDL_GL_BLUE_SIZE, GL_ATTRIBUTE_COLOR_SIZE },
+			{ SDL_GL_CONTEXT_MAJOR_VERSION, GL_ATTRIBUTE_MAJOR_VERSION },
+			{ SDL_GL_CONTEXT_MINOR_VERSION, GL_ATTRIBUTE_MINOR_VERSION },
+			{ SDL_GL_DEPTH_SIZE, GL_ATTRIBUTE_DEPTH_SIZE },
+			{ SDL_GL_DOUBLEBUFFER, GL_ATTRIBUTE_DOUBLEBUFFER },
+			{ SDL_GL_GREEN_SIZE, GL_ATTRIBUTE_COLOR_SIZE },
+			{ SDL_GL_RED_SIZE, GL_ATTRIBUTE_COLOR_SIZE },
+			};
+
+		static const std::map<GLenum, std::map<GLenum, GLenum>> GRAPHIC_ATTRIBUTE = {
+			{ GL_LINE_SMOOTH, { std::pair<GLenum, GLenum>(GL_LINE_SMOOTH_HINT, GL_NICEST) } },
 			};
 
 		manager::manager(void) :
 			m_camera(nullptr),
+			m_debug(SESSION_DEBUG_DEFAULT),
 			m_manager_display(nomic::graphic::display::acquire()),
 			m_manager_entity(nomic::entity::manager::acquire()),
 			m_manager_graphic(nomic::graphic::manager::acquire()),
@@ -102,7 +90,7 @@ namespace nomic {
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initializing...");
 
-			for(std::map<SDL_GLattr, GLint>::const_iterator iter = DISPLAY_ATTRIBUTE.begin(); iter != DISPLAY_ATTRIBUTE.end();
+			for(std::map<SDL_GLattr, GLint>::const_iterator iter = SDL_ATTRIBUTE.begin(); iter != SDL_ATTRIBUTE.end();
 					++iter) {
 
 				if(SDL_GL_SetAttribute(iter->first, iter->second)) {
@@ -134,6 +122,16 @@ namespace nomic {
 					"SDL_SetRelativeMouseMode(%x) failed! Error=%s", DISPLAY_MOUSE_RELATIVE, SDL_GetError());
 			}
 
+			for(std::map<GLenum, std::map<GLenum, GLenum>>::const_iterator iter_attribute = GRAPHIC_ATTRIBUTE.begin();
+					iter_attribute != GRAPHIC_ATTRIBUTE.end(); ++iter_attribute) {
+				GL_CHECK(LEVEL_WARNING, glEnable, iter_attribute->first);
+
+				for(std::map<GLenum, GLenum>::const_iterator iter_hint = iter_attribute->second.begin();
+						iter_hint != iter_attribute->second.end(); ++iter_hint) {
+					GL_CHECK(LEVEL_WARNING, glHint, iter_hint->first, iter_hint->second);
+				}
+			}
+
 			m_manager_graphic.initialize();
 			m_manager_render.initialize();
 			m_manager_entity.initialize();
@@ -149,48 +147,34 @@ namespace nomic {
 			m_camera->enable(false);
 			m_camera->show(false);
 
-// TODO: DEBUG
+			for(size_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
 
-			vao_axis = new nomic::graphic::vao;
-			if(!vao_axis) {
-				THROW_EXCEPTION("Allocation failed!");
+				m_debug_renderer.push_back(new nomic::core::renderer);
+				if(!m_debug_renderer.at(iter)) {
+					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Renderer=%u", iter);
+				}
+
+				m_debug_renderer.at(iter)->set_shaders(DEBUG_RENDERER_SHADER.at(iter).first, DEBUG_RENDERER_SHADER.at(iter).second);
+
+				switch(iter) {
+					case DEBUG_OBJECT_AXIS:
+						m_debug_object.push_back(new nomic::entity::axis);
+						break;
+					case DEBUG_OBJECT_RETICLE:
+						m_debug_object.push_back(new nomic::entity::reticle);
+						break;
+					default:
+						break;
+				}
+
+				if(!m_debug_object.at(iter)) {
+					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
+				}
+
+				m_debug_object.at(iter)->enable(m_debug);
+				m_debug_object.at(iter)->show(m_debug);
+				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->get_id());
 			}
-
-			vao_axis->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_COLOR[0],
-				((uint8_t *) &AXIS_COLOR[0]) + (54 * sizeof(GLfloat))), GL_STATIC_DRAW), 0, 3, GL_FLOAT);
-			vao_axis->enable(0);
-
-			vao_axis->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_VERTEX[0],
-				((uint8_t *) &AXIS_VERTEX[0]) + (54 * sizeof(GLfloat))), GL_STATIC_DRAW), 1, 3, GL_FLOAT);
-			vao_axis->enable(1);
-
-			prog_axis = new nomic::core::renderer;
-			if(!prog_axis) {
-				THROW_EXCEPTION("Allocation failed!");
-			}
-
-			prog_axis->set_shaders("./res/vert_axis.glsl", "./res/frag_axis.glsl");
-
-			vao_cursor = new nomic::graphic::vao;
-			if(!vao_cursor) {
-				THROW_EXCEPTION("Allocation failed!");
-			}
-
-			vao_cursor->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &CURSOR_COLOR[0],
-				((uint8_t *) &CURSOR_COLOR[0]) + (12 * sizeof(GLfloat))), GL_STATIC_DRAW), 0, 3, GL_FLOAT);
-			vao_cursor->enable(0);
-
-			vao_cursor->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &CURSOR_VERTEX[0],
-				((uint8_t *) &CURSOR_VERTEX[0]) + (12 * sizeof(GLfloat))), GL_STATIC_DRAW), 1, 3, GL_FLOAT);
-			vao_cursor->enable(1);
-
-			prog_cursor = new nomic::core::renderer;
-			if(!prog_cursor) {
-				THROW_EXCEPTION("Allocation failed!");
-			}
-
-			prog_cursor->set_shaders("./res/vert_cursor.glsl", "./res/frag_cursor.glsl");
-// ---
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initialized");
 
@@ -210,32 +194,23 @@ namespace nomic {
 				m_camera = nullptr;
 			}
 
+			for(size_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
+
+				if(m_debug_object.at(iter)) {
+					delete m_debug_object.at(iter);
+					m_debug_object.at(iter) = nullptr;
+				}
+
+				if(m_debug_renderer.at(iter)) {
+					delete m_debug_renderer.at(iter);
+					m_debug_renderer.at(iter) = nullptr;
+				}
+			}
+
+			m_debug_object.clear();
+			m_debug_renderer.clear();
+
 			// TODO: uninitialize gl managers
-
-// TODO: DEBUG
-
-			if(prog_axis) {
-				delete prog_axis;
-				prog_axis = nullptr;
-			}
-
-			if(prog_cursor) {
-				delete prog_cursor;
-				prog_cursor = nullptr;
-			}
-
-			if(vao_axis) {
-				vao_axis->disable_all();
-				delete vao_axis;
-				vao_axis = nullptr;
-			}
-
-			if(vao_cursor) {
-				vao_cursor->disable_all();
-				delete vao_cursor;
-				vao_cursor = nullptr;
-			}
-// ---
 
 			m_manager_entity.uninitialize();
 			m_manager_render.uninitialize();
@@ -276,18 +251,32 @@ namespace nomic {
 			m_camera->render(delta);
 			m_manager_display.clear();
 			m_manager_render.render(m_camera->projection(), m_camera->view(), delta);
-
-// TODO: DEBUG
-			prog_cursor->use();
-			vao_cursor->bind();
-			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, 4);
-
-			prog_axis->use(m_camera->projection(), m_camera->view());
-			vao_axis->bind();
-			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, 18);
-// ---
-
 			m_manager_display.show();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::set_debug(
+			__in bool debug
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Debug=%x", debug);
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_debug = debug;
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Debug mode %s", (m_debug ? "active" : "inactive"));
+
+			for(std::vector<nomic::entity::object *>::iterator iter = m_debug_object.begin(); iter != m_debug_object.end(); ++iter) {
+
+				if(*iter) {
+					(*iter)->enable(m_debug);
+					(*iter)->show(m_debug);
+				}
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -388,6 +377,16 @@ namespace nomic {
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 			return result.str();
+		}
+
+		void 
+		manager::toggle_debug(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			set_debug(!m_debug);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 

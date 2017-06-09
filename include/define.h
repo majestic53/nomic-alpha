@@ -118,7 +118,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1723
 
 	#define OBJECT_COUNT 1
@@ -154,6 +154,8 @@ namespace nomic {
 		} \
 		instance.release(); \
 		}
+
+	#define SESSION_DEBUG_DEFAULT true
 
 	#define STRING_EMPTY "<EMPTY>"
 	#define STRING_INVALID "<INVALID>"
@@ -227,10 +229,11 @@ namespace nomic {
 	};
 
 	enum {
-		KEY_BACKWARD = 22,
-		KEY_FORWARD = 26,
-		KEY_LEFT = 4,
-		KEY_RIGHT = 7,
+		KEY_BACKWARD = SDL_SCANCODE_S,
+		KEY_DEBUG = SDL_SCANCODE_GRAVE,
+		KEY_FORWARD = SDL_SCANCODE_W,
+		KEY_LEFT = SDL_SCANCODE_A,
+		KEY_RIGHT = SDL_SCANCODE_D,
 	};
 
 	enum {

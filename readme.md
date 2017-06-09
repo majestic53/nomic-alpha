@@ -26,6 +26,11 @@ Changelog
 
 Version 0.1.1723
 ----------------
+*Updated: 6/8/2017*
+
+* Added debug entity objects
+* Added debug mode to session
+
 *Updated: 6/7/2017*
 
 * Added entity object base class
