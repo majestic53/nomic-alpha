@@ -163,6 +163,24 @@ namespace nomic {
 		}
 
 		void 
+		display::set_icon(
+			__in const std::string &path
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
+
+			if(!m_initialized) {
+				THROW_NOMIC_GRAPHIC_DISPLAY_EXCEPTION(NOMIC_GRAPHIC_DISPLAY_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_window_icon.set(path);
+			SDL_SetWindowIcon(m_window, m_window_icon.surface());
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display icon[%u]=%s", path.size(), STRING_CHECK(path));
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		display::set_title(
 			__in const std::string &title
 			)

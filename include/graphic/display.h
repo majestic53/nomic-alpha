@@ -20,6 +20,7 @@
 #define NOMIC_GRAPHIC_DISPLAY_H_
 
 #include "../core/singleton.h"
+#include "./bitmap.h"
 
 namespace nomic {
 
@@ -40,6 +41,10 @@ namespace nomic {
 
 				void set_fullscreen(
 					__in bool fullscreen
+					);
+
+				void set_icon(
+					__in const std::string &path
 					);
 
 				void set_title(
@@ -73,6 +78,8 @@ namespace nomic {
 				SDL_Window *m_window;
 
 				SDL_GLContext m_window_context;
+
+				nomic::graphic::bitmap m_window_icon;
 		};
 	}
 }

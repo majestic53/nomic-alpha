@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1723
 ----------------
+*Updated: 6/9/2017*
+
+* Added bitmap graphic class
+
 *Updated: 6/8/2017*
 
 * Added debug entity objects

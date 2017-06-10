@@ -100,6 +100,11 @@ namespace nomic {
 			}
 
 			m_manager_display.initialize();
+
+			// TODO: configure display
+			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
+			// ---
+
 			glewExperimental = GL_TRUE;
 
 			err = glewInit();
