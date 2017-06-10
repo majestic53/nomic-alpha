@@ -55,6 +55,10 @@ namespace nomic {
 					__in bool fullscreen
 					);
 
+				void set_icon(
+					__in const std::string &path
+					);
+
 				void set_title(
 					__in const std::string &title
 					);

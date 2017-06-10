@@ -325,6 +325,22 @@ namespace nomic {
 		}
 
 		void 
+		manager::set_icon(
+			__in const std::string &path
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_manager_display.set_icon(path);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		manager::set_title(
 			__in const std::string &title
 			)
