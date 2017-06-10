@@ -119,6 +119,9 @@ namespace nomic {
 				case PRIMITIVE_SHADER:
 					GL_CHECK(LEVEL_WARNING, glDeleteShader, iter->first);
 					break;
+				case PRIMITIVE_TEXTURE:
+					GL_CHECK(LEVEL_WARNING, glDeleteTextures, HANDLE_COUNT, &iter->first);
+					break;
 				case PRIMITIVE_VAO:
 					GL_CHECK(LEVEL_WARNING, glDeleteVertexArrays, HANDLE_COUNT, &iter->first);
 					break;
@@ -179,6 +182,9 @@ namespace nomic {
 					break;
 				case PRIMITIVE_SHADER:
 					GL_CHECK_RESULT(LEVEL_WARNING, glCreateShader, result, subtype);
+					break;
+				case PRIMITIVE_TEXTURE:
+					GL_CHECK(LEVEL_WARNING, glGenTextures, HANDLE_COUNT, &result);
 					break;
 				case PRIMITIVE_VAO:
 					GL_CHECK(LEVEL_WARNING, glGenVertexArrays, HANDLE_COUNT, &result);

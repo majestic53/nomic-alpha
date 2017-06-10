@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1723
 ----------------
+*Updated: 6/10/2017*
+
+* Added texture primitive class
+
 *Updated: 6/9/2017*
 
 * Added bitmap graphic class
@@ -42,21 +46,6 @@ Version 0.1.1723
 *Updated: 6/5-6/2017*
 
 * Added render singleton class <s>(incomplete)</s>
-
-Version 0.1.1722
-----------------
-*Updated: 6/4/2017*
-
-* Added core renderer class <s>(incomplete)</s>
-
-*Updated: 6/3/2017*
-
-* Added camera class
-
-*Updated: 5/31-6/1/2017*
-
-* Added entity/manager class <s>(incomplete)</s>
-* Added input event class
 
 *Changelog truncated (see file history for full log)*
 

@@ -24,13 +24,6 @@ namespace nomic {
 
 	namespace graphic {
 
-		enum {
-			BITMAP_DEPTH_8 = 1,
-			BITMAP_DEPTH_16,
-			BITMAP_DEPTH_24,
-			BITMAP_DEPTH_32,
-		};
-
 		bitmap::bitmap(
 			__in_opt const std::string &path
 			) :
@@ -39,7 +32,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
 
 			if(!path.empty()) {
-				set(path);
+				load(path);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -53,7 +46,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", other.m_path.size(), STRING_CHECK(other.m_path));
 
 			if(!other.m_path.empty()) {
-				set(other.m_path);
+				load(other.m_path);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -76,7 +69,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", other.m_path.size(), STRING_CHECK(other.m_path));
 
 			if((this != &other) && !other.m_path.empty()) {
-				set(other.m_path);
+				load(other.m_path);
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
@@ -130,6 +123,25 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return result;
+		}
+
+		void 
+		bitmap::load(
+			__in const std::string &path
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
+
+			destroy();
+
+			m_surface = SDL_LoadBMP(&path[0]);
+			if(!m_surface) {
+				THROW_NOMIC_GRAPHIC_BITMAP_EXCEPTION_FORMAT(NOMIC_GRAPHIC_BITMAP_EXCEPTION_EXTERNAL, "%s", SDL_GetError());
+			}
+
+			m_path = path;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		bool 
@@ -231,25 +243,6 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", result);
 			return result;
-		}
-
-		void 
-		bitmap::set(
-			__in const std::string &path
-			)
-		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
-
-			destroy();
-
-			m_surface = SDL_LoadBMP(&path[0]);
-			if(!m_surface) {
-				THROW_NOMIC_GRAPHIC_BITMAP_EXCEPTION_FORMAT(NOMIC_GRAPHIC_BITMAP_EXCEPTION_EXTERNAL, "%s", SDL_GetError());
-			}
-
-			m_path = path;
-
-			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		SDL_Surface *

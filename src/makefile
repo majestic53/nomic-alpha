@@ -49,7 +49,8 @@ archive:
 		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_object.o $(DIR_BUILD)entity_reticle.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_camera.o $(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o \
-			$(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
+			$(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_texture.o $(DIR_BUILD)graphic_vao.o \
+			$(DIR_BUILD)graphic_vbo.o \
 		$(DIR_BUILD)render_manager.o \
 		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)uuid_manager.o
@@ -140,8 +141,8 @@ event_queue.o: $(DIR_SRC_EVENT)queue.cpp $(DIR_INC_EVENT)queue.h
 
 ### GRAPHIC ###
 
-build_graphic: graphic_bitmap.o graphic_camera.o graphic_display.o graphic_manager.o graphic_program.o graphic_shader.o graphic_vao.o \
-	graphic_vbo.o
+build_graphic: graphic_bitmap.o graphic_camera.o graphic_display.o graphic_manager.o graphic_program.o graphic_shader.o graphic_texture.o \
+	graphic_vao.o graphic_vbo.o
 
 graphic_bitmap.o: $(DIR_SRC_GRAPHIC)bitmap.cpp $(DIR_INC_GRAPHIC)bitmap.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)bitmap.cpp -o $(DIR_BUILD)graphic_bitmap.o
@@ -160,6 +161,9 @@ graphic_program.o: $(DIR_SRC_GRAPHIC)program.cpp $(DIR_INC_GRAPHIC)program.h
 
 graphic_shader.o: $(DIR_SRC_GRAPHIC)shader.cpp $(DIR_INC_GRAPHIC)shader.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)shader.cpp -o $(DIR_BUILD)graphic_shader.o
+
+graphic_texture.o: $(DIR_SRC_GRAPHIC)texture.cpp $(DIR_INC_GRAPHIC)texture.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)texture.cpp -o $(DIR_BUILD)graphic_texture.o
 
 graphic_vao.o: $(DIR_SRC_GRAPHIC)vao.cpp $(DIR_INC_GRAPHIC)vao.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)vao.cpp -o $(DIR_BUILD)graphic_vao.o

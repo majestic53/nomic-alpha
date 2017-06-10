@@ -47,6 +47,10 @@ namespace nomic {
 
 				uint32_t height(void) const;
 
+				void load(
+					__in const std::string &path
+					);
+
 				bool loaded(void) const;
 
 				std::string path(void) const;
@@ -59,10 +63,6 @@ namespace nomic {
 					) const;
 
 				void *pixels(void) const;
-
-				void set(
-					__in const std::string &path
-					);
 
 				SDL_Surface *surface(void) const;
 

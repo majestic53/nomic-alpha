@@ -173,7 +173,7 @@ namespace nomic {
 				THROW_NOMIC_GRAPHIC_DISPLAY_EXCEPTION(NOMIC_GRAPHIC_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_window_icon.set(path);
+			m_window_icon.load(path);
 			SDL_SetWindowIcon(m_window, m_window_icon.surface());
 			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display icon[%u]=%s", path.size(), STRING_CHECK(path));
 
