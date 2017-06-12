@@ -27,22 +27,22 @@ namespace nomic {
 		#define AXIS_SEGMENT_COUNT 18
 		#define AXIS_SEGMENT_WIDTH 3
 
-		const float AXIS_COLOR[] = {
+		enum {
+			AXIS_INDEX_COLOR = 0,
+			AXIS_INDEX_VERTEX,
+		};
+
+		static const float AXIS_COLOR[] = {
 			1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, // red x
 			0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, // green y
 			0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, // blue z
 			};
 
-		const float AXIS_VERTEX[] = {
+		static const float AXIS_VERTEX[] = {
 			0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.75f, 0.25f, 0.f, 1.f, 0.f, 0.f, 0.75f, -0.25f, 0.f, // x
 			0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, 0.f, // y
 			0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, // z
 			};
-
-		enum {
-			AXIS_INDEX_COLOR = 0,
-			AXIS_INDEX_VERTEX,
-		};
 
 		axis::axis(void) :
 			nomic::entity::object(ENTITY_AXIS)

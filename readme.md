@@ -24,6 +24,12 @@ make release
 Changelog
 =========
 
+Version 0.1.1724
+----------------
+*Updated: 6/11/2017*
+
+* Added support for colored/textured plain primitives
+
 Version 0.1.1723
 ----------------
 *Updated: 6/10/2017*

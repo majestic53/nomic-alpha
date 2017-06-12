@@ -37,8 +37,8 @@ namespace nomic {
 		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_RETICLE
 
 		static const std::vector<std::pair<std::string, std::string>> DEBUG_RENDERER_SHADER = {
-			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl" },
-			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl" },
+			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", },
+			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", },
 			};
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {

@@ -29,20 +29,20 @@ namespace nomic {
 		#define RETICLE_SEGMENT_WIDTH 3
 		#define RETICLE_WIDTH 0.04f
 
-		const float RETICLE_COLOR[] = {
-			0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
-			0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
-			};
-
-		const float RETICLE_VERTEX[] = {
-			-RETICLE_WIDTH * RETICLE_RATIO, 0.f, 0.f, RETICLE_WIDTH * RETICLE_RATIO, 0.f, 0.f, // horizontal
-			0.0f, -RETICLE_WIDTH, 0.f, 0.f, RETICLE_WIDTH, 0.f,  // vertical
-			};
-
 		enum {
 			RETICLE_INDEX_COLOR = 0,
 			RETICLE_INDEX_VERTEX,
 		};
+
+		static const float RETICLE_COLOR[] = {
+			0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
+			0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
+			};
+
+		static const float RETICLE_VERTEX[] = {
+			-RETICLE_WIDTH * RETICLE_RATIO, 0.f, 0.f, RETICLE_WIDTH * RETICLE_RATIO, 0.f, 0.f, // horizontal
+			0.0f, -RETICLE_WIDTH, 0.f, 0.f, RETICLE_WIDTH, 0.f,  // vertical
+			};
 
 		reticle::reticle(void) :
 			nomic::entity::object(ENTITY_AXIS)

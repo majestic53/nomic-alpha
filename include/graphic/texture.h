@@ -32,6 +32,8 @@ namespace nomic {
 
 				explicit texture(
 					__in_opt const std::string &path = std::string(),
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
 					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
 					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
 					);
@@ -62,6 +64,8 @@ namespace nomic {
 
 				void set(
 					__in const std::string &path,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
 					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
 					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
 					);

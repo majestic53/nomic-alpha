@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <climits>
 #include "../../include/graphic/texture.h"
 #include "../../include/graphic/bitmap.h"
 #include "../../include/trace.h"
@@ -27,6 +28,8 @@ namespace nomic {
 
 		texture::texture(
 			__in_opt const std::string &path,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
 			__in_opt GLenum filter_min,
 			__in_opt GLenum filter_mag
 			) :
@@ -34,10 +37,11 @@ namespace nomic {
 				m_depth(0),
 				m_mode(0)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s, Filter={%x, %x}", path.size(), STRING_CHECK(path), filter_min, filter_mag);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s, Wrap={%x, %x}, Filter={%x, %x}", path.size(), STRING_CHECK(path),
+				wrap_s, wrap_t, filter_min, filter_mag);
 
 			if(!path.empty()) {
-				set(path, filter_min, filter_mag);
+				set(path, wrap_s, wrap_t, filter_min, filter_mag);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -85,7 +89,6 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_2D, m_handle);
-			GL_CHECK(LEVEL_WARNING, glEnable, GL_TEXTURE_2D);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -150,18 +153,21 @@ namespace nomic {
 		void 
 		texture::set(
 			__in const std::string &path,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
 			__in_opt GLenum filter_min,
 			__in_opt GLenum filter_mag
 			)
 		{
 			nomic::graphic::bitmap image;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s, Filter={%x, %x}", path.size(), STRING_CHECK(path), filter_min, filter_mag);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s, Wrap={%x, %x}, Filter={%x, %x}", path.size(), STRING_CHECK(path),
+				wrap_s, wrap_t, filter_min, filter_mag);
 
 			image.load(path);
 
 			m_depth = image.depth();
-			switch(m_depth) {
+			switch(m_depth / CHAR_WIDTH) {
 				case BITMAP_DEPTH_24:
 					m_mode = GL_RGB;
 					break;
@@ -175,10 +181,13 @@ namespace nomic {
 
 			m_dimension = glm::uvec2(image.width(), image.height());
 			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_2D, m_handle);
-			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimension.x, m_dimension.y, 0, m_mode, GL_UNSIGNED_BYTE,
-				image.pixels());
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mag);
+			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimension.x, m_dimension.y, 0, m_mode,
+				GL_UNSIGNED_INT_8_8_8_8, image.pixels());
+			GL_CHECK(LEVEL_WARNING, glGenerateMipmap, GL_TEXTURE_2D);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
