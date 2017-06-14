@@ -16,13 +16,14 @@
 
 CC=clang++
 CC_FLAGS=-march=native -std=gnu++11 -Wall -Werror
-CC_FLAGS_EXT=
+CC_FLAGS_EXT=`pkg-config --cflags freetype2`
 DIR_BIN=./../bin/
 DIR_BUILD=./../build/
 DIR_INC=./../include/
 DIR_INC_CORE=./../include/core/
 DIR_INC_ENTITY=./../include/entity/
 DIR_INC_EVENT=./../include/event/
+DIR_INC_FONT=./../include/font/
 DIR_INC_GRAPHIC=./../include/graphic/
 DIR_INC_RENDER=./../include/render/
 DIR_INC_SESSION=./../include/session/
@@ -31,6 +32,7 @@ DIR_SRC=./
 DIR_SRC_CORE=./core/
 DIR_SRC_ENTITY=./entity/
 DIR_SRC_EVENT=./event/
+DIR_SRC_FONT=./font/
 DIR_SRC_GRAPHIC=./graphic/
 DIR_SRC_RENDER=./render/
 DIR_SRC_SESSION=./session/
@@ -43,155 +45,169 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o $(DIR_BUILD)base_utility.o \
-		$(DIR_BUILD)core_entity.o $(DIR_BUILD)core_event.o $(DIR_BUILD)core_id.o $(DIR_BUILD)core_object.o $(DIR_BUILD)core_primitive.o \
-			$(DIR_BUILD)core_renderer.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o \
-			$(DIR_BUILD)core_uniform.o \
+		$(DIR_BUILD)core_entity.o $(DIR_BUILD)core_event.o $(DIR_BUILD)core_font.o $(DIR_BUILD)core_id.o $(DIR_BUILD)core_object.o \
+			$(DIR_BUILD)core_primitive.o $(DIR_BUILD)core_renderer.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
+			$(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
 		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_object.o $(DIR_BUILD)entity_plain.o \
 			$(DIR_BUILD)entity_reticle.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
-		$(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_camera.o $(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o \
-			$(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_texture.o $(DIR_BUILD)graphic_vao.o \
-			$(DIR_BUILD)graphic_vbo.o \
+		$(DIR_BUILD)font_manager.o \
+		$(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_camera.o $(DIR_BUILD)graphic_character.o $(DIR_BUILD)graphic_display.o \
+			$(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_texture.o \
+			$(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
 		$(DIR_BUILD)render_manager.o \
 		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_core build_entity build_event build_graphic build_render build_session build_uuid
+build: build_base build_core build_entity build_event build_font build_graphic build_render build_session build_uuid
 
 ### BASE ###
 
 build_base: base_exception.o base_runtime.o base_trace.o base_utility.o
 
 base_exception.o: $(DIR_SRC)exception.cpp $(DIR_INC)exception.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)exception.cpp -o $(DIR_BUILD)base_exception.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)exception.cpp -o $(DIR_BUILD)base_exception.o
 
 base_runtime.o: $(DIR_SRC)runtime.cpp $(DIR_INC)runtime.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)runtime.cpp -o $(DIR_BUILD)base_runtime.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)runtime.cpp -o $(DIR_BUILD)base_runtime.o
 
 base_trace.o: $(DIR_SRC)trace.cpp
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)trace.cpp -o $(DIR_BUILD)base_trace.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)trace.cpp -o $(DIR_BUILD)base_trace.o
 
 base_utility.o: $(DIR_SRC)utility.cpp
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)utility.cpp -o $(DIR_BUILD)base_utility.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)utility.cpp -o $(DIR_BUILD)base_utility.o
 
 ### CORE ###
 
-build_core: core_entity.o core_event.o core_id.o core_object.o core_primitive.o core_renderer.o core_signal.o core_thread.o core_transform.o \
-	core_uniform.o
+build_core: core_entity.o core_event.o core_font.o core_id.o core_object.o core_primitive.o core_renderer.o core_signal.o core_thread.o \
+	core_transform.o core_uniform.o
 
 core_entity.o: $(DIR_SRC_CORE)entity.cpp $(DIR_INC_CORE)entity.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)entity.cpp -o $(DIR_BUILD)core_entity.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)entity.cpp -o $(DIR_BUILD)core_entity.o
 
 core_event.o: $(DIR_SRC_CORE)event.cpp $(DIR_INC_CORE)event.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)event.cpp -o $(DIR_BUILD)core_event.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)event.cpp -o $(DIR_BUILD)core_event.o
+
+core_font.o: $(DIR_SRC_CORE)font.cpp $(DIR_INC_CORE)font.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)font.cpp -o $(DIR_BUILD)core_font.o
 
 core_id.o: $(DIR_SRC_CORE)id.cpp $(DIR_INC_CORE)id.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)id.cpp -o $(DIR_BUILD)core_id.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)id.cpp -o $(DIR_BUILD)core_id.o
 
 core_object.o: $(DIR_SRC_CORE)object.cpp $(DIR_INC_CORE)object.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)object.cpp -o $(DIR_BUILD)core_object.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)object.cpp -o $(DIR_BUILD)core_object.o
 
 core_primitive.o: $(DIR_SRC_CORE)primitive.cpp $(DIR_INC_CORE)primitive.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)primitive.cpp -o $(DIR_BUILD)core_primitive.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)primitive.cpp -o $(DIR_BUILD)core_primitive.o
 
 core_renderer.o: $(DIR_SRC_CORE)renderer.cpp $(DIR_INC_CORE)renderer.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)renderer.cpp -o $(DIR_BUILD)core_renderer.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)renderer.cpp -o $(DIR_BUILD)core_renderer.o
 
 core_signal.o: $(DIR_SRC_CORE)signal.cpp $(DIR_INC_CORE)signal.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)signal.cpp -o $(DIR_BUILD)core_signal.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)signal.cpp -o $(DIR_BUILD)core_signal.o
 
 core_thread.o: $(DIR_SRC_CORE)thread.cpp $(DIR_INC_CORE)thread.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)thread.cpp -o $(DIR_BUILD)core_thread.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)thread.cpp -o $(DIR_BUILD)core_thread.o
 
 core_transform.o: $(DIR_SRC_CORE)transform.cpp $(DIR_INC_CORE)transform.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)transform.cpp -o $(DIR_BUILD)core_transform.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)transform.cpp -o $(DIR_BUILD)core_transform.o
 
 core_uniform.o: $(DIR_SRC_CORE)uniform.cpp $(DIR_INC_CORE)uniform.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)uniform.cpp -o $(DIR_BUILD)core_uniform.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)uniform.cpp -o $(DIR_BUILD)core_uniform.o
 
 ### ENTITY ###
 
 build_entity: entity_axis.o entity_manager.o entity_object.o entity_plain.o entity_reticle.o
 
 entity_axis.o: $(DIR_SRC_ENTITY)axis.cpp $(DIR_INC_ENTITY)axis.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)axis.cpp -o $(DIR_BUILD)entity_axis.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)axis.cpp -o $(DIR_BUILD)entity_axis.o
 
 entity_manager.o: $(DIR_SRC_ENTITY)manager.cpp $(DIR_INC_ENTITY)manager.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)manager.cpp -o $(DIR_BUILD)entity_manager.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)manager.cpp -o $(DIR_BUILD)entity_manager.o
 
 entity_object.o: $(DIR_SRC_ENTITY)object.cpp $(DIR_INC_ENTITY)object.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)object.cpp -o $(DIR_BUILD)entity_object.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)object.cpp -o $(DIR_BUILD)entity_object.o
 
 entity_plain.o: $(DIR_SRC_ENTITY)plain.cpp $(DIR_INC_ENTITY)plain.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)plain.cpp -o $(DIR_BUILD)entity_plain.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)plain.cpp -o $(DIR_BUILD)entity_plain.o
 
 entity_reticle.o: $(DIR_SRC_ENTITY)reticle.cpp $(DIR_INC_ENTITY)reticle.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)reticle.cpp -o $(DIR_BUILD)entity_reticle.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)reticle.cpp -o $(DIR_BUILD)entity_reticle.o
 
 ### EVENT ###
 
 build_event: event_input.o event_manager.o event_queue.o
 
 event_input.o: $(DIR_SRC_EVENT)input.cpp $(DIR_INC_EVENT)input.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)input.cpp -o $(DIR_BUILD)event_input.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)input.cpp -o $(DIR_BUILD)event_input.o
 
 event_manager.o: $(DIR_SRC_EVENT)manager.cpp $(DIR_INC_EVENT)manager.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)manager.cpp -o $(DIR_BUILD)event_manager.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)manager.cpp -o $(DIR_BUILD)event_manager.o
 
 event_queue.o: $(DIR_SRC_EVENT)queue.cpp $(DIR_INC_EVENT)queue.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)queue.cpp -o $(DIR_BUILD)event_queue.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_EVENT)queue.cpp -o $(DIR_BUILD)event_queue.o
+
+### FONT ###
+
+build_font: font_manager.o
+
+font_manager.o: $(DIR_SRC_FONT)manager.cpp $(DIR_INC_FONT)manager.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_FONT)manager.cpp -o $(DIR_BUILD)font_manager.o
 
 ### GRAPHIC ###
 
-build_graphic: graphic_bitmap.o graphic_camera.o graphic_display.o graphic_manager.o graphic_program.o graphic_shader.o graphic_texture.o \
-	graphic_vao.o graphic_vbo.o
+build_graphic: graphic_bitmap.o graphic_camera.o graphic_character.o graphic_display.o graphic_manager.o graphic_program.o graphic_shader.o \
+	graphic_texture.o graphic_vao.o graphic_vbo.o
 
 graphic_bitmap.o: $(DIR_SRC_GRAPHIC)bitmap.cpp $(DIR_INC_GRAPHIC)bitmap.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)bitmap.cpp -o $(DIR_BUILD)graphic_bitmap.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)bitmap.cpp -o $(DIR_BUILD)graphic_bitmap.o
 
 graphic_camera.o: $(DIR_SRC_GRAPHIC)camera.cpp $(DIR_INC_GRAPHIC)camera.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)camera.cpp -o $(DIR_BUILD)graphic_camera.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)camera.cpp -o $(DIR_BUILD)graphic_camera.o
+
+graphic_character.o: $(DIR_SRC_GRAPHIC)character.cpp $(DIR_INC_GRAPHIC)character.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)character.cpp -o $(DIR_BUILD)graphic_character.o
 
 graphic_display.o: $(DIR_SRC_GRAPHIC)display.cpp $(DIR_INC_GRAPHIC)display.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)display.cpp -o $(DIR_BUILD)graphic_display.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)display.cpp -o $(DIR_BUILD)graphic_display.o
 
 graphic_manager.o: $(DIR_SRC_GRAPHIC)manager.cpp $(DIR_INC_GRAPHIC)manager.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)manager.cpp -o $(DIR_BUILD)graphic_manager.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)manager.cpp -o $(DIR_BUILD)graphic_manager.o
 
 graphic_program.o: $(DIR_SRC_GRAPHIC)program.cpp $(DIR_INC_GRAPHIC)program.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)program.cpp -o $(DIR_BUILD)graphic_program.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)program.cpp -o $(DIR_BUILD)graphic_program.o
 
 graphic_shader.o: $(DIR_SRC_GRAPHIC)shader.cpp $(DIR_INC_GRAPHIC)shader.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)shader.cpp -o $(DIR_BUILD)graphic_shader.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)shader.cpp -o $(DIR_BUILD)graphic_shader.o
 
 graphic_texture.o: $(DIR_SRC_GRAPHIC)texture.cpp $(DIR_INC_GRAPHIC)texture.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)texture.cpp -o $(DIR_BUILD)graphic_texture.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)texture.cpp -o $(DIR_BUILD)graphic_texture.o
 
 graphic_vao.o: $(DIR_SRC_GRAPHIC)vao.cpp $(DIR_INC_GRAPHIC)vao.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)vao.cpp -o $(DIR_BUILD)graphic_vao.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)vao.cpp -o $(DIR_BUILD)graphic_vao.o
 
 graphic_vbo.o: $(DIR_SRC_GRAPHIC)vbo.cpp $(DIR_INC_GRAPHIC)vbo.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)vbo.cpp -o $(DIR_BUILD)graphic_vbo.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)vbo.cpp -o $(DIR_BUILD)graphic_vbo.o
 
 ### RENDER ###
 
 build_render: render_manager.o
 
 render_manager.o: $(DIR_SRC_RENDER)manager.cpp $(DIR_INC_RENDER)manager.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_RENDER)manager.cpp -o $(DIR_BUILD)render_manager.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_RENDER)manager.cpp -o $(DIR_BUILD)render_manager.o
 
 ### SESSION ###
 
 build_session: session_manager.o
 
 session_manager.o: $(DIR_SRC_SESSION)manager.cpp $(DIR_INC_SESSION)manager.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SESSION)manager.cpp -o $(DIR_BUILD)session_manager.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SESSION)manager.cpp -o $(DIR_BUILD)session_manager.o
 
 ### UUID ###
 
 build_uuid: uuid_manager.o
 
 uuid_manager.o: $(DIR_SRC_UUID)manager.cpp $(DIR_INC_UUID)manager.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_UUID)manager.cpp -o $(DIR_BUILD)uuid_manager.o
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_UUID)manager.cpp -o $(DIR_BUILD)uuid_manager.o

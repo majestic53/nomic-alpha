@@ -27,6 +27,8 @@
 #include <mutex>
 #include <sstream>
 #include <string>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -66,6 +68,11 @@ namespace nomic {
 
 	#define CHANNEL_MAX UINT8_MAX
 
+	#define CHARACTER_FILTER_MAG_DEFAULT GL_LINEAR
+	#define CHARACTER_FILTER_MIN_DEFAULT GL_LINEAR
+	#define CHARACTER_WRAP_S_DEFAULT GL_CLAMP_TO_EDGE
+	#define CHARACTER_WRAP_T_DEFAULT GL_CLAMP_TO_EDGE
+
 	#define DISPLAY_DEFAULT_ALPHA CHANNEL_MAX
 	#define DISPLAY_DEFAULT_BLUE 0
 	#define DISPLAY_DEFAULT_FULLSCREEN false
@@ -82,6 +89,8 @@ namespace nomic {
 	#define DISPLAY_MOUSE_RELATIVE SDL_TRUE
 
 	#define EXCEPTION_UNKNOWN "Unknown exception"
+
+	#define FONT_SIZE_DEFAULT 12
 
 	#define FORMAT_STRING(_FORMAT_, ...) nomic::utility::format_as_string(_FORMAT_, __VA_ARGS__)
 
@@ -119,7 +128,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1724
 
 	#define OBJECT_COUNT 1
@@ -263,7 +272,8 @@ namespace nomic {
 	};
 
 	enum {
-		PRIMITIVE_PROGRAM = 0,
+		PRIMITIVE_CHARACTER = 0,
+		PRIMITIVE_PROGRAM,
 		PRIMITIVE_SHADER,
 		PRIMITIVE_TEXTURE,
 		PRIMITIVE_VAO,

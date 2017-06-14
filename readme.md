@@ -26,7 +26,11 @@ Changelog
 
 Version 0.1.1724
 ----------------
-*Updated: 6/11/2017*
+*Updated: 6/14/2017*
+
+* Added font rendering support (incomplete)
+
+*Updated: 6/12/2017*
 
 * Added support for colored/textured plain primitives
 

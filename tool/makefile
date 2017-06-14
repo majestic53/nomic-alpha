@@ -16,7 +16,7 @@
 
 CC=clang++
 CC_FLAGS=-march=native -std=gnu++11 -Wall -Werror
-CC_FLAGS_EXT=-pthread -lGL -lGLU -lGLEW -lSDL2 -lSDL2main
+CC_FLAGS_EXT=-pthread `pkg-config --cflags freetype2` -lGL -lGLU -lGLEW -lSDL2 -lSDL2main `pkg-config --libs freetype2`
 DIR_BIN=./../bin/
 DIR_BUILD=./../build/
 EXE=nomic
