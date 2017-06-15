@@ -21,6 +21,7 @@
 
 #include <vector>
 #include "../entity/manager.h"
+#include "../font/manager.h"
 #include "../graphic/camera.h"
 #include "../graphic/display.h"
 #include "../graphic/manager.h"
@@ -106,6 +107,8 @@ namespace nomic {
 				nomic::graphic::display &m_manager_display;
 
 				nomic::entity::manager &m_manager_entity;
+
+				nomic::font::manager &m_manager_font;
 
 				nomic::graphic::manager &m_manager_graphic;
 

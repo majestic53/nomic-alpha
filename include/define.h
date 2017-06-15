@@ -90,6 +90,8 @@ namespace nomic {
 
 	#define EXCEPTION_UNKNOWN "Unknown exception"
 
+	#define FONT_CHARACTER_MIN 0
+	#define FONT_CHARACTER_MAX CHAR_MAX
 	#define FONT_SIZE_DEFAULT 12
 
 	#define FORMAT_STRING(_FORMAT_, ...) nomic::utility::format_as_string(_FORMAT_, __VA_ARGS__)
@@ -128,7 +130,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_REVISION 3
 	#define NOMIC_VERSION_WEEK 1724
 
 	#define OBJECT_COUNT 1

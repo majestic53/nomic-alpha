@@ -26,9 +26,9 @@ Changelog
 
 Version 0.1.1724
 ----------------
-*Updated: 6/14/2017*
+*Updated: 6/14-15/2017*
 
-* Added font rendering support (incomplete)
+* Added font rendering support <s>(incomplete)</s>
 
 *Updated: 6/12/2017*
 

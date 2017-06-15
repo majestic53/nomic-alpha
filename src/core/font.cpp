@@ -17,6 +17,7 @@
  */
 
 #include "../../include/core/font.h"
+#include "../../include/uuid/manager.h"
 #include "../../include/trace.h"
 #include "./font_type.h"
 
@@ -25,7 +26,7 @@ namespace nomic {
 	namespace core {
 
 		font::font(
-			__in FT_Library parent,
+			__in_opt FT_Library parent,
 			__in_opt const std::string &path,
 			__in_opt uint32_t size
 			) :
@@ -41,6 +42,17 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		font::font(
+			__in const font &other
+			) :
+				nomic::core::id(other),
+				m_face(other.m_face),
+				m_size(other.m_size)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		font::~font(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -48,6 +60,23 @@ namespace nomic {
 			unload();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		font &
+		font::operator=(
+			__in const font &other
+			)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(this != &other) {
+				nomic::core::id::operator=(other);
+				m_face = other.m_face;
+				m_size = other.m_size;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
+			return *this;
 		}
 
 		void 
@@ -160,11 +189,20 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			if(m_face) {
+				size_t references = REFERENCE_INIT;
 
-				FT_Error result = FT_Done_Face(m_face);
-				if(result) {
-					THROW_NOMIC_CORE_FONT_EXCEPTION_FORMAT(NOMIC_CORE_FONT_EXCEPTION_EXTERNAL, "FT_Done_Face failed! Error=%x",
-						result);
+				nomic::uuid::manager &instance = nomic::uuid::manager::acquire();
+				if(instance.initialized() && instance.contains(m_id)) {
+					references = instance.references(m_id);
+				}
+
+				if(references <= REFERENCE_INIT) {
+
+					FT_Error result = FT_Done_Face(m_face);
+					if(result) {
+						THROW_NOMIC_CORE_FONT_EXCEPTION_FORMAT(NOMIC_CORE_FONT_EXCEPTION_EXTERNAL,
+							"FT_Done_Face failed! Error=%x", result);
+					}
 				}
 
 				m_face = nullptr;

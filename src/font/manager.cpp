@@ -24,6 +24,243 @@ namespace nomic {
 
 	namespace font {
 
-		// TODO
+		manager::manager(void) :
+			m_handle(nullptr)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		manager::~manager(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		nomic::font::character_set::iterator 
+		manager::find_character(
+			__in std::map<uint32_t, nomic::font::context>::iterator iter,
+			__in GLchar value
+			)
+		{
+			nomic::font::character_set::iterator result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Iter=%p, Value=%x(\'%c\')", iter, (int) value, value);
+
+			result = iter->second.second.find(value);
+			if(result == iter->second.second.end()) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_CHARACTER_NOT_FOUND, "Value=%x(\'%c\')",
+					value, value);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return result;
+		}
+
+		std::map<uint32_t, nomic::font::context>::iterator 
+		manager::find_font(
+			__in uint32_t id
+			)
+		{
+			std::map<uint32_t, nomic::font::context>::iterator result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			if(id == UID_INVALID) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_FONT_INVALID, "Id=%x", id);
+			}
+
+			result = m_font.find(id);
+			if(result == m_font.end()) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_FONT_NOT_FOUND, "Id=%x", id);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return result;
+		}
+
+		uint32_t 
+		manager::load(
+			__in const std::string &path,
+			__in uint32_t size
+			)
+		{
+			uint32_t result;
+			std::map<uint32_t, nomic::font::context>::iterator iter_cont;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s, Size=%u", path.size(), STRING_CHECK(path), size);
+
+			if(!m_initialized) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION(NOMIC_FONT_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			nomic::core::font entry;
+			result = entry.get_id();
+
+			if(m_font.find(result) != m_font.end()) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_FONT_DUPLICATE, "Id=%x", result);
+			}
+
+			m_font.insert(std::make_pair(result, std::make_pair(entry, nomic::font::character_set())));
+			iter_cont = find_font(result);
+			iter_cont->second.first.load(m_handle, path, size);
+			GL_CHECK(LEVEL_WARNING, glPixelStorei, GL_UNPACK_ALIGNMENT, 1);
+
+			for(char value = FONT_CHARACTER_MIN; value <= FONT_CHARACTER_MAX; ++value) {
+				iter_cont->second.second.insert(std::make_pair(value, nomic::graphic::character()));
+
+				nomic::font::character_set::iterator iter_set = iter_cont->second.second.find(value);
+				if(iter_set == iter_cont->second.second.end()) {
+					THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_CHARACTER_NOT_FOUND, "Value=%x(\'%c\')",
+						value, value);
+				}
+
+				iter_cont->second.first.generate(iter_set->second, value);
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		bool 
+		manager::loaded(
+			__in uint32_t id
+			) const
+		{
+			bool result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			if(!m_initialized) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION(NOMIC_FONT_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(id == UID_INVALID) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_FONT_INVALID, "Id=%x", id);
+			}
+
+			result = (m_font.find(id) != m_font.end());
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		bool 
+		manager::on_initialize(void)
+		{
+			FT_Error err;
+			bool result = true;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Font manager initializing...");
+
+			err = FT_Init_FreeType(&m_handle);
+			if(err) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_EXTERNAL, "FT_Init_FreeType failed! Error=%x",
+					err);
+			}
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Font manager initialized.");
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		void 
+		manager::on_uninitialize(void)
+		{
+			FT_Error result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Font manager uninitializing...");
+
+			m_font.clear();
+
+			result = FT_Done_FreeType(m_handle);
+			if(result) {
+				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_EXTERNAL, "FT_Done_FreeType failed! Error=%x",
+					result);
+			}
+
+			m_handle = nullptr;
+
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Font manager uninitialized.");
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::unload(
+			__in uint32_t id
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+
+			if(m_initialized) {
+
+				if(id == UID_INVALID) {
+					THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_FONT_INVALID, "Id=%x", id);
+				}
+
+				m_font.erase(find_font(id));
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::unload_all(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(m_initialized) {
+				m_font.clear();
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		std::string 
+		manager::to_string(
+			__in_opt bool verbose
+			) const
+		{
+			std::stringstream result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%p", verbose);
+
+			result << NOMIC_FONT_MANAGER_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
+
+			if(verbose) {
+				result << " Base=" << SINGLETON_CLASS(nomic::font::manager)::to_string(verbose);
+
+				if(m_initialized) {
+					result << ", Handle=" << SCALAR_AS_HEX(FT_Library, m_handle)
+						<< ", Font[" << m_font.size() << "]";
+
+					if(!m_font.empty()) {
+						result << "={";
+
+						for(std::map<uint32_t, nomic::font::context>::const_iterator iter = m_font.begin();
+								iter != m_font.end(); ++iter) {
+
+							if(iter != m_font.begin()) {
+								result << ", ";
+							}
+
+							result << "{" << SCALAR_AS_HEX(uint32_t, iter->first)
+								<< ", " << iter->second.first.to_string(verbose) << "}";
+						}
+
+						result << "}";
+					}
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return result.str();
+		}
 	}
 }

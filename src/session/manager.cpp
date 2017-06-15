@@ -61,6 +61,7 @@ namespace nomic {
 			m_debug(SESSION_DEBUG_DEFAULT),
 			m_manager_display(nomic::graphic::display::acquire()),
 			m_manager_entity(nomic::entity::manager::acquire()),
+			m_manager_font(nomic::font::manager::acquire()),
 			m_manager_graphic(nomic::graphic::manager::acquire()),
 			m_manager_render(nomic::render::manager::acquire())
 		{
@@ -74,6 +75,7 @@ namespace nomic {
 
 			m_manager_display.release();
 			m_manager_entity.release();
+			m_manager_font.release();
 			m_manager_graphic.release();
 			m_manager_render.release();
 
@@ -139,6 +141,7 @@ namespace nomic {
 
 			m_manager_graphic.initialize();
 			m_manager_render.initialize();
+			m_manager_font.initialize();
 			m_manager_entity.initialize();
 
 			// TODO: initialize gl managers
@@ -218,6 +221,7 @@ namespace nomic {
 			// TODO: uninitialize gl managers
 
 			m_manager_entity.uninitialize();
+			m_manager_font.uninitialize();
 			m_manager_render.uninitialize();
 			m_manager_graphic.uninitialize();
 			m_manager_display.uninitialize();

@@ -32,12 +32,20 @@ namespace nomic {
 			public:
 
 				explicit font(
-					__in FT_Library parent,
+					__in_opt FT_Library parent = nullptr,
 					__in_opt const std::string &path = std::string(),
 					__in_opt uint32_t size = FONT_SIZE_DEFAULT
 					);
 
+				font(
+					__in const font &other
+					);
+
 				virtual ~font(void);
+
+				font &operator=(
+					__in const font &other
+					);
 
 				void generate(
 					__inout nomic::graphic::character &output,
@@ -61,14 +69,6 @@ namespace nomic {
 				void unload(void);
 
 			protected:
-
-				font(
-					__in const font &other
-					) = delete;
-
-				font &operator=(
-					__in const font &other
-					) = delete;
 
 				FT_Face m_face;
 

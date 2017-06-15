@@ -27,6 +27,10 @@ namespace nomic {
 
 	namespace font {
 
+		typedef std::map<GLchar, nomic::graphic::character> character_set;
+
+		typedef std::pair<nomic::core::font, nomic::font::character_set> context;
+
 		class manager :
 				public SINGLETON_CLASS(nomic::font::manager) {
 
@@ -34,20 +38,20 @@ namespace nomic {
 
 				~manager(void);
 
-				bool font_loaded(
-					__in uint32_t id
-					) const;
-
-				uint32_t load_font(
+				uint32_t load(
 					__in const std::string &path,
 					__in uint32_t size
 					);
 
-				void unload_all_fonts(void);
+				bool loaded(
+					__in uint32_t id
+					) const;
 
-				void unload_font(
+				void unload(
 					__in uint32_t id
 					);
+
+				void unload_all(void);
 
 				std::string to_string(
 					__in_opt bool verbose = false
@@ -67,20 +71,20 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
-				std::map<uint32_t, std::pair<nomic::core::font, std::map<GLchar, nomic::graphic::character>>>::iterator find_font(
-					__in uint32_t id
+				nomic::font::character_set::iterator find_character(
+					__in std::map<uint32_t, nomic::font::context>::iterator iter,
+					__in GLchar value
 					);
 
-				std::map<GLchar, nomic::graphic::character>::iterator find_character(
-					__in std::map<uint32_t, std::pair<nomic::core::font, std::map<GLchar, nomic::graphic::character>>>::iterator iter,
-					__in GLchar ch
+				std::map<uint32_t, nomic::font::context>::iterator find_font(
+					__in uint32_t id
 					);
 
 				bool on_initialize(void);
 
 				void on_uninitialize(void);
 
-				std::map<uint32_t, std::pair<nomic::core::font, std::map<GLchar, nomic::graphic::character>>> m_font;
+				std::map<uint32_t, nomic::font::context> m_font;
 
 				FT_Library m_handle;
 		};
