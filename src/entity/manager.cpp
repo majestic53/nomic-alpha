@@ -74,6 +74,7 @@ namespace nomic {
 			}
 
 			iter->second.insert(handle);
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity added. Handle=%p", handle);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -195,6 +196,7 @@ namespace nomic {
 			iter_id = find_id(handle->get_id());
 			iter_handle = find_handle(handle, iter_id);
 			iter_id->second.erase(iter_handle);
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity removed. Handle=%p", handle);
 
 			if(iter_id->second.empty()) {
 				m_id.erase(iter_id);

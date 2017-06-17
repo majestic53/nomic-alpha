@@ -310,6 +310,20 @@ namespace nomic {
 
 		void 
 		renderer::use(
+			__in const glm::mat4 &projection
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p", &projection);
+
+			nomic::graphic::program::use();
+			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
+			set_attributes();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		renderer::use(
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view
 			)

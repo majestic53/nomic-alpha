@@ -207,6 +207,8 @@ namespace nomic {
 				m_id.insert(std::make_pair(id, entry));
 			}
 
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Event registered. Id=%x, Handle=%p", handle, id);
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -236,6 +238,8 @@ namespace nomic {
 			if(result && (handle != nullptr)) {
 				result = (iter->second.find(handle) != iter->second.end());
 			}
+
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Event registered. Id=%x, Handle=%p", handle, id);
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -363,6 +367,8 @@ namespace nomic {
 				m_id.erase(find_id(*iter));
 			}
 
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "All events unregistered. Handle=%p", handle);
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -400,6 +406,8 @@ namespace nomic {
 			} else {
 				m_id.erase(iter);
 			}
+
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Event unregistered. Id=%x, Handle=%p", handle, id);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

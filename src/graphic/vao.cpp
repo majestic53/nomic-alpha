@@ -63,7 +63,7 @@ namespace nomic {
 			return *this;
 		}
 
-		void 
+		GLuint 
 		vao::add(
 			__in const nomic::graphic::vbo &vbo,
 			__in GLuint index,
@@ -85,9 +85,10 @@ namespace nomic {
 			vbo.bind();
 			GL_CHECK(LEVEL_WARNING, glVertexAttribPointer, index, size, type, normalized, stride, pointer);
 			m_vbo.insert(std::make_pair(index, vbo));
-			enable(index);			
+			enable(index);
 
-			TRACE_EXIT(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", index);
+			return index;
 		}
 
 		void 
@@ -96,6 +97,18 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			GL_CHECK(LEVEL_WARNING, glBindVertexArray, m_handle);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		vao::bind_vbo(
+			__in GLuint index
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Index=%x", index);
+
+			find(index)->second.bind();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -207,6 +220,21 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			m_vbo.clear();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		vao::set_subdata(
+			__in GLuint index,
+			__in GLintptr offset,
+			__in GLsizeiptr size,
+			__in const GLvoid *data
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Index=%x, Offset=%p, Data[%u]=%p", index, offset, size, data);
+
+			find(index)->second.set_subdata(offset, size, data);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

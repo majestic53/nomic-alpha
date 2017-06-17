@@ -68,6 +68,7 @@ namespace nomic {
 
 	#define CHANNEL_MAX UINT8_MAX
 
+	#define CHARACTER_FILL ' '
 	#define CHARACTER_FILTER_MAG_DEFAULT GL_LINEAR
 	#define CHARACTER_FILTER_MIN_DEFAULT GL_LINEAR
 	#define CHARACTER_WRAP_S_DEFAULT GL_CLAMP_TO_EDGE
@@ -91,7 +92,7 @@ namespace nomic {
 	#define EXCEPTION_UNKNOWN "Unknown exception"
 
 	#define FONT_CHARACTER_MIN 0
-	#define FONT_CHARACTER_MAX CHAR_MAX
+	#define FONT_CHARACTER_MAX 127
 	#define FONT_SIZE_DEFAULT 12
 
 	#define FORMAT_STRING(_FORMAT_, ...) nomic::utility::format_as_string(_FORMAT_, __VA_ARGS__)
@@ -130,7 +131,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1724
 
 	#define OBJECT_COUNT 1
@@ -153,7 +154,7 @@ namespace nomic {
 	#define RENDERER_DEPTH_MODE_DEFAULT GL_LESS
 
 	#define RUNTIME_PAUSE_DELAY 200
-	#define RUNTIME_TICKS_PER_SECOND 25
+	#define RUNTIME_TICKS_PER_SECOND 30
 	#define RUNTIME_TICK_SKIP 5
 
 	#define SCALAR_AS_HEX(_TYPE_, _VAL_) \

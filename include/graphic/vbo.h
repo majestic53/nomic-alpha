@@ -37,6 +37,12 @@ namespace nomic {
 
 				vbo(
 					__in GLenum target,
+					__in uint32_t size,
+					__in GLenum usage
+					);
+
+				vbo(
+					__in GLenum target,
 					__in const std::vector<uint8_t> &data,
 					__in GLenum usage
 					);
@@ -54,8 +60,19 @@ namespace nomic {
 				void bind(void) const;
 
 				void set(
+					__in uint32_t size,
+					__in GLenum usage
+					);
+
+				void set(
 					__in const std::vector<uint8_t> &data,
 					__in GLenum usage
+					);
+
+				void set_subdata(
+					__in GLintptr offset,
+					__in GLsizeiptr size,
+					__in const GLvoid *data
 					);
 
 				virtual std::string to_string(

@@ -38,6 +38,11 @@ namespace nomic {
 
 				~manager(void);
 
+				nomic::graphic::character &character(
+					__in uint32_t id,
+					__in GLchar value
+					);
+
 				uint32_t load(
 					__in const std::string &path,
 					__in uint32_t size

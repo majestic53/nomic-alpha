@@ -37,6 +37,17 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		nomic::graphic::character &
+		manager::character(
+			__in uint32_t id,
+			__in GLchar value
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x, Value=%x(\'%c\')", id, value, std::isprint(value) ? value : CHARACTER_FILL);
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return find_character(find_font(id), value)->second;
+		}
+
 		nomic::font::character_set::iterator 
 		manager::find_character(
 			__in std::map<uint32_t, nomic::font::context>::iterator iter,
@@ -45,12 +56,12 @@ namespace nomic {
 		{
 			nomic::font::character_set::iterator result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Iter=%p, Value=%x(\'%c\')", iter, (int) value, value);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Iter=%p, Value=%x(\'%c\')", iter, (int) value, std::isprint(value) ? value : CHARACTER_FILL);
 
 			result = iter->second.second.find(value);
 			if(result == iter->second.second.end()) {
 				THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_CHARACTER_NOT_FOUND, "Value=%x(\'%c\')",
-					value, value);
+					value, std::isprint(value) ? value : CHARACTER_FILL);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -106,17 +117,20 @@ namespace nomic {
 			iter_cont->second.first.load(m_handle, path, size);
 			GL_CHECK(LEVEL_WARNING, glPixelStorei, GL_UNPACK_ALIGNMENT, 1);
 
-			for(char value = FONT_CHARACTER_MIN; value <= FONT_CHARACTER_MAX; ++value) {
+			for(uint16_t value = FONT_CHARACTER_MIN; value <= FONT_CHARACTER_MAX; ++value) {
 				iter_cont->second.second.insert(std::make_pair(value, nomic::graphic::character()));
 
 				nomic::font::character_set::iterator iter_set = iter_cont->second.second.find(value);
 				if(iter_set == iter_cont->second.second.end()) {
 					THROW_NOMIC_FONT_MANAGER_EXCEPTION_FORMAT(NOMIC_FONT_MANAGER_EXCEPTION_CHARACTER_NOT_FOUND, "Value=%x(\'%c\')",
-						value, value);
+						value, std::isprint(value) ? value : CHARACTER_FILL);
 				}
 
 				iter_cont->second.first.generate(iter_set->second, value);
 			}
+
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Font loaded. Path[%u]=%s, Size=%u, Id=%x", path.size(), STRING_CHECK(path), size,
+				result);
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -205,6 +219,7 @@ namespace nomic {
 				}
 
 				m_font.erase(find_font(id));
+				TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Font unloaded. Id=%x", id);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -217,6 +232,7 @@ namespace nomic {
 
 			if(m_initialized) {
 				m_font.clear();
+				TRACE_MESSAGE(LEVEL_INFORMATION, "All fonts unloaded.");
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

@@ -25,6 +25,22 @@
 #include "../../include/trace.h"
 #include "./manager_type.h"
 
+// TODO: DEBUG
+uint32_t font_id = 0;
+std::string string_test = "<DEBUG>";
+
+#define STRING_SEGMENT_COUNT 6
+#define STRING_SEGMENT_WIDTH 4
+
+enum {
+	STRING_INDEX_VERTEX = 0,
+};
+
+GLuint string_vbo_id;
+nomic::graphic::vao *string_vao = nullptr;
+nomic::core::renderer *string_renderer = nullptr;
+// ---
+
 namespace nomic {
 
 	namespace session {
@@ -146,6 +162,19 @@ namespace nomic {
 
 			// TODO: initialize gl managers
 
+// TODO
+			font_id = m_manager_font.load("./res/FreeSans.ttf", 16);
+
+			string_renderer = new nomic::core::renderer;
+			string_renderer->set_shaders("./res/vert_string_static.glsl", "./res/frag_string_static.glsl");
+
+			string_vao = new nomic::graphic::vao;
+			string_vbo_id = string_vao->add(nomic::graphic::vbo(GL_ARRAY_BUFFER,
+				STRING_SEGMENT_COUNT * STRING_SEGMENT_WIDTH * sizeof(GLfloat), GL_DYNAMIC_DRAW), STRING_INDEX_VERTEX,
+				STRING_SEGMENT_WIDTH, GL_FLOAT);
+			string_vao->enable(STRING_INDEX_VERTEX);
+// ---
+
 			m_camera = new nomic::graphic::camera(glm::uvec2(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT));
 			if(!m_camera) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
@@ -218,6 +247,18 @@ namespace nomic {
 			m_debug_object.clear();
 			m_debug_renderer.clear();
 
+// TODO: DEBUG
+			if(string_vao) {
+				delete string_vao;
+				string_vao = nullptr;
+			}
+
+			if(string_renderer) {
+				delete string_renderer;
+				string_renderer = nullptr;
+			}
+// ---
+
 			// TODO: uninitialize gl managers
 
 			m_manager_entity.uninitialize();
@@ -260,6 +301,43 @@ namespace nomic {
 			m_camera->render(delta);
 			m_manager_display.clear();
 			m_manager_render.render(m_camera->projection(), m_camera->view(), delta);
+
+// TODO: DEBUG
+			string_renderer->use(glm::ortho(0.f, (float) DISPLAY_DEFAULT_WIDTH, 0.f, (float) DISPLAY_DEFAULT_HEIGHT, -1.f, 1.f));
+			string_renderer->set_uniform(string_renderer->uniform_location("out_color"), glm::vec3(1.f, 1.f, 1.f));
+			GL_CHECK(LEVEL_WARNING, glActiveTexture, GL_TEXTURE0);
+			string_vao->bind();
+
+			GLfloat x = 25.f, y = (DISPLAY_DEFAULT_HEIGHT - 25.f);
+
+			for(std::string::iterator iter = string_test.begin(); iter != string_test.end(); ++iter) {
+				nomic::graphic::character &ch = m_manager_font.character(font_id, *iter);
+
+				GLfloat xpos = x + (ch.bearing().x * 1.f),
+					ypos = y - ((ch.dimension().y - ch.bearing().y) * 1.f),
+					w = (ch.dimension().x * 1.f),
+					h = (ch.dimension().y * 1.f),
+					vertices[STRING_SEGMENT_COUNT][STRING_SEGMENT_WIDTH] = {
+						{ xpos, ypos + h, 0.f, 0.f },
+						{ xpos, ypos, 0.f, 1.f },
+						{ xpos + w, ypos, 1.f, 1.f },
+						{ xpos, ypos + h, 0.f, 0.f },
+						{ xpos + w, ypos, 1.f, 1.f },
+						{ xpos + w, ypos + h, 1.f, 0.f },
+					};
+
+				ch.bind();
+				string_vao->set_subdata(string_vbo_id, 0, sizeof(vertices), vertices);
+				GL_CHECK(LEVEL_WARNING, glBindBuffer, GL_ARRAY_BUFFER, 0);
+				GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, STRING_SEGMENT_COUNT);
+
+				x += ((ch.advance() >> 6) * 1.f);
+			}
+
+			GL_CHECK(LEVEL_WARNING, glBindVertexArray, 0);
+			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_2D, 0);
+// ---
+
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);

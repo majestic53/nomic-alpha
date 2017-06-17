@@ -26,7 +26,7 @@ namespace nomic {
 	namespace core {
 
 		class renderer :
-				protected nomic::graphic::program {
+				public nomic::graphic::program {
 
 			public:
 
@@ -84,6 +84,10 @@ namespace nomic {
 					) const;
 
 				void use(void);
+
+				void use(
+					__in const glm::mat4 &projection
+					);
 
 				void use(
 					__in const glm::mat4 &projection,

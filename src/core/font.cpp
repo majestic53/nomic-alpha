@@ -85,7 +85,8 @@ namespace nomic {
 			__in char value
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Output=%p, Value=%x(\'%c\')", &output, (int) value, value);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Output=%p, Value=%x(\'%c\')", &output, (int) value,
+				std::isprint(value) ? value : CHARACTER_FILL);
 
 			if(!m_face) {
 				THROW_NOMIC_CORE_FONT_EXCEPTION(NOMIC_CORE_FONT_EXCEPTION_UNLOADED);
@@ -94,7 +95,8 @@ namespace nomic {
 			FT_Error result = FT_Load_Char(m_face, value, FT_LOAD_RENDER);
 			if(result) {
 				THROW_NOMIC_CORE_FONT_EXCEPTION_FORMAT(NOMIC_CORE_FONT_EXCEPTION_EXTERNAL,
-					"FT_Load_Char failed! Error=%x, Value=%x(\'%c\')", result, (int) value, value);
+					"FT_Load_Char failed! Error=%x, Value=%x(\'%c\')", result, (int) value,
+					std::isprint(value) ? value : CHARACTER_FILL);
 			}
 
 			output.set(m_face);

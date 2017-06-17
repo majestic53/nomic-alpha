@@ -77,6 +77,8 @@ namespace nomic {
 
 			iter_id->second.insert(std::make_pair(handle, std::set<nomic::core::entity *>()));
 
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer added. Handle=%p", handle);
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -259,6 +261,8 @@ namespace nomic {
 				iter_handle->second.insert(handle);
 			}
 
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity registered. Handle=%p", handle);
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -285,6 +289,8 @@ namespace nomic {
 			if(iter_id->second.empty()) {
 				m_id.erase(iter_id);
 			}
+
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer removed. Handle=%p", handle);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -411,6 +417,7 @@ namespace nomic {
 			}
 
 			m_id.erase(find_id(id));
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Unregistered all entities.");
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -446,6 +453,8 @@ namespace nomic {
 					iter_handle->second.erase(iter_entity);
 				}
 			}
+
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Unregisted entity. Handle=%p", handle);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

@@ -36,6 +36,21 @@ namespace nomic {
 
 		vbo::vbo(
 			__in GLenum target,
+			__in uint32_t size,
+			__in GLenum usage
+			) :
+				nomic::core::primitive(PRIMITIVE_VBO, target),
+				m_usage(GL_STATIC_DRAW)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Target=%x, Size=%u, Usage=%x", target, size, usage);
+
+			set(size, usage);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		vbo::vbo(
+			__in GLenum target,
 			__in const std::vector<uint8_t> &data,
 			__in GLenum usage
 			) :
@@ -97,6 +112,22 @@ namespace nomic {
 
 		void 
 		vbo::set(
+			__in uint32_t size,
+			__in GLenum usage
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Size=%u, Usage=%x", size, usage);
+
+			bind();
+			GL_CHECK(LEVEL_WARNING, glBufferData, m_subtype, size, nullptr, usage);
+			m_data.clear();
+			m_usage = usage;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		vbo::set(
 			__in const std::vector<uint8_t> &data,
 			__in GLenum usage
 			)
@@ -107,6 +138,21 @@ namespace nomic {
 			GL_CHECK(LEVEL_WARNING, glBufferData, m_subtype, data.size(), &data[0], usage);
 			m_data = data;
 			m_usage = usage;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		vbo::set_subdata(
+			__in GLintptr offset,
+			__in GLsizeiptr size,
+			__in const GLvoid *data
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Offset=%p, Data[%u]=%p", index, offset, size, data);
+
+			bind();
+			GL_CHECK(LEVEL_WARNING, glBufferSubData, m_subtype, offset, size, data);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

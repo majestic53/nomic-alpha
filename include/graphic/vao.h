@@ -43,7 +43,7 @@ namespace nomic {
 					__in const vao &other
 					);
 
-				void add(
+				GLuint add(
 					__in const nomic::graphic::vbo &vbo,
 					__in GLuint index,
 					__in GLint size,
@@ -54,6 +54,10 @@ namespace nomic {
 					);
 
 				void bind(void) const;
+
+				void bind_vbo(
+					__in GLuint index
+					);
 
 				bool contains(
 					__in GLuint index
@@ -76,6 +80,13 @@ namespace nomic {
 					);
 
 				void remove_all(void);
+
+				void set_subdata(
+					__in GLuint index,
+					__in GLintptr offset,
+					__in GLsizeiptr size,
+					__in const GLvoid *data
+					);
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
