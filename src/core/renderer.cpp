@@ -41,6 +41,7 @@ namespace nomic {
 				m_cull_mode(cull_mode),
 				m_depth(depth),
 				m_depth_mode(depth_mode),
+				m_mode(RENDER_PERSPECTIVE),
 				m_uniform_model(0),
 				m_uniform_projection(0),
 				m_uniform_view(0)
@@ -64,6 +65,7 @@ namespace nomic {
 				m_cull_mode(other.m_cull_mode),
 				m_depth(other.m_depth),
 				m_depth_mode(other.m_depth_mode),
+				m_mode(other.m_mode),
 				m_uniform_model(other.m_uniform_model),
 				m_uniform_projection(other.m_uniform_projection),
 				m_uniform_view(other.m_uniform_view)
@@ -105,6 +107,7 @@ namespace nomic {
 				m_cull_mode = other.m_cull_mode;
 				m_depth = other.m_depth;
 				m_depth_mode = other.m_depth_mode;
+				m_mode = other.m_mode;
 				m_uniform_model = other.m_uniform_model;
 				m_uniform_projection = other.m_uniform_projection;
 				m_uniform_view = other.m_uniform_view;
@@ -131,7 +134,7 @@ namespace nomic {
 		}
 
 		bool 
-		renderer::blended(void)
+		renderer::blended(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_blend);
@@ -139,7 +142,7 @@ namespace nomic {
 		}
 
 		bool 
-		renderer::culled(void)
+		renderer::culled(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_cull);
@@ -147,7 +150,7 @@ namespace nomic {
 		}
 
 		bool 
-		renderer::depth(void)
+		renderer::depth(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_depth);
@@ -155,7 +158,7 @@ namespace nomic {
 		}
 
 		GLuint 
-		renderer::get_id(void)
+		renderer::get_id(void) const
 		{
 			GLuint result;
 
@@ -165,6 +168,14 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
+		}
+
+		uint32_t 
+		renderer::mode(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_mode);
+			return m_mode;
 		}
 
 		void 
@@ -256,6 +267,18 @@ namespace nomic {
 		}
 
 		void 
+		renderer::set_mode(
+			__in uint32_t mode
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Mode=%x", mode);
+
+			m_mode = mode;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		renderer::set_shaders(
 			__in const std::string &vertex,
 			__in const std::string &fragment
@@ -291,6 +314,8 @@ namespace nomic {
 					<< ", " << SCALAR_AS_HEX(GLenum, m_blend_dfactor) << "}, Cull=" << m_cull
 					<< ", Cull Mode=" << SCALAR_AS_HEX(GLenum, m_cull_mode)
 					<< ", Depth=" << m_depth << ", Depth Mode=" << SCALAR_AS_HEX(GLenum, m_depth_mode)
+					<< ", Mode=" << SCALAR_AS_HEX(uint32_t, m_mode)
+						<< "(" << ((m_mode == RENDER_PERSPECTIVE) ? "Perspective" : "Orthogonal") << ")"
 					<< ", Model=" << m_uniform_model << ", Projection=" << m_uniform_projection << ", View=" << m_uniform_view;
 			}
 

@@ -34,7 +34,7 @@ namespace nomic {
 
 				explicit plain(
 					__in_opt const std::string &path = std::string(),
-					__in_opt const glm::vec2 dimension = PLAIN_DIMENSION_DEFAULT,
+					__in_opt const glm::vec2 dimensions = PLAIN_DIMENSION_DEFAULT,
 					__in_opt float scale = PLAIN_SCALE_DEFAULT,
 					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
 					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
@@ -43,7 +43,7 @@ namespace nomic {
 
 				explicit plain(
 					__in const glm::vec4 &color,
-					__in_opt const glm::vec2 dimension = PLAIN_DIMENSION_DEFAULT,
+					__in_opt const glm::vec2 dimensions = PLAIN_DIMENSION_DEFAULT,
 					__in_opt float scale = PLAIN_SCALE_DEFAULT,
 					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
 					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
@@ -65,17 +65,16 @@ namespace nomic {
 				glm::vec2 dimensions(void) const;
 
 				virtual void on_render(
+					__in nomic::core::renderer &renderer,
 					__in float delta
 					);
-
-				virtual void on_update(void);
 
 				void set_color(
 					__in const glm::vec4 &color
 					);
 
 				void set_dimensions(
-					__in const glm::vec2 dimension,
+					__in const glm::vec2 dimensions,
 					__in float scale
 					);
 
@@ -99,7 +98,7 @@ namespace nomic {
 
 				glm::vec4 m_color;
 
-				glm::vec2 m_dimension;
+				glm::vec2 m_dimensions;
 
 				bool m_texture_set;
 		};

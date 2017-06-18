@@ -55,10 +55,20 @@ namespace nomic {
 					);
 
 				virtual void on_render(
+					__in nomic::core::renderer &renderer,
 					__in float delta
 					);
 
-				virtual void on_update(void);
+				virtual void on_update(
+					__in void *runtime,
+					__in void *camera
+					);
+
+				virtual void on_view_change(void);
+
+				void set_view_dimensions(
+					__in const glm::vec2 &view_dimensions
+					);
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
@@ -66,9 +76,17 @@ namespace nomic {
 
 				nomic::graphic::vao &vertex_array(void);
 
+				glm::uvec2 view_dimensions(void) const;
+
+				uint32_t view_height(void) const;
+
+				uint32_t view_width(void) const;
+
 			protected:
 
 				nomic::graphic::vao m_vao;
+
+				glm::uvec2 m_view_dimensions;
 		};
 	}
 }

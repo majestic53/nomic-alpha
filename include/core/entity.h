@@ -22,6 +22,7 @@
 #include <set>
 #include "./id.h"
 #include "./object.h"
+#include "./renderer.h"
 #include "./transform.h"
 
 namespace nomic {
@@ -60,10 +61,14 @@ namespace nomic {
 				bool enabled(void) const;
 
 				virtual void on_render(
+					__in nomic::core::renderer &renderer,
 					__in float delta
 					);
 
-				virtual void on_update(void);
+				virtual void on_update(
+					__in void *runtime,
+					__in void *camera
+					);
 
 				void register_renderer(
 					__in GLuint id
@@ -72,6 +77,10 @@ namespace nomic {
 				bool registered(
 					__in GLuint id
 					) const;
+
+				virtual void set_view_dimensions(
+					__in const glm::vec2 &view_dimensions
+					);
 
 				void show(
 					__in bool state

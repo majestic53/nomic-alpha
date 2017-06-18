@@ -297,8 +297,9 @@ namespace nomic {
 
 		void 
 		manager::render(
-			__in glm::mat4 &projection,
-			__in glm::mat4 &view,
+			__in const glm::mat4 &projection,
+			__in const glm::mat4 &view,
+			__in const glm::uvec2 &view_dimensions,
 			__in float delta
 			)
 		{
@@ -316,7 +317,15 @@ namespace nomic {
 						continue;
 					}
 
-					iter_handle->first->use(projection, view);
+					switch(iter_handle->first->mode()) {
+						case RENDER_PERSPECTIVE:
+							iter_handle->first->use(projection, view);
+							break;
+						default:
+							iter_handle->first->use(glm::ortho(0.f, (float) view_dimensions.x, 0.f,
+								(float) view_dimensions.y, -1.f, 1.f));
+							break;
+					}
 
 					for(std::set<nomic::core::entity *>::iterator iter_entity = iter_handle->second.begin();
 							iter_entity != iter_handle->second.end(); ++iter_entity) {
@@ -325,7 +334,7 @@ namespace nomic {
 							continue;
 						}
 
-						(*iter_entity)->on_render(delta);
+						(*iter_entity)->on_render(*iter_handle->first, delta);
 					}
 				}
 			}

@@ -56,7 +56,7 @@ namespace nomic {
 
 				void bind(void);
 
-				glm::ivec2 dimension(void) const;
+				glm::ivec2 dimensions(void) const;
 
 				void disable(void);
 
@@ -88,7 +88,7 @@ namespace nomic {
 
 				glm::ivec2 m_bearing;
 
-				glm::ivec2 m_dimension;
+				glm::ivec2 m_dimensions;
 		};	
 	}
 }

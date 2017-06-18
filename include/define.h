@@ -69,6 +69,8 @@ namespace nomic {
 	#define CHANNEL_MAX UINT8_MAX
 
 	#define CHARACTER_FILL ' '
+	#define CHARACTER_NEWLINE '\n'
+
 	#define CHARACTER_FILTER_MAG_DEFAULT GL_LINEAR
 	#define CHARACTER_FILTER_MIN_DEFAULT GL_LINEAR
 	#define CHARACTER_WRAP_S_DEFAULT GL_CLAMP_TO_EDGE
@@ -131,7 +133,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "pre-alpha"
-	#define NOMIC_VERSION_REVISION 4
+	#define NOMIC_VERSION_REVISION 5
 	#define NOMIC_VERSION_WEEK 1724
 
 	#define OBJECT_COUNT 1
@@ -178,6 +180,11 @@ namespace nomic {
 	#define STRING_EMPTY "<EMPTY>"
 	#define STRING_INVALID "<INVALID>"
 	#define STRING_UNKNOWN "<UNKNOWN>"
+
+	#define STRING_ADVANCE_SHIFT 6
+	#define STRING_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.5f)
+	#define STRING_SCALE_DEFAULT 1.f
+	#define STRING_VERTICAL_PAD 5
 
 	#define STRING_CHECK(_STR_) (_STR_.empty() ? STRING_EMPTY : _STR_.c_str())
 
@@ -236,6 +243,7 @@ namespace nomic {
 
 	#define UNIFORM_MATRIX_DEFAULT glm::mat4(1.f)
 
+	#define UNIFORM_COLOR "color"
 	#define UNIFORM_MODEL "model"
 	#define UNIFORM_PROJECTION "projection"
 	#define UNIFORM_VIEW "view"
@@ -250,6 +258,7 @@ namespace nomic {
 	enum {
 		ENTITY_AXIS = 0,
 		ENTITY_CAMERA,
+		ENTITY_DIAGNOSTIC,
 		ENTITY_PLAIN,
 		ENTITY_RETICLE,
 	};
@@ -281,6 +290,11 @@ namespace nomic {
 		PRIMITIVE_TEXTURE,
 		PRIMITIVE_VAO,
 		PRIMITIVE_VBO,
+	};
+
+	enum {
+		RENDER_PERSPECTIVE = 0,
+		RENDER_ORTHOGONAL,
 	};
 
 	class utility {

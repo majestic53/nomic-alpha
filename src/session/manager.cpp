@@ -17,29 +17,15 @@
  */
 
 #include <map>
+#include <tuple>
 #include "../../include/session/manager.h"
 #include "../../include/core/renderer.h"
 #include "../../include/entity/axis.h"
+#include "../../include/entity/diagnostic.h"
 #include "../../include/entity/reticle.h"
 #include "../../include/graphic/vao.h"
 #include "../../include/trace.h"
 #include "./manager_type.h"
-
-// TODO: DEBUG
-uint32_t font_id = 0;
-std::string string_test = "<DEBUG>";
-
-#define STRING_SEGMENT_COUNT 6
-#define STRING_SEGMENT_WIDTH 4
-
-enum {
-	STRING_INDEX_VERTEX = 0,
-};
-
-GLuint string_vbo_id;
-nomic::graphic::vao *string_vao = nullptr;
-nomic::core::renderer *string_renderer = nullptr;
-// ---
 
 namespace nomic {
 
@@ -47,14 +33,22 @@ namespace nomic {
 
 		enum {
 			DEBUG_OBJECT_AXIS = 0,
+			DEBUG_OBJECT_DIAGNOSTIC,
 			DEBUG_OBJECT_RETICLE,
 		};
 
 		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_RETICLE
 
-		static const std::vector<std::pair<std::string, std::string>> DEBUG_RENDERER_SHADER = {
-			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", },
-			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", },
+		enum {
+			DEBUG_TUPLE_SHADER_VERTEX = 0,
+			DEBUG_TUPLE_SHADER_FRAGMENT,
+			DEBUG_TUPLE_MODE,
+		};
+
+		static const std::vector<std::tuple<std::string, std::string, bool>> DEBUG_RENDERER_COFIGURATION = {
+			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE },
+			{ "./res/vert_string_static.glsl", "./res/frag_string_static.glsl", RENDER_ORTHOGONAL },
+			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", RENDER_PERSPECTIVE },
 			};
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
@@ -79,7 +73,8 @@ namespace nomic {
 			m_manager_entity(nomic::entity::manager::acquire()),
 			m_manager_font(nomic::font::manager::acquire()),
 			m_manager_graphic(nomic::graphic::manager::acquire()),
-			m_manager_render(nomic::render::manager::acquire())
+			m_manager_render(nomic::render::manager::acquire()),
+			m_runtime(nullptr)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -162,20 +157,7 @@ namespace nomic {
 
 			// TODO: initialize gl managers
 
-// TODO
-			font_id = m_manager_font.load("./res/FreeSans.ttf", 16);
-
-			string_renderer = new nomic::core::renderer;
-			string_renderer->set_shaders("./res/vert_string_static.glsl", "./res/frag_string_static.glsl");
-
-			string_vao = new nomic::graphic::vao;
-			string_vbo_id = string_vao->add(nomic::graphic::vbo(GL_ARRAY_BUFFER,
-				STRING_SEGMENT_COUNT * STRING_SEGMENT_WIDTH * sizeof(GLfloat), GL_DYNAMIC_DRAW), STRING_INDEX_VERTEX,
-				STRING_SEGMENT_WIDTH, GL_FLOAT);
-			string_vao->enable(STRING_INDEX_VERTEX);
-// ---
-
-			m_camera = new nomic::graphic::camera(glm::uvec2(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT));
+			m_camera = new nomic::entity::camera(glm::uvec2(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT));
 			if(!m_camera) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
 					"Failed to allocate camera, Address=%p", m_camera);
@@ -191,11 +173,16 @@ namespace nomic {
 					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Renderer=%u", iter);
 				}
 
-				m_debug_renderer.at(iter)->set_shaders(DEBUG_RENDERER_SHADER.at(iter).first, DEBUG_RENDERER_SHADER.at(iter).second);
+				m_debug_renderer.at(iter)->set_shaders(std::get<DEBUG_TUPLE_SHADER_VERTEX>(DEBUG_RENDERER_COFIGURATION.at(iter)),
+					std::get<DEBUG_TUPLE_SHADER_FRAGMENT>(DEBUG_RENDERER_COFIGURATION.at(iter)));
+				m_debug_renderer.at(iter)->set_mode(std::get<DEBUG_TUPLE_MODE>(DEBUG_RENDERER_COFIGURATION.at(iter)));
 
 				switch(iter) {
 					case DEBUG_OBJECT_AXIS:
 						m_debug_object.push_back(new nomic::entity::axis);
+						break;
+					case DEBUG_OBJECT_DIAGNOSTIC:
+						m_debug_object.push_back(new nomic::entity::diagnostic);
 						break;
 					case DEBUG_OBJECT_RETICLE:
 						m_debug_object.push_back(new nomic::entity::reticle);
@@ -247,18 +234,6 @@ namespace nomic {
 			m_debug_object.clear();
 			m_debug_renderer.clear();
 
-// TODO: DEBUG
-			if(string_vao) {
-				delete string_vao;
-				string_vao = nullptr;
-			}
-
-			if(string_renderer) {
-				delete string_renderer;
-				string_renderer = nullptr;
-			}
-// ---
-
 			// TODO: uninitialize gl managers
 
 			m_manager_entity.uninitialize();
@@ -300,44 +275,7 @@ namespace nomic {
 
 			m_camera->render(delta);
 			m_manager_display.clear();
-			m_manager_render.render(m_camera->projection(), m_camera->view(), delta);
-
-// TODO: DEBUG
-			string_renderer->use(glm::ortho(0.f, (float) DISPLAY_DEFAULT_WIDTH, 0.f, (float) DISPLAY_DEFAULT_HEIGHT, -1.f, 1.f));
-			string_renderer->set_uniform(string_renderer->uniform_location("out_color"), glm::vec3(1.f, 1.f, 1.f));
-			GL_CHECK(LEVEL_WARNING, glActiveTexture, GL_TEXTURE0);
-			string_vao->bind();
-
-			GLfloat x = 25.f, y = (DISPLAY_DEFAULT_HEIGHT - 25.f);
-
-			for(std::string::iterator iter = string_test.begin(); iter != string_test.end(); ++iter) {
-				nomic::graphic::character &ch = m_manager_font.character(font_id, *iter);
-
-				GLfloat xpos = x + (ch.bearing().x * 1.f),
-					ypos = y - ((ch.dimension().y - ch.bearing().y) * 1.f),
-					w = (ch.dimension().x * 1.f),
-					h = (ch.dimension().y * 1.f),
-					vertices[STRING_SEGMENT_COUNT][STRING_SEGMENT_WIDTH] = {
-						{ xpos, ypos + h, 0.f, 0.f },
-						{ xpos, ypos, 0.f, 1.f },
-						{ xpos + w, ypos, 1.f, 1.f },
-						{ xpos, ypos + h, 0.f, 0.f },
-						{ xpos + w, ypos, 1.f, 1.f },
-						{ xpos + w, ypos + h, 1.f, 0.f },
-					};
-
-				ch.bind();
-				string_vao->set_subdata(string_vbo_id, 0, sizeof(vertices), vertices);
-				GL_CHECK(LEVEL_WARNING, glBindBuffer, GL_ARRAY_BUFFER, 0);
-				GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, STRING_SEGMENT_COUNT);
-
-				x += ((ch.advance() >> 6) * 1.f);
-			}
-
-			GL_CHECK(LEVEL_WARNING, glBindVertexArray, 0);
-			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_2D, 0);
-// ---
-
+			m_manager_render.render(m_camera->projection(), m_camera->view(), m_camera->dimensions(), delta);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -370,10 +308,10 @@ namespace nomic {
 
 		void 
 		manager::set_dimensions(
-			__in const glm::uvec2 &dimension
+			__in const glm::uvec2 &dimensions
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimension.x, dimension.y);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimensions.x, dimensions.y);
 
 			if(!m_initialized) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
@@ -384,8 +322,9 @@ namespace nomic {
 					"Camera is not allocated, Address=%p", m_camera);
 			}
 
-			m_manager_display.set_dimensions(dimension);
-			m_camera->set_dimensions(dimension);
+			m_manager_display.set_dimensions(dimensions);
+			m_camera->set_dimensions(dimensions);
+			m_manager_entity.set_view_dimensions(dimensions);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -418,6 +357,22 @@ namespace nomic {
 			}
 
 			m_manager_display.set_icon(path);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::set_runtime(
+			__in void *runtime
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p", runtime);
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_runtime = runtime;
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -513,7 +468,7 @@ namespace nomic {
 
 			// TODO: handle update event
 
-			m_manager_entity.update();
+			m_manager_entity.update(m_runtime, m_camera);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

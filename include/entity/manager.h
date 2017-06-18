@@ -47,11 +47,18 @@ namespace nomic {
 					__in nomic::core::entity *handle
 					);
 
+				void set_view_dimensions(
+					__in const glm::uvec2 &view_dimensions
+					);
+
 				std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
-				void update(void);
+				void update(
+					__in void *runtime,
+					__in void *camera
+					);
 
 			protected:
 

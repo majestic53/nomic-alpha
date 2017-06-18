@@ -36,7 +36,7 @@ namespace nomic {
 				void clear(void);
 
 				void set_dimensions(
-					__in const glm::uvec2 &dimension
+					__in const glm::uvec2 &dimensions
 					);
 
 				void set_fullscreen(

@@ -35,7 +35,8 @@ namespace nomic {
 			__in_opt const glm::mat4 &view
 			) :
 				nomic::core::entity(type, subtype, position, rotation, up),
-				nomic::core::uniform(model, projection, view)
+				nomic::core::uniform(model, projection, view),
+				m_view_dimensions(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", type, subtype);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -46,7 +47,8 @@ namespace nomic {
 			) :
 				nomic::core::entity(other),
 				nomic::core::uniform(other),
-				m_vao(other.m_vao)
+				m_vao(other.m_vao),
+				m_view_dimensions(other.m_view_dimensions)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -69,6 +71,7 @@ namespace nomic {
 				nomic::core::entity::operator=(other);
 				nomic::core::uniform::operator=(other);
 				m_vao = other.m_vao;
+				m_view_dimensions = other.m_view_dimensions;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
@@ -77,17 +80,41 @@ namespace nomic {
 
 		void 
 		object::on_render(
+			__in nomic::core::renderer &renderer,
 			__in float delta
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Delta=%f", &renderer, delta);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
-		object::on_update(void)
+		object::on_update(
+			__in void *runtime,
+			__in void *camera
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		object::on_view_change(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		object::set_view_dimensions(
+			__in const glm::vec2 &view_dimensions
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "View={%u, %u}", view_dimensions.x, view_dimensions.y);
+
+			m_view_dimensions = view_dimensions;
+			on_view_change();
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -117,6 +144,30 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
 			return m_vao;
+		}
+
+		glm::uvec2 
+		object::view_dimensions(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "View={%u, %u}", m_view_dimensions.x, m_view_dimensions.y);
+			return m_view_dimensions;
+		}
+
+		uint32_t 
+		object::view_height(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Height=%u", m_view_dimensions.y);
+			return m_view_dimensions.y;
+		}
+
+		uint32_t 
+		object::view_width(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Width=%u", m_view_dimensions.x);
+			return m_view_dimensions.x;
 		}
 	}
 }

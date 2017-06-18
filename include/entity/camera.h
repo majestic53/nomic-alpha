@@ -16,16 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_GRAPHIC_CAMERA_H_
-#define NOMIC_GRAPHIC_CAMERA_H_
+#ifndef NOMIC_ENTITY_CAMERA_H_
+#define NOMIC_ENTITY_CAMERA_H_
 
 #include <map>
-#include "../entity/object.h"
+#include "./object.h"
 #include "../event/input.h"
 
 namespace nomic {
 
-	namespace graphic {
+	namespace entity {
 
 		class camera :
 				public nomic::entity::object,
@@ -34,7 +34,7 @@ namespace nomic {
 			public:
 
 				explicit camera(
-					__in const glm::uvec2 &dimension,
+					__in const glm::uvec2 &dimensions,
 					__in_opt const glm::vec3 &position = CAMERA_POSITION_DEFAULT,
 					__in_opt const glm::vec3 &rotation = CAMERA_ROTATION_DEFAULT,
 					__in_opt const glm::vec3 &up = CAMERA_UP_DEFAULT,
@@ -51,12 +51,16 @@ namespace nomic {
 					__in const camera &other
 					);
 
+				glm::uvec2 dimensions(void) const;
+
+				float fov(void) const;
+
 				void render(
 					__in float delta
 					);
 
 				void set_dimensions(
-					__in const glm::uvec2 &dimension
+					__in const glm::uvec2 &dimensions
 					);
 
 				void set_fov(
@@ -91,7 +95,7 @@ namespace nomic {
 
 				void update_perspective(void);
 
-				glm::uvec2 m_dimension;
+				glm::uvec2 m_dimensions;
 
 				float m_fov;
 
@@ -106,4 +110,4 @@ namespace nomic {
 	}
 }
 
-#endif // NOMIC_GRAPHIC_CAMERA_H_
+#endif // NOMIC_ENTITY_CAMERA_H_

@@ -50,13 +50,15 @@ namespace nomic {
 					__in const renderer &other
 					);
 
-				bool blended(void);
+				bool blended(void) const;
 
-				bool culled(void);
+				bool culled(void) const;
 
-				bool depth(void);
+				bool depth(void) const;
 
-				GLuint get_id(void);
+				GLuint get_id(void) const;
+
+				uint32_t mode(void) const;
 
 				void set_blend(
 					__in bool blend,
@@ -72,6 +74,10 @@ namespace nomic {
 				void set_depth(
 					__in bool depth,
 					__in_opt GLenum mode = RENDERER_DEPTH_MODE_DEFAULT
+					);
+
+				void set_mode(
+					__in uint32_t mode
 					);
 
 				void set_shaders(
@@ -121,6 +127,8 @@ namespace nomic {
 				bool m_depth;
 
 				GLenum m_depth_mode;
+
+				uint32_t m_mode;
 
 				GLint m_uniform_model;
 

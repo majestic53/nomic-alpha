@@ -122,17 +122,17 @@ namespace nomic {
 
 		void 
 		display::set_dimensions(
-			__in const glm::uvec2 &dimension
+			__in const glm::uvec2 &dimensions
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimension.x, dimension.y);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimensions.x, dimensions.y);
 
 			if(!m_initialized) {
 				THROW_NOMIC_GRAPHIC_DISPLAY_EXCEPTION(NOMIC_GRAPHIC_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			SDL_SetWindowSize(m_window, dimension.x, dimension.y);
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display dimesions={%u, %u}", dimension.x, dimension.y);
+			SDL_SetWindowSize(m_window, dimensions.x, dimensions.y);
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Display dimesions={%u, %u}", dimensions.x, dimensions.y);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -226,13 +226,13 @@ namespace nomic {
 				result << " Base=" << SINGLETON_CLASS(nomic::graphic::display)::to_string(true);
 
 				if(m_initialized) {
-					glm::ivec2 dimension;
+					glm::ivec2 dimensions;
 					bool fullscreen = ((SDL_GetWindowFlags(m_window) & SDL_WINDOW_FULLSCREEN) ? true : false);
 					std::string title = SDL_GetWindowTitle(m_window);
 
-					SDL_GetWindowSize(m_window, &dimension.x, &dimension.y);
+					SDL_GetWindowSize(m_window, &dimensions.x, &dimensions.y);
 					result << ", Title[" << title.size() << "]=" << title
-						<< ", Dimension={" << dimension.x << ", " << dimension.y << "}"
+						<< ", Dimension={" << dimensions.x << ", " << dimensions.y << "}"
 						<< ", State=" << (fullscreen ? "Fullscreen" : "Windowed");
 				}
 			}

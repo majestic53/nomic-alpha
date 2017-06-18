@@ -205,6 +205,36 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		void 
+		manager::set_view_dimensions(
+			__in const glm::uvec2 &view_dimensions
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "View={%u, %u}", view_dimensions.x, view_dimensions.y);
+
+			std::lock_guard<std::mutex> lock(m_mutex);
+
+			if(!m_initialized) {
+				THROW_NOMIC_ENTITY_MANAGER_EXCEPTION(NOMIC_ENTITY_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			for(std::map<uint32_t, std::set<nomic::core::entity *>>::iterator iter_id = m_id.begin(); iter_id != m_id.end();
+					++iter_id) {
+
+				for(std::set<nomic::core::entity *>::iterator iter_handle = iter_id->second.begin();
+						iter_handle != iter_id->second.end(); ++iter_handle) {
+
+					if(!*iter_handle) {
+						continue;
+					}
+
+					(*iter_handle)->set_view_dimensions(view_dimensions);
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		std::string 
 		manager::to_string(
 			__in_opt bool verbose
@@ -259,9 +289,12 @@ namespace nomic {
 		}
 
 		void 
-		manager::update(void)
+		manager::update(
+			__in void *runtime,
+			__in void *camera
+			)
 		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
 			std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -279,7 +312,7 @@ namespace nomic {
 						continue;
 					}
 
-					(*iter_handle)->on_update();
+					(*iter_handle)->on_update(runtime, camera);
 				}
 			}
 

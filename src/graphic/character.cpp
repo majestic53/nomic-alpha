@@ -57,9 +57,9 @@ namespace nomic {
 				nomic::core::primitive(other),
 				m_advance(other.m_advance),
 				m_bearing(other.m_bearing),
-				m_dimension(other.m_dimension)
+				m_dimensions(other.m_dimensions)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%i, %i}, Bearing={%i, %i}, Advance=%u", other.m_dimension.x, other.m_dimension.y,
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%i, %i}, Bearing={%i, %i}, Advance=%u", other.m_dimensions.x, other.m_dimensions.y,
 				other.m_bearing.x, other.m_bearing.y, other.m_advance);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -75,14 +75,14 @@ namespace nomic {
 			__in const character &other
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%i, %i}, Bearing={%i, %i}, Advance=%u", other.m_dimension.x, other.m_dimension.y,
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%i, %i}, Bearing={%i, %i}, Advance=%u", other.m_dimensions.x, other.m_dimensions.y,
 				other.m_bearing.x, other.m_bearing.y, other.m_advance);
 
 			if(this != &other) {
 				nomic::core::primitive::operator=(other);
 				m_advance = other.m_advance;
 				m_bearing = other.m_bearing;
-				m_dimension = other.m_dimension;
+				m_dimensions = other.m_dimensions;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
@@ -116,11 +116,11 @@ namespace nomic {
 		}
 
 		glm::ivec2 
-		character::dimension(void) const
+		character::dimensions(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%i, %i}", m_dimension.x, m_dimension.y);
-			return m_dimension;
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%i, %i}", m_dimensions.x, m_dimensions.y);
+			return m_dimensions;
 		}
 
 		void 
@@ -147,8 +147,8 @@ namespace nomic {
 		character::height(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%i", m_dimension.y);
-			return m_dimension.y;
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%i", m_dimensions.y);
+			return m_dimensions.y;
 		}
 
 		int32_t 
@@ -178,7 +178,7 @@ namespace nomic {
 
 			m_advance = face->glyph->advance.x;
 			m_bearing = glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top);
-			m_dimension = glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows);
+			m_dimensions = glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows);
 			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_2D, m_handle);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
@@ -204,7 +204,7 @@ namespace nomic {
 
 			if(verbose) {
 				result << " Base=" << nomic::core::primitive::to_string(verbose)
-					<< ", Dimension={" << m_dimension.x << ", " << m_dimension.y << "}"
+					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
 					<< ", Bearing={" << m_bearing.x << ", " << m_bearing.y << "}"
 					<< ", Advance=" << m_advance;
 			}
@@ -225,8 +225,8 @@ namespace nomic {
 		character::width(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%i", m_dimension.x);
-			return m_dimension.x;
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%i", m_dimensions.x);
+			return m_dimensions.x;
 		}
 	}
 }

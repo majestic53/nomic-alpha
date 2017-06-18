@@ -16,30 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../include/graphic/camera.h"
+#include "../../include/entity/camera.h"
 #include "../../include/session/manager.h"
 #include "../../include/trace.h"
 #include "./camera_type.h"
 
 namespace nomic {
 
-	namespace graphic {
+	namespace entity {
 
 		camera::camera(
-			__in const glm::uvec2 &dimension,
+			__in const glm::uvec2 &dimensions,
 			__in_opt const glm::vec3 &position,
 			__in_opt const glm::vec3 &rotation,
 			__in_opt const glm::vec3 &up,
 			__in_opt float fov
 			) :
 				nomic::entity::object(ENTITY_CAMERA, SUBTYPE_UNDEFINED, position, rotation, up),
-				m_dimension(dimension),
+				m_dimensions(dimensions),
 				m_fov(fov),
 				m_rotation_previous(rotation.x, rotation.y),
 				m_wheel(0)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimensions={%u, %u}, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}, fov=%f",
-				dimension.x, dimension.y, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z,
+				dimensions.x, dimensions.y, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z,
 				up.x, up.y, up.z, fov);
 
 			update_perspective();
@@ -51,7 +51,7 @@ namespace nomic {
 			__in const camera &other
 			) :
 				nomic::entity::object(other),
-				m_dimension(other.m_dimension),
+				m_dimensions(other.m_dimensions),
 				m_fov(other.m_fov),
 				m_key(other.m_key),
 				m_motion(other.m_motion),
@@ -59,7 +59,7 @@ namespace nomic {
 				m_wheel(other.m_wheel)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimensions={%u, %u}, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}, fov=%f",
-				other.m_dimension.x, other.m_dimension.y, other.m_position.x, other.m_position.y, other.m_position.z,
+				other.m_dimensions.x, other.m_dimensions.y, other.m_position.x, other.m_position.y, other.m_position.z,
 				other.m_rotation.x, other.m_rotation.y, other.m_rotation.z,
 				other.m_up.x, other.m_up.y, other.m_up.z, other.m_fov);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -77,13 +77,13 @@ namespace nomic {
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimensions={%u, %u}, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}, fov=%f",
-				other.m_dimension.x, other.m_dimension.y, other.m_position.x, other.m_position.y, other.m_position.z,
+				other.m_dimensions.x, other.m_dimensions.y, other.m_position.x, other.m_position.y, other.m_position.z,
 				other.m_rotation.x, other.m_rotation.y, other.m_rotation.z,
 				other.m_up.x, other.m_up.y, other.m_up.z, other.m_fov);
 
 			if(this != &other) {
 				nomic::entity::object::operator=(other);
-				m_dimension = other.m_dimension;
+				m_dimensions = other.m_dimensions;
 				m_fov = other.m_fov;
 				m_key = other.m_key;
 				m_motion = other.m_motion;
@@ -93,6 +93,22 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
 			return *this;
+		}
+
+		glm::uvec2 
+		camera::dimensions(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return m_dimensions;
+		}
+
+		float 
+		camera::fov(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%f", m_fov);
+			return m_fov;
 		}
 
 		void 
@@ -237,12 +253,12 @@ namespace nomic {
 
 		void 
 		camera::set_dimensions(
-			__in const glm::uvec2 &dimension
+			__in const glm::uvec2 &dimensions
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimension.x, dimension.y);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimensions.x, dimensions.y);
 
-			m_dimension = dimension;
+			m_dimensions = dimensions;
 			update_perspective();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -270,11 +286,11 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
 
-			result << NOMIC_GRAPHIC_CAMERA_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
+			result << NOMIC_ENTITY_CAMERA_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
 				result << " Base=" << nomic::entity::object::to_string(verbose)
-					<< ", Dimension={" << m_dimension.x << ", " << m_dimension.y << "}"
+					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
 					<< ", FOV=" << m_fov;
 			}
 
@@ -287,7 +303,7 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			m_projection = glm::perspective(glm::radians(m_fov), m_dimension.x / (float) m_dimension.y,
+			m_projection = glm::perspective(glm::radians(m_fov), m_dimensions.x / (float) m_dimensions.y,
 				CAMERA_CLIP_MIN, CAMERA_CLIP_MAX);
 			m_rotation = glm::normalize(glm::vec3(
 				std::cos(glm::radians(m_rotation_previous.x)) * std::sin(glm::radians(m_rotation_previous.y)),

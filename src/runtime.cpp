@@ -273,6 +273,7 @@ namespace nomic {
 		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime loop entered");
 
 		m_manager_session.initialize();
+		m_manager_session.set_runtime(this);
 		duration = (MILLISECONDS_PER_SECOND / RUNTIME_TICKS_PER_SECOND);
 		frame = 0;
 		next = SDL_GetTicks();

@@ -20,11 +20,11 @@
 
 in vec2 out_coordinate;
 
-uniform vec3 out_color;
+uniform vec4 color;
 uniform sampler2D out_texture;
 
 void
 main(void)
 {
-	gl_FragColor = vec4(out_color, 1.f) * vec4(1.f, 1.f, 1.f, texture(out_texture, out_coordinate).r);
+	gl_FragColor = color * vec4(1.f, 1.f, 1.f, texture(out_texture, out_coordinate).r);
 }

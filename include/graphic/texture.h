@@ -52,7 +52,7 @@ namespace nomic {
 
 				uint8_t depth(void) const;
 
-				glm::uvec2 dimension(void) const;
+				glm::uvec2 dimensions(void) const;
 
 				void disable(void);
 
@@ -80,7 +80,7 @@ namespace nomic {
 
 				uint8_t m_depth;
 
-				glm::uvec2 m_dimension;
+				glm::uvec2 m_dimensions;
 
 				GLenum m_mode;
 		};

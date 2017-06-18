@@ -132,17 +132,21 @@ namespace nomic {
 
 		void 
 		entity::on_render(
+			__in nomic::core::renderer &renderer,
 			__in float delta
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Delta=%f", &renderer, delta);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
-		entity::on_update(void)
+		entity::on_update(
+			__in void *runtime,
+			__in void *camera
+			)
 		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -213,6 +217,15 @@ namespace nomic {
 
 			instance.release();
 
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		entity::set_view_dimensions(
+			__in const glm::vec2 &view_dimensions
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "View={%u, %u}", view_dimensions.x, view_dimensions.y);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 

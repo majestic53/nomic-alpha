@@ -52,7 +52,7 @@ namespace nomic {
 			) :
 				nomic::core::primitive(other),
 				m_depth(other.m_depth),
-				m_dimension(other.m_dimension),
+				m_dimensions(other.m_dimensions),
 				m_mode(other.m_mode)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -75,7 +75,7 @@ namespace nomic {
 			if(this != &other) {
 				nomic::core::primitive::operator=(other);
 				m_depth = other.m_depth;
-				m_dimension = other.m_dimension;
+				m_dimensions = other.m_dimensions;
 				m_mode = other.m_mode;
 			}
 
@@ -102,11 +102,11 @@ namespace nomic {
 		}
 
 		glm::uvec2 
-		texture::dimension(void) const
+		texture::dimensions(void) const
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%u, %u}", m_dimension.x, m_dimension.y);
-			return m_dimension;
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%u, %u}", m_dimensions.x, m_dimensions.y);
+			return m_dimensions;
 		}
 
 		void 
@@ -136,7 +136,7 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			result = m_dimension.y;
+			result = m_dimensions.y;
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return result;
@@ -179,13 +179,13 @@ namespace nomic {
 						"Depth=%u", m_depth);
 			}
 
-			m_dimension = glm::uvec2(image.width(), image.height());
+			m_dimensions = glm::uvec2(image.width(), image.height());
 			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_2D, m_handle);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mag);
-			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimension.x, m_dimension.y, 0, m_mode,
+			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimensions.x, m_dimensions.y, 0, m_mode,
 				GL_UNSIGNED_INT_8_8_8_8, image.pixels());
 			GL_CHECK(LEVEL_WARNING, glGenerateMipmap, GL_TEXTURE_2D);
 
@@ -206,7 +206,7 @@ namespace nomic {
 			if(verbose) {
 				result << " Base=" << nomic::core::primitive::to_string(verbose)
 					<< ", Depth=" << m_depth
-					<< ", Dimension={" << m_dimension.x << ", " << m_dimension.y << "}"
+					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
 					<< ", Mode=" << SCALAR_AS_HEX(GLenum, m_mode);
 			}
 
@@ -221,7 +221,7 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			result = m_dimension.x;
+			result = m_dimensions.x;
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return result;

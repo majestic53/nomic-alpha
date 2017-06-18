@@ -20,9 +20,9 @@
 #define NOMIC_SESSION_MANAGER_H_
 
 #include <vector>
+#include "../entity/camera.h"
 #include "../entity/manager.h"
 #include "../font/manager.h"
-#include "../graphic/camera.h"
 #include "../graphic/display.h"
 #include "../graphic/manager.h"
 #include "../render/manager.h"
@@ -49,7 +49,7 @@ namespace nomic {
 					);
 
 				void set_dimensions(
-					__in const glm::uvec2 &dimension
+					__in const glm::uvec2 &dimensions
 					);
 
 				void set_fullscreen(
@@ -58,6 +58,10 @@ namespace nomic {
 
 				void set_icon(
 					__in const std::string &path
+					);
+
+				void set_runtime(
+					__in void *runtime
 					);
 
 				void set_title(
@@ -96,7 +100,7 @@ namespace nomic {
 
 				void on_uninitialize(void);
 
-				nomic::graphic::camera *m_camera;
+				nomic::entity::camera *m_camera;
 
 				bool m_debug;
 
@@ -113,6 +117,8 @@ namespace nomic {
 				nomic::graphic::manager &m_manager_graphic;
 
 				nomic::render::manager &m_manager_render;
+
+				void *m_runtime;
 		};
 	}
 }
