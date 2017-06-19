@@ -114,6 +114,7 @@ namespace nomic {
 
 			switch(type) {
 				case PRIMITIVE_CHARACTER:
+				case PRIMITIVE_CUBEMAP:
 				case PRIMITIVE_TEXTURE:
 					GL_CHECK(LEVEL_WARNING, glDeleteTextures, HANDLE_COUNT, &iter->first);
 					break;
@@ -179,6 +180,7 @@ namespace nomic {
 
 			switch(type) {
 				case PRIMITIVE_CHARACTER:
+				case PRIMITIVE_CUBEMAP:
 				case PRIMITIVE_TEXTURE:
 					GL_CHECK(LEVEL_WARNING, glGenTextures, HANDLE_COUNT, &result);
 					break;

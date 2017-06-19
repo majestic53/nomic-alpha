@@ -24,6 +24,12 @@ make release
 Changelog
 =========
 
+Version 0.1.1725
+----------------
+*Updated: 6/19/2017*
+
+* Added cubemap graphic primitive class
+
 Version 0.1.1724
 ----------------
 *Updated: 6/18/2017*
@@ -37,29 +43,6 @@ Version 0.1.1724
 *Updated: 6/12/2017*
 
 * Added support for colored/textured plain primitives
-
-Version 0.1.1723
-----------------
-*Updated: 6/10/2017*
-
-* Added texture primitive class
-
-*Updated: 6/9/2017*
-
-* Added bitmap graphic class
-
-*Updated: 6/8/2017*
-
-* Added debug entity objects
-* Added debug mode to session
-
-*Updated: 6/7/2017*
-
-* Added entity object base class
-
-*Updated: 6/5-6/2017*
-
-* Added render singleton class <s>(incomplete)</s>
 
 *Changelog truncated (see file history for full log)*
 
