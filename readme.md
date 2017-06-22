@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1725
 ----------------
+*Updated: 6/22/2017*
+
+* Added skybox entity class
+
 *Updated: 6/19/2017*
 
 * Added cubemap graphic primitive class

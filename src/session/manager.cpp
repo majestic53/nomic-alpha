@@ -113,11 +113,6 @@ namespace nomic {
 			}
 
 			m_manager_display.initialize();
-
-			// TODO: configure display
-			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
-			// ---
-
 			glewExperimental = GL_TRUE;
 
 			err = glewInit();
@@ -157,7 +152,7 @@ namespace nomic {
 
 			// TODO: initialize gl managers
 
-			m_camera = new nomic::entity::camera(glm::uvec2(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT));
+			m_camera = new nomic::entity::camera(m_manager_display.dimensions());
 			if(!m_camera) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
 					"Failed to allocate camera, Address=%p", m_camera);
@@ -165,6 +160,10 @@ namespace nomic {
 
 			m_camera->enable(false);
 			m_camera->show(false);
+
+			// TODO: configure display
+			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
+			// ---
 
 			for(size_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
 

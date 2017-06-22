@@ -16,22 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_GRAPHIC_CUBEMAP_H_
-#define NOMIC_GRAPHIC_CUBEMAP_H_
+#ifndef NOMIC_ENTITY_SKYBOX_H_
+#define NOMIC_ENTITY_SKYBOX_H_
 
-#include <map>
-#include "../core/primitive.h"
+#include "../graphic/cubemap.h"
+#include "./object.h"
 
 namespace nomic {
 
-	namespace graphic {
+	namespace entity {
 
-		class cubemap :
-				public nomic::core::primitive {
+		class skybox :
+				public nomic::entity::object,
+				protected nomic::graphic::cubemap {
 
 			public:
 
-				explicit cubemap(
+				skybox(
 					__in_opt const std::map<uint32_t, std::string> &path = std::map<uint32_t, std::string>(),
 					__in_opt float scale = CUBEMAP_SCALE_DEFAULT,
 					__in_opt GLenum wrap_s = CUBEMAP_WRAP_S_DEFAULT,
@@ -41,21 +42,20 @@ namespace nomic {
 					__in_opt GLenum filter_mag = CUBEMAP_FILTER_MAG_DEFAULT
 					);
 
-				cubemap(
-					__in const cubemap &other
+				skybox(
+					__in const skybox &other
 					);
 
-				virtual ~cubemap(void);
+				virtual ~skybox(void);
 
-				cubemap &operator=(
-					__in const cubemap &other
+				skybox &operator=(
+					__in const skybox &other
 					);
 
-				void bind(void);
-
-				void disable(void);
-
-				void enable(void);
+				virtual void on_render(
+					__in nomic::core::renderer &renderer,
+					__in float delta
+					);
 
 				void set(
 					__in const std::map<uint32_t, std::string> &path,
@@ -70,8 +70,12 @@ namespace nomic {
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
+
+			protected:
+
+				void setup(void);
 		};
 	}
 }
 
-#endif // NOMIC_GRAPHIC_CUBEMAP_H_
+#endif // NOMIC_ENTITY_SKYBOX_H_

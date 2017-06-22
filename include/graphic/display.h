@@ -35,6 +35,8 @@ namespace nomic {
 
 				void clear(void);
 
+				glm::uvec2 dimensions(void) const;
+
 				void set_dimensions(
 					__in const glm::uvec2 &dimensions
 					);

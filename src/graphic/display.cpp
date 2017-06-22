@@ -54,6 +54,19 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		glm::uvec2 
+		display::dimensions(void) const
+		{
+			int height, width;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			SDL_GetWindowSize(m_window, &width, &height);
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Dimensions={%u, %u}", width, height);
+			return glm::uvec2(width, height);
+		}
+
 		bool 
 		display::on_initialize(void)
 		{

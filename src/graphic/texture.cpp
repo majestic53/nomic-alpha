@@ -160,6 +160,7 @@ namespace nomic {
 			)
 		{
 			nomic::graphic::bitmap image;
+			GLenum format = GL_UNSIGNED_BYTE;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s, Wrap={%x, %x}, Filter={%x, %x}", path.size(), STRING_CHECK(path),
 				wrap_s, wrap_t, filter_min, filter_mag);
@@ -170,9 +171,11 @@ namespace nomic {
 			switch(m_depth / CHAR_WIDTH) {
 				case BITMAP_DEPTH_24:
 					m_mode = GL_RGB;
+					format = GL_UNSIGNED_BYTE;
 					break;
 				case BITMAP_DEPTH_32:
 					m_mode = GL_RGBA;
+					format = GL_UNSIGNED_INT_8_8_8_8;
 					break;
 				default:
 					THROW_NOMIC_GRAPHIC_TEXTURE_EXCEPTION_FORMAT(NOMIC_GRAPHIC_TEXTURE_EXCEPTION_DEPTH_INVALID,
@@ -185,8 +188,8 @@ namespace nomic {
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mag);
-			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimensions.x, m_dimensions.y, 0, m_mode,
-				GL_UNSIGNED_INT_8_8_8_8, image.pixels());
+			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimensions.x, m_dimensions.y, 0, m_mode, format,
+				image.pixels());
 			GL_CHECK(LEVEL_WARNING, glGenerateMipmap, GL_TEXTURE_2D);
 
 			TRACE_EXIT(LEVEL_VERBOSE);

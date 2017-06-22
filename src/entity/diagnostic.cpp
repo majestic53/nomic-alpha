@@ -173,7 +173,7 @@ namespace nomic {
 
 			result << "Pos=" << position.x << "," << position.y << "," << position.z
 				<< std::endl << "Rot=" << rotation.x << "," << rotation.y << "," << rotation.z
-				<< std::endl << "Fov=" << fov << ", Fps=" << frame_rate << ", Tic=" << tick
+				<< std::endl << "Fov=" << fov << ", Fps=" << frame_rate << ", Tick=" << tick
 				<< "(@" << RUNTIME_TICKS_PER_SECOND << "/sec)";
 			m_text = result.str();
 

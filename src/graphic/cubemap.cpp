@@ -87,6 +87,26 @@ namespace nomic {
 		}
 
 		void 
+		cubemap::disable(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			GL_CHECK(LEVEL_WARNING, glDisable, GL_TEXTURE_2D);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		cubemap::enable(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			GL_CHECK(LEVEL_WARNING, glEnable, GL_TEXTURE_2D);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		cubemap::set(
 			__in const std::map<uint32_t, std::string> &path,
 			__in_opt float scale,
@@ -100,8 +120,9 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u], Scale=%f, Wrap={%x, %x, %x}, Filter={%x, %x}", path.size(), scale,
 				wrap_s, wrap_t, wrap_r, filter_min, filter_mag);
 
-			if(path.size() != (GL_TEXTURE_CUBE_MAP_NEGATIVE_Z + 1)) {
-				THROW_NOMIC_GRAPHIC_CUBEMAP_EXCEPTION_FORMAT(NOMIC_GRAPHIC_CUBEMAP_EXCEPTION_FACE_INVALID, "Count=%u", path.size());
+			if(path.size() != ((GL_TEXTURE_CUBE_MAP_NEGATIVE_Z - GL_TEXTURE_CUBE_MAP_POSITIVE_X) + 1)) {
+				THROW_NOMIC_GRAPHIC_CUBEMAP_EXCEPTION_FORMAT(NOMIC_GRAPHIC_CUBEMAP_EXCEPTION_FACE_INVALID, "Count=%u (expected: %u)",
+					path.size(), (GL_TEXTURE_CUBE_MAP_NEGATIVE_Z - GL_TEXTURE_CUBE_MAP_POSITIVE_X) + 1);
 			}
 
 			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_CUBE_MAP, m_handle);
@@ -120,14 +141,16 @@ namespace nomic {
 
 				nomic::graphic::bitmap image(iter->second);
 				glm::uvec2 dimensions(image.width(), image.height());
-				GLenum mode = GL_RGB;
+				GLenum format = GL_UNSIGNED_BYTE, mode = GL_RGB;
 
 				uint32_t depth = image.depth();
 				switch(depth / CHAR_WIDTH) {
 					case BITMAP_DEPTH_24:
+						format = GL_UNSIGNED_BYTE;
 						mode = GL_RGB;
 						break;
 					case BITMAP_DEPTH_32:
+						format = GL_UNSIGNED_INT_8_8_8_8;
 						mode = GL_RGBA;
 						break;
 					default:
@@ -135,9 +158,7 @@ namespace nomic {
 							"Depth=%u", depth);
 				}
 
-				GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, mode, dimensions.x, dimensions.y, 0,
-					mode, GL_UNSIGNED_INT_8_8_8_8, image.pixels());
-				GL_CHECK(LEVEL_WARNING, glGenerateMipmap, GL_TEXTURE_CUBE_MAP);
+				GL_CHECK(LEVEL_WARNING, glTexImage2D, face, 0, mode, dimensions.x, dimensions.y, 0, mode, format, image.pixels());
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
