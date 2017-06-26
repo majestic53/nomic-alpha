@@ -26,6 +26,12 @@ Changelog
 
 Version 0.1.1725
 ----------------
+*Updated: 6/26/2017*
+
+* Integrated terrain generation classes
+
+Version 0.1.1725
+----------------
 *Updated: 6/22/2017*
 
 * Added skybox entity class
@@ -33,20 +39,6 @@ Version 0.1.1725
 *Updated: 6/19/2017*
 
 * Added cubemap graphic primitive class
-
-Version 0.1.1724
-----------------
-*Updated: 6/18/2017*
-
-* Added diagnostic entity class
-
-*Updated: 6/14-15/2017*
-
-* Added font rendering support <s>(incomplete)</s>
-
-*Updated: 6/12/2017*
-
-* Added support for colored/textured plain primitives
 
 *Changelog truncated (see file history for full log)*
 

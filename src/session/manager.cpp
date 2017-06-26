@@ -27,6 +27,45 @@
 #include "../../include/trace.h"
 #include "./manager_type.h"
 
+// TODO: DEBUGGING
+#include "../../include/graphic/cubemap.h"
+
+#define BLOCK_SEGMENT_COUNT 36
+#define BLOCK_SEGMENT_WIDTH 3
+
+enum {
+	BLOCK_INDEX_VERTEX = 0,
+};
+
+static const float BLOCK_VERTEX[] = {
+	-1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, -1.f, //right
+	1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f, -1.f,
+	-1.f, -1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, // left
+	-1.f, 1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f,
+	1.f, -1.f, -1.f, 1.f, -1.f, 1.f, 1.f, 1.f, 1.f, // top
+	1.f, 1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f,
+	-1.f, -1.f, 1.f, -1.f, 1.f, 1.f, 1.f, 1.f, 1.f, // bottom
+	1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f,
+	-1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, 1.f, 1.f, // back
+	1.f, 1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, -1.f,
+	-1.f, -1.f, -1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, // front
+	1.f, -1.f, -1.f, -1.f, -1.f, 1.f, 1.f, -1.f, 1.f,
+	};
+
+static const std::map<uint32_t, std::string> BLOCK_PATH = {
+	{ GL_TEXTURE_CUBE_MAP_POSITIVE_X, "./res/block_right.bmp" }, // right
+	{ GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "./res/block_left.bmp" }, // left
+	{ GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "./res/block_top.bmp" }, // top
+	{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "./res/block_bottom.bmp" }, // bottom
+	{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "./res/block_back.bmp" }, // back
+	{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "./res/block_forward.bmp" }, // forward
+	};
+
+nomic::core::renderer *block_renderer = nullptr;
+nomic::graphic::vao *block_vao = nullptr;
+nomic::graphic::cubemap *block_cubemap = nullptr;
+// ---
+
 namespace nomic {
 
 	namespace session {
@@ -150,8 +189,6 @@ namespace nomic {
 			m_manager_font.initialize();
 			m_manager_entity.initialize();
 
-			// TODO: initialize gl managers
-
 			m_camera = new nomic::entity::camera(m_manager_display.dimensions());
 			if(!m_camera) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
@@ -199,6 +236,34 @@ namespace nomic {
 				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->get_id());
 			}
 
+// TODO: DEBUGGING
+
+			block_renderer = new nomic::core::renderer;
+			if(!block_renderer) {
+				THROW_EXCEPTION("Failed to allocate renderer!");
+			}
+
+			block_renderer->set_shaders("./res/vert_block.glsl", "./res/frag_block.glsl");
+			block_renderer->set_mode(RENDER_PERSPECTIVE);
+
+			block_vao = new nomic::graphic::vao;
+			if(!block_vao) {
+				THROW_EXCEPTION("Failed to allocate vao!");
+			}
+
+			block_vao->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &BLOCK_VERTEX[0],
+				((uint8_t *) &BLOCK_VERTEX[0]) + ((BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				BLOCK_INDEX_VERTEX, BLOCK_SEGMENT_WIDTH, GL_FLOAT);
+			block_vao->enable(BLOCK_INDEX_VERTEX);
+
+			block_cubemap = new nomic::graphic::cubemap;
+			if(!block_cubemap) {
+				THROW_EXCEPTION("Failed to allocate cubemap!");
+			}
+
+			block_cubemap->set(BLOCK_PATH);
+// ---
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initialized");
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -230,11 +295,26 @@ namespace nomic {
 				}
 			}
 
+// TODO: DEBUGGING
+
+			if(block_cubemap) {
+				delete block_cubemap;
+				block_cubemap = nullptr;
+			}
+
+			if(block_vao) {
+				delete block_vao;
+				block_vao = nullptr;
+			}
+
+			if(block_renderer) {
+				delete block_renderer;
+				block_renderer = nullptr;
+			}
+// ---
+
 			m_debug_object.clear();
 			m_debug_renderer.clear();
-
-			// TODO: uninitialize gl managers
-
 			m_manager_entity.uninitialize();
 			m_manager_font.uninitialize();
 			m_manager_render.uninitialize();
@@ -252,9 +332,6 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager pausing...");
-
-			// TODO: handle pause event
-
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager paused");
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -274,6 +351,14 @@ namespace nomic {
 
 			m_camera->render(delta);
 			m_manager_display.clear();
+
+// TODO: DEBUGGING
+			block_renderer->use(m_camera->projection(), m_camera->view());
+			block_cubemap->bind();
+			block_vao->bind();
+			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, BLOCK_SEGMENT_COUNT);
+// ---
+
 			m_manager_render.render(m_camera->projection(), m_camera->view(), m_camera->dimensions(), delta);
 			m_manager_display.show();
 
@@ -452,9 +537,6 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager unpausing...");
-
-			// TODO: handle unpause event
-
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager unpaused");
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -464,8 +546,6 @@ namespace nomic {
 		manager::update(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-
-			// TODO: handle update event
 
 			m_manager_entity.update(m_runtime, m_camera);
 

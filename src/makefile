@@ -27,6 +27,7 @@ DIR_INC_FONT=./../include/font/
 DIR_INC_GRAPHIC=./../include/graphic/
 DIR_INC_RENDER=./../include/render/
 DIR_INC_SESSION=./../include/session/
+DIR_INC_TERRAIN=./../include/terrain/
 DIR_INC_UUID=./../include/uuid/
 DIR_SRC=./
 DIR_SRC_CORE=./core/
@@ -36,6 +37,7 @@ DIR_SRC_FONT=./font/
 DIR_SRC_GRAPHIC=./graphic/
 DIR_SRC_RENDER=./render/
 DIR_SRC_SESSION=./session/
+DIR_SRC_TERRAIN=./terrain/
 DIR_SRC_UUID=./uuid/
 LIB=libnomic.a
 
@@ -45,9 +47,9 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o $(DIR_BUILD)base_utility.o \
-		$(DIR_BUILD)core_entity.o $(DIR_BUILD)core_event.o $(DIR_BUILD)core_font.o $(DIR_BUILD)core_id.o $(DIR_BUILD)core_object.o \
-			$(DIR_BUILD)core_primitive.o $(DIR_BUILD)core_renderer.o $(DIR_BUILD)core_signal.o $(DIR_BUILD)core_thread.o \
-			$(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
+		$(DIR_BUILD)core_entity.o $(DIR_BUILD)core_event.o $(DIR_BUILD)core_font.o $(DIR_BUILD)core_id.o $(DIR_BUILD)core_noise.o \
+			$(DIR_BUILD)core_object.o $(DIR_BUILD)core_primitive.o $(DIR_BUILD)core_renderer.o $(DIR_BUILD)core_signal.o \
+			$(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
 		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_camera.o $(DIR_BUILD)entity_diagnostic.o $(DIR_BUILD)entity_manager.o \
 			$(DIR_BUILD)entity_object.o $(DIR_BUILD)entity_plain.o $(DIR_BUILD)entity_reticle.o $(DIR_BUILD)entity_skybox.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
@@ -57,11 +59,12 @@ archive:
 			$(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
 		$(DIR_BUILD)render_manager.o \
 		$(DIR_BUILD)session_manager.o \
+		$(DIR_BUILD)terrain_chunk.o $(DIR_BUILD)terrain_generator.o \
 		$(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_core build_entity build_event build_font build_graphic build_render build_session build_uuid
+build: build_base build_core build_entity build_event build_font build_graphic build_render build_session build_terrain build_uuid
 
 ### BASE ###
 
@@ -81,8 +84,8 @@ base_utility.o: $(DIR_SRC)utility.cpp
 
 ### CORE ###
 
-build_core: core_entity.o core_event.o core_font.o core_id.o core_object.o core_primitive.o core_renderer.o core_signal.o core_thread.o \
-	core_transform.o core_uniform.o
+build_core: core_entity.o core_event.o core_font.o core_id.o core_noise.o core_object.o core_primitive.o core_renderer.o core_signal.o \
+	core_thread.o core_transform.o core_uniform.o
 
 core_entity.o: $(DIR_SRC_CORE)entity.cpp $(DIR_INC_CORE)entity.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)entity.cpp -o $(DIR_BUILD)core_entity.o
@@ -95,6 +98,9 @@ core_font.o: $(DIR_SRC_CORE)font.cpp $(DIR_INC_CORE)font.h
 
 core_id.o: $(DIR_SRC_CORE)id.cpp $(DIR_INC_CORE)id.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)id.cpp -o $(DIR_BUILD)core_id.o
+
+core_noise.o: $(DIR_SRC_CORE)noise.cpp $(DIR_INC_CORE)noise.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)noise.cpp -o $(DIR_BUILD)core_noise.o
 
 core_object.o: $(DIR_SRC_CORE)object.cpp $(DIR_INC_CORE)object.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CORE)object.cpp -o $(DIR_BUILD)core_object.o
@@ -213,6 +219,16 @@ build_session: session_manager.o
 
 session_manager.o: $(DIR_SRC_SESSION)manager.cpp $(DIR_INC_SESSION)manager.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SESSION)manager.cpp -o $(DIR_BUILD)session_manager.o
+
+### TERRAIN ###
+
+build_terrain: terrain_chunk.o terrain_generator.o
+
+terrain_chunk.o: $(DIR_SRC_TERRAIN)chunk.cpp $(DIR_INC_TERRAIN)chunk.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TERRAIN)chunk.cpp -o $(DIR_BUILD)terrain_chunk.o
+
+terrain_generator.o: $(DIR_SRC_TERRAIN)generator.cpp $(DIR_INC_TERRAIN)generator.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TERRAIN)generator.cpp -o $(DIR_BUILD)terrain_generator.o
 
 ### UUID ###
 

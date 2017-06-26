@@ -18,12 +18,17 @@
 
 #version 330 core
 
-in vec3 out_vertex;
+layout(location = 0) in vec3 in_vertex;
 
-uniform samplerCube out_cube;
+uniform mat4 model;
+uniform mat4 projection;
+uniform mat4 view;
+
+out vec3 out_vertex;
 
 void
 main(void)
 {
-	gl_FragColor = texture(out_cube, out_vertex);
+	out_vertex = in_vertex;
+	gl_Position = (projection * view * vec4(in_vertex, 1.f));
 }
