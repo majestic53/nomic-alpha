@@ -34,5 +34,5 @@ main(void)
 {
 	out_color = in_color;
 	out_coordinate = in_coordinate;
-	gl_Position = (projection * view * vec4(in_vertex, 1.f));
+	gl_Position = (projection * view * model * vec4(in_vertex, 1.f));
 }

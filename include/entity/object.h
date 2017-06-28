@@ -54,6 +54,8 @@ namespace nomic {
 					__in const object &other
 					);
 
+				glm::mat4 &model(void);
+
 				virtual void on_render(
 					__in nomic::core::renderer &renderer,
 					__in float delta

@@ -365,12 +365,12 @@ namespace nomic {
 
 		void 
 		renderer::use(
-			__in const glm::mat4 &model,
 			__in const glm::mat4 &projection,
-			__in const glm::mat4 &view
+			__in const glm::mat4 &view,
+			__in const glm::mat4 &model
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Model=%p, Projection=%p, View=%p", &model, &projection, &view);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p, Model=%p", &projection, &view, &model);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_model, model);

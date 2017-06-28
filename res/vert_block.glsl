@@ -18,17 +18,21 @@
 
 #version 330 core
 
-layout(location = 0) in vec3 in_vertex;
+layout(location = 0) in vec4 in_color;
+layout(location = 1) in vec2 in_coordinate;
+layout(location = 2) in vec3 in_vertex;
 
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 
-out vec3 out_vertex;
+out vec4 out_color;
+out vec2 out_coordinate;
 
 void
 main(void)
 {
-	out_vertex = in_vertex;
+	out_color = in_color;
+	out_coordinate = in_coordinate;
 	gl_Position = (projection * view * vec4(in_vertex, 1.f));
 }

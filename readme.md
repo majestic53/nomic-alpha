@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1725
 ----------------
+*Updated: 6/28/2017*
+
+* Added block entity class (incomplete)
+
 *Updated: 6/26/2017*
 
 * Integrated terrain generation classes

@@ -101,9 +101,9 @@ namespace nomic {
 					);
 
 				void use(
-					__in const glm::mat4 &model,
 					__in const glm::mat4 &projection,
-					__in const glm::mat4 &view
+					__in const glm::mat4 &view,
+					__in const glm::mat4 &model
 					);
 
 			protected:

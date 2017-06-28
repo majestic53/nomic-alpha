@@ -27,43 +27,8 @@
 #include "../../include/trace.h"
 #include "./manager_type.h"
 
-// TODO: DEBUGGING
-#include "../../include/graphic/cubemap.h"
-
-#define BLOCK_SEGMENT_COUNT 36
-#define BLOCK_SEGMENT_WIDTH 3
-
-enum {
-	BLOCK_INDEX_VERTEX = 0,
-};
-
-static const float BLOCK_VERTEX[] = {
-	-1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, -1.f, //right
-	1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f, -1.f,
-	-1.f, -1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, // left
-	-1.f, 1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f,
-	1.f, -1.f, -1.f, 1.f, -1.f, 1.f, 1.f, 1.f, 1.f, // top
-	1.f, 1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f,
-	-1.f, -1.f, 1.f, -1.f, 1.f, 1.f, 1.f, 1.f, 1.f, // bottom
-	1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f,
-	-1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, 1.f, 1.f, // back
-	1.f, 1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, -1.f,
-	-1.f, -1.f, -1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, // front
-	1.f, -1.f, -1.f, -1.f, -1.f, 1.f, 1.f, -1.f, 1.f,
-	};
-
-static const std::map<uint32_t, std::string> BLOCK_PATH = {
-	{ GL_TEXTURE_CUBE_MAP_POSITIVE_X, "./res/block_right.bmp" }, // right
-	{ GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "./res/block_left.bmp" }, // left
-	{ GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "./res/block_top.bmp" }, // top
-	{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "./res/block_bottom.bmp" }, // bottom
-	{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "./res/block_back.bmp" }, // back
-	{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "./res/block_forward.bmp" }, // forward
-	};
-
-nomic::core::renderer *block_renderer = nullptr;
-nomic::graphic::vao *block_vao = nullptr;
-nomic::graphic::cubemap *block_cubemap = nullptr;
+// TODO
+#include "../../include/entity/block.h"
 // ---
 
 namespace nomic {
@@ -74,20 +39,46 @@ namespace nomic {
 			DEBUG_OBJECT_AXIS = 0,
 			DEBUG_OBJECT_DIAGNOSTIC,
 			DEBUG_OBJECT_RETICLE,
+
+// TODO
+			DEBUG_OBJECT_BLOCK,
 		};
 
-		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_RETICLE
+		//#define DEBUG_OBJECT_MAX DEBUG_OBJECT_RETICLE
+		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_BLOCK
+// ---
 
 		enum {
-			DEBUG_TUPLE_SHADER_VERTEX = 0,
-			DEBUG_TUPLE_SHADER_FRAGMENT,
-			DEBUG_TUPLE_MODE,
+			DEBUG_SHADER_VERTEX = 0,
+			DEBUG_SHADER_FRAGMENT,
+			DEBUG_MODE,
+			DEBUG_BLEND_ENABLED,
+			DEBUG_BLEND_DFACTOR,
+			DEBUG_BLEND_SFACTOR,
+			DEBUG_CULL_ENABLED,
+			DEBUG_CULL_MODE,
+			DEBUG_DEPTH_ENABLED,
+			DEBUG_DEPTH_MODE,
 		};
 
-		static const std::vector<std::tuple<std::string, std::string, bool>> DEBUG_RENDERER_COFIGURATION = {
-			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE },
-			{ "./res/vert_string_static.glsl", "./res/frag_string_static.glsl", RENDER_ORTHOGONAL },
-			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", RENDER_PERSPECTIVE },
+		typedef std::tuple<std::string, std::string, uint32_t, bool, uint32_t, uint32_t, bool, uint32_t, bool, uint32_t> tuple_debug;
+
+		static const std::vector<tuple_debug> DEBUG_RENDERER_CONFIGURATION = {
+			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT, RENDERER_BLEND_DFACTOR_DEFAULT,
+				RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_DEPTH_DEFAULT,
+				RENDERER_DEPTH_MODE_DEFAULT }, // axis
+			{ "./res/vert_string_static.glsl", "./res/frag_string_static.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_BACK,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
+			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
+
+// TODO
+			{ "./res/vert_block.glsl", "./res/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // block
+// ---
 			};
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
@@ -209,9 +200,17 @@ namespace nomic {
 					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Renderer=%u", iter);
 				}
 
-				m_debug_renderer.at(iter)->set_shaders(std::get<DEBUG_TUPLE_SHADER_VERTEX>(DEBUG_RENDERER_COFIGURATION.at(iter)),
-					std::get<DEBUG_TUPLE_SHADER_FRAGMENT>(DEBUG_RENDERER_COFIGURATION.at(iter)));
-				m_debug_renderer.at(iter)->set_mode(std::get<DEBUG_TUPLE_MODE>(DEBUG_RENDERER_COFIGURATION.at(iter)));
+				const tuple_debug &config = DEBUG_RENDERER_CONFIGURATION.at(iter);
+
+				nomic::core::renderer *rend = m_debug_renderer.at(iter);
+				if(rend) {
+					rend->set_shaders(std::get<DEBUG_SHADER_VERTEX>(config), std::get<DEBUG_SHADER_FRAGMENT>(config));
+					rend->set_mode(std::get<DEBUG_MODE>(config));
+					rend->set_blend(std::get<DEBUG_BLEND_ENABLED>(config), std::get<DEBUG_BLEND_SFACTOR>(config),
+						std::get<DEBUG_BLEND_DFACTOR>(config));
+					rend->set_cull(std::get<DEBUG_CULL_ENABLED>(config), std::get<DEBUG_CULL_MODE>(config));
+					rend->set_depth(std::get<DEBUG_DEPTH_ENABLED>(config), std::get<DEBUG_DEPTH_MODE>(config));
+				}
 
 				switch(iter) {
 					case DEBUG_OBJECT_AXIS:
@@ -223,6 +222,13 @@ namespace nomic {
 					case DEBUG_OBJECT_RETICLE:
 						m_debug_object.push_back(new nomic::entity::reticle);
 						break;
+
+// TODO
+					case DEBUG_OBJECT_BLOCK:
+						m_debug_object.push_back(new nomic::entity::block);
+						break;
+// ---
+
 					default:
 						break;
 				}
@@ -235,34 +241,6 @@ namespace nomic {
 				m_debug_object.at(iter)->show(m_debug);
 				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->get_id());
 			}
-
-// TODO: DEBUGGING
-
-			block_renderer = new nomic::core::renderer;
-			if(!block_renderer) {
-				THROW_EXCEPTION("Failed to allocate renderer!");
-			}
-
-			block_renderer->set_shaders("./res/vert_block.glsl", "./res/frag_block.glsl");
-			block_renderer->set_mode(RENDER_PERSPECTIVE);
-
-			block_vao = new nomic::graphic::vao;
-			if(!block_vao) {
-				THROW_EXCEPTION("Failed to allocate vao!");
-			}
-
-			block_vao->add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &BLOCK_VERTEX[0],
-				((uint8_t *) &BLOCK_VERTEX[0]) + ((BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				BLOCK_INDEX_VERTEX, BLOCK_SEGMENT_WIDTH, GL_FLOAT);
-			block_vao->enable(BLOCK_INDEX_VERTEX);
-
-			block_cubemap = new nomic::graphic::cubemap;
-			if(!block_cubemap) {
-				THROW_EXCEPTION("Failed to allocate cubemap!");
-			}
-
-			block_cubemap->set(BLOCK_PATH);
-// ---
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager initialized");
 
@@ -294,24 +272,6 @@ namespace nomic {
 					m_debug_renderer.at(iter) = nullptr;
 				}
 			}
-
-// TODO: DEBUGGING
-
-			if(block_cubemap) {
-				delete block_cubemap;
-				block_cubemap = nullptr;
-			}
-
-			if(block_vao) {
-				delete block_vao;
-				block_vao = nullptr;
-			}
-
-			if(block_renderer) {
-				delete block_renderer;
-				block_renderer = nullptr;
-			}
-// ---
 
 			m_debug_object.clear();
 			m_debug_renderer.clear();
@@ -351,14 +311,6 @@ namespace nomic {
 
 			m_camera->render(delta);
 			m_manager_display.clear();
-
-// TODO: DEBUGGING
-			block_renderer->use(m_camera->projection(), m_camera->view());
-			block_cubemap->bind();
-			block_vao->bind();
-			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, BLOCK_SEGMENT_COUNT);
-// ---
-
 			m_manager_render.render(m_camera->projection(), m_camera->view(), m_camera->dimensions(), delta);
 			m_manager_display.show();
 

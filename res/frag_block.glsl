@@ -18,12 +18,11 @@
 
 #version 330 core
 
-in vec3 out_vertex;
-
-uniform samplerCube out_cube;
+in vec4 out_color;
+in vec2 out_coordinate;
 
 void
 main(void)
 {
-	gl_FragColor = texture(out_cube, out_vertex);
+	gl_FragColor = out_color;
 }

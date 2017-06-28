@@ -33,6 +33,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace nomic {
@@ -51,16 +52,18 @@ namespace nomic {
 #endif // __inout_opt
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
-
+	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
+	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define BLOCK_DEPTH_DIRT 20
 	#define BLOCK_DEPTH_SAND 10
-
 	#define BLOCK_HEIGHT_DIRT 68
 	#define BLOCK_HEIGHT_MAX 120
 	#define BLOCK_HEIGHT_MIN 20
 	#define BLOCK_HEIGHT_SNOW 106
 	#define BLOCK_HEIGHT_STONE 100
 	#define BLOCK_HEIGHT_WATER 64
+	#define BLOCK_SCALE_DEFAULT 1.f
+	#define BLOCK_SCALE_MIN 0.f
 
 	#define CAMERA_CLIP_MAX 1000.f
 	#define CAMERA_CLIP_MIN 0.1f
@@ -166,7 +169,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1726
 
 	#define OBJECT_COUNT 1
@@ -186,7 +189,7 @@ namespace nomic {
 	#define RENDERER_BLEND_DFACTOR_DEFAULT GL_ONE_MINUS_SRC_ALPHA
 	#define RENDERER_BLEND_SFACTOR_DEFAULT GL_SRC_ALPHA
 	#define RENDERER_CULL_DEFAULT true
-	#define RENDERER_CULL_MODE_DEFAULT GL_FRONT
+	#define RENDERER_CULL_MODE_DEFAULT GL_BACK
 	#define RENDERER_DEPTH_DEFAULT true
 	#define RENDERER_DEPTH_MODE_DEFAULT GL_LESS
 
@@ -199,6 +202,8 @@ namespace nomic {
 			<< std::dec
 
 	#define SCALAR_INVALID(_TYPE_) ((_TYPE_) -1)
+
+	#define SCALE_DEFAULT 1.f
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
@@ -307,12 +312,25 @@ namespace nomic {
 	};
 
 	enum {
+		BLOCK_FACE_RIGHT = 0,
+		BLOCK_FACE_LEFT,
+		BLOCK_FACE_TOP,
+		BLOCK_FACE_BOTTOM,
+		BLOCK_FACE_BACK,
+		BLOCK_FACE_FRONT,
+	};
+
+	#define BLOCK_FACE_MIN BLOCK_FACE_RIGHT
+	#define BLOCK_FACE_MAX BLOCK_FACE_FRONT
+
+	enum {
 		ENTITY_SKYBOX = 0,
 		ENTITY_CAMERA,
 		ENTITY_PLAIN,
 		ENTITY_AXIS,
 		ENTITY_DIAGNOSTIC,
 		ENTITY_RETICLE,
+		ENTITY_BLOCK,
 	};
 
 	enum {

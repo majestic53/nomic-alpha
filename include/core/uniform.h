@@ -47,6 +47,11 @@ namespace nomic {
 
 				glm::mat4 &model(void);
 
+				glm::mat4 &model(
+					__in const glm::vec3 &position,
+					__in const glm::vec3 &rotation
+					);
+
 				glm::mat4 &projection(void);
 
 				void reset(void);

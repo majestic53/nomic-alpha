@@ -78,6 +78,14 @@ namespace nomic {
 			return *this;
 		}
 
+		glm::mat4 &
+		object::model(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return nomic::core::uniform::model(m_position, m_rotation);
+		}
+
 		void 
 		object::on_render(
 			__in nomic::core::renderer &renderer,

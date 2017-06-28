@@ -80,6 +80,22 @@ namespace nomic {
 		}
 
 		glm::mat4 &
+		uniform::model(
+			__in const glm::vec3 &position,
+			__in const glm::vec3 &rotation
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Rotation={%f, %f, %f}",
+				position.x, position.y, position.z, rotation.x, rotation.y, rotation.z);
+
+			m_model = (glm::translate(position) * glm::rotate(UNIFORM_MATRIX_DEFAULT, rotation.y, rotation)
+				* (glm::scale(UNIFORM_MATRIX_DEFAULT, glm::vec3(SCALE_DEFAULT))));
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return m_model;
+		}
+
+		glm::mat4 &
 		uniform::projection(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
