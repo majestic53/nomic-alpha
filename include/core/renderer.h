@@ -80,6 +80,18 @@ namespace nomic {
 					__in uint32_t mode
 					);
 
+				void set_model(
+					__in const glm::mat4 &model
+					);
+
+				void set_projection(
+					__in const glm::mat4 &projection
+					);
+
+				void set_view(
+					__in const glm::mat4 &view
+					);
+
 				void set_shaders(
 					__in const std::string &vertex,
 					__in const std::string &fragment

@@ -279,6 +279,42 @@ namespace nomic {
 		}
 
 		void 
+		renderer::set_model(
+			__in const glm::mat4 &model
+			)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::program::set_uniform(m_uniform_model, model);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		renderer::set_projection(
+			__in const glm::mat4 &projection
+			)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		renderer::set_view(
+			__in const glm::mat4 &view
+			)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::program::set_uniform(m_uniform_view, view);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		renderer::set_shaders(
 			__in const std::string &vertex,
 			__in const std::string &fragment

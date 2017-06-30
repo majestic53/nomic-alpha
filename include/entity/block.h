@@ -35,10 +35,10 @@ namespace nomic {
 				block(
 					__in_opt const std::map<uint32_t, std::string> &paths = std::map<uint32_t, std::string>(),
 					__in_opt float scale = BLOCK_SCALE_DEFAULT,
-					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
-					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
-					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
-					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT,
+					__in_opt GLenum wrap_s = BLOCK_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = BLOCK_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = BLOCK_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = BLOCK_FILTER_MAG_DEFAULT,
 					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
 					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
 					__in_opt const glm::vec3 &up = TRANSFORM_UP_DEFAULT
@@ -65,10 +65,10 @@ namespace nomic {
 
 				void set_textures(
 					__in_opt const std::map<uint32_t, std::string> &paths,
-					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
-					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
-					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
-					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
+					__in_opt GLenum wrap_s = BLOCK_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = BLOCK_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = BLOCK_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = BLOCK_FILTER_MAG_DEFAULT
 					);
 
 				virtual std::string to_string(

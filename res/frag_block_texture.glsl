@@ -18,21 +18,13 @@
 
 #version 330 core
 
-layout(location = 0) in vec4 in_color;
-layout(location = 1) in vec2 in_coordinate;
-layout(location = 2) in vec3 in_vertex;
+in vec4 out_color;
+in vec2 out_coordinate;
 
-uniform mat4 model;
-uniform mat4 projection;
-uniform mat4 view;
-
-out vec4 out_color;
-out vec2 out_coordinate;
+uniform sampler2D out_texture;
 
 void
 main(void)
 {
-	out_color = in_color;
-	out_coordinate = in_coordinate;
-	gl_Position = (projection * view * vec4(in_vertex, 1.f));
+	gl_FragColor = texture(out_texture, out_coordinate);
 }

@@ -26,9 +26,9 @@ Changelog
 
 Version 0.1.1725
 ----------------
-*Updated: 6/28/2017*
+*Updated: 6/28-30/2017*
 
-* Added block entity class (incomplete)
+* Added block entity class <s>(incomplete)</s>
 
 *Updated: 6/26/2017*
 

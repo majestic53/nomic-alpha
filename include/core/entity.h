@@ -70,6 +70,8 @@ namespace nomic {
 					__in void *camera
 					);
 
+				virtual glm::mat4 &model(void) = 0;
+
 				void register_renderer(
 					__in GLuint id
 					);

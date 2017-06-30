@@ -45,27 +45,81 @@ namespace nomic {
 			};
 
 		static const glm::vec2 BLOCK_COORDINATE[] = {
-			{ 1.f, 1.f }, // bottom left
-			{ 1.f, 0.f }, // top left
-			{ 0.f, 0.f }, // top right
-			{ 1.f, 1.f }, // bottom left
-			{ 0.f, 0.f }, // top right
-			{ 0.f, 1.f }, // bottom right
+			{ 1.f, 1.f, }, // right
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 1.f, 1.f, }, // left
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 1.f, 1.f, }, // top
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 1.f, 0.f, }, // bottom
+			{ 1.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 1.f, }, // back
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 1.f, 0.f, }, // front
+			{ 1.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
 			};
 
 		static const float BLOCK_VERTEX[] = {
-			-1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, -1.f, //right
-			1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f, -1.f,
-			-1.f, -1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f, -1.f, // left
-			-1.f, 1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, 1.f,
-			1.f, -1.f, -1.f, 1.f, -1.f, 1.f, 1.f, 1.f, 1.f, // top
-			1.f, 1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f,
-			-1.f, -1.f, 1.f, -1.f, 1.f, 1.f, 1.f, 1.f, 1.f, // bottom
-			1.f, 1.f, 1.f, 1.f, -1.f, 1.f, -1.f, -1.f, 1.f,
-			-1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, 1.f, 1.f, // back
-			1.f, 1.f, 1.f, -1.f, 1.f, 1.f, -1.f, 1.f, -1.f,
-			-1.f, -1.f, -1.f, -1.f, -1.f, 1.f, 1.f, -1.f, -1.f, // front
-			1.f, -1.f, -1.f, -1.f, -1.f, 1.f, 1.f, -1.f, 1.f,
+			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // right
+			BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
+			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
+			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, // left
+			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // top
+			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
+			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // bottom
+			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
+			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
+			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, // back
+			-BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
+			BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // front
+			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
+			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
+			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
+			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
+			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
 			};
 
 		block::block(
@@ -138,10 +192,17 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Delta=%f", &renderer, delta);
 
-			// TODO: render textures/vao
 			vertex_array().bind();
-			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, BLOCK_SEGMENT_COUNT);
-			// ---
+
+			if(!m_face.empty()) {
+
+				for(uint32_t iter = BLOCK_FACE_MIN; iter <= BLOCK_FACE_MAX; ++iter) {
+					m_face.at(iter).bind();
+					GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, iter * BLOCK_FACE_COUNT, BLOCK_FACE_COUNT);
+				}
+			} else {
+				GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, BLOCK_SEGMENT_COUNT);
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -155,12 +216,11 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			// TODO: configure vao
 			for(uint32_t iter = BLOCK_FACE_MIN; iter <= BLOCK_FACE_MAX; ++iter) {
 
 				for(uint32_t face = BLOCK_FACE_MIN; face <= BLOCK_FACE_MAX; ++face) {
-						color.push_back(BLOCK_COLOR[face]);
-						coordinate.push_back(BLOCK_COORDINATE[face]);
+					color.push_back(BLOCK_COLOR[face]);
+					coordinate.push_back(BLOCK_COORDINATE[(iter * BLOCK_FACE_COUNT) + face]);
 				}
 			}
 
@@ -181,7 +241,6 @@ namespace nomic {
 			arr.enable(BLOCK_INDEX_COLOR);
 			arr.enable(BLOCK_INDEX_COORDINATE);
 			arr.enable(BLOCK_INDEX_VERTEX);
-			// ---
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

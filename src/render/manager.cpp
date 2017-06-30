@@ -334,6 +334,7 @@ namespace nomic {
 							continue;
 						}
 
+						iter_handle->first->set_model((*iter_entity)->model());
 						(*iter_entity)->on_render(*iter_handle->first, delta);
 					}
 				}

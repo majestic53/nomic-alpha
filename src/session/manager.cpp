@@ -29,6 +29,15 @@
 
 // TODO
 #include "../../include/entity/block.h"
+
+static const std::map<uint32_t, std::string> BLOCK_FACE = {
+	{ nomic::BLOCK_FACE_RIGHT, "./res/block_side.bmp" }, // right
+	{ nomic::BLOCK_FACE_LEFT, "./res/block_side.bmp" }, // left
+	{ nomic::BLOCK_FACE_TOP, "./res/block_top.bmp" }, // top
+	{ nomic::BLOCK_FACE_BOTTOM, "./res/block_bottom.bmp" }, // bottom
+	{ nomic::BLOCK_FACE_BACK, "./res/block_side.bmp" }, // back
+	{ nomic::BLOCK_FACE_FRONT, "./res/block_side.bmp" }, // front
+	};
 // ---
 
 namespace nomic {
@@ -37,16 +46,16 @@ namespace nomic {
 
 		enum {
 			DEBUG_OBJECT_AXIS = 0,
-			DEBUG_OBJECT_DIAGNOSTIC,
-			DEBUG_OBJECT_RETICLE,
 
 // TODO
 			DEBUG_OBJECT_BLOCK,
+// ---
+
+			DEBUG_OBJECT_DIAGNOSTIC,
+			DEBUG_OBJECT_RETICLE,
 		};
 
-		//#define DEBUG_OBJECT_MAX DEBUG_OBJECT_RETICLE
-		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_BLOCK
-// ---
+		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_RETICLE
 
 		enum {
 			DEBUG_SHADER_VERTEX = 0,
@@ -67,18 +76,19 @@ namespace nomic {
 			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT, RENDERER_BLEND_DFACTOR_DEFAULT,
 				RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_DEPTH_DEFAULT,
 				RENDERER_DEPTH_MODE_DEFAULT }, // axis
+
+// TODO
+			{ "./res/vert_block_texture.glsl", "./res/frag_block_texture.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, GL_FRONT,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // block
+// ---
+
 			{ "./res/vert_string_static.glsl", "./res/frag_string_static.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
-				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_BACK,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
 			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
-
-// TODO
-			{ "./res/vert_block.glsl", "./res/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
-				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
-				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // block
-// ---
 			};
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
@@ -216,19 +226,21 @@ namespace nomic {
 					case DEBUG_OBJECT_AXIS:
 						m_debug_object.push_back(new nomic::entity::axis);
 						break;
+
+// TODO
+					case DEBUG_OBJECT_BLOCK:
+						m_debug_object.push_back(new nomic::entity::block);
+						//m_debug_object.back()->position() += glm::vec3(BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS);
+						((nomic::entity::block *) m_debug_object.back())->set_textures(BLOCK_FACE);
+						break;
+// ---
+
 					case DEBUG_OBJECT_DIAGNOSTIC:
 						m_debug_object.push_back(new nomic::entity::diagnostic);
 						break;
 					case DEBUG_OBJECT_RETICLE:
 						m_debug_object.push_back(new nomic::entity::reticle);
 						break;
-
-// TODO
-					case DEBUG_OBJECT_BLOCK:
-						m_debug_object.push_back(new nomic::entity::block);
-						break;
-// ---
-
 					default:
 						break;
 				}

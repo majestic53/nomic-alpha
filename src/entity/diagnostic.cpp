@@ -26,12 +26,6 @@ namespace nomic {
 
 	namespace entity {
 
-		#define DIAGNOSTIC_FONT_DEFAULT "/usr/share/fonts/TTF/DejaVuSansMono.ttf"
-		#define DIAGNOSTIC_FONT_SIZE_DEFAULT 16
-		#define DIAGNOSTIC_TEXT_DEFAULT "<UNDEFINED>"
-		#define DIAGNOSTIC_TEXT_LEFT_DEFAULT 10.f
-		#define DIAGNOSTIC_TEXT_TOP_DEFAULT 25.f
-
 		#define STRING_SEGMENT_COUNT 6
 		#define STRING_SEGMENT_WIDTH 4
 
