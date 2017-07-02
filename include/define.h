@@ -166,6 +166,8 @@ namespace nomic {
 	#define HANDLE_COUNT 1
 	#define HANDLE_INVALID 0
 
+	#define INPUT_EVENT_QUEUING
+
 	#define MILLISECONDS_PER_SECOND 1000
 
 	#define NOISE_AMPLITUDE_DEFAULT 1.0
@@ -181,7 +183,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1726
 
 	#define OBJECT_COUNT 1
@@ -234,7 +236,7 @@ namespace nomic {
 	#define STRING_UNKNOWN "<UNKNOWN>"
 
 	#define STRING_ADVANCE_SHIFT 6
-	#define STRING_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.5f)
+	#define STRING_COLOR_DEFAULT glm::vec4(0.4f, 0.4f, 0.4f, 1.f)
 	#define STRING_SCALE_DEFAULT 1.f
 	#define STRING_VERTICAL_PAD 5
 
@@ -344,6 +346,7 @@ namespace nomic {
 		ENTITY_DIAGNOSTIC,
 		ENTITY_RETICLE,
 		ENTITY_BLOCK,
+		ENTITY_CHUNK,
 	};
 
 	enum {

@@ -16,24 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_TERRAIN_CHUNK_H_
-#define NOMIC_TERRAIN_CHUNK_H_
+#ifndef NOMIC_ENTITY_CHUNK_H_
+#define NOMIC_ENTITY_CHUNK_H_
 
-#include <mutex>
-#include <queue>
-#include <tuple>
-#include "../define.h"
+#include "../terrain/chunk.h"
+#include "../terrain/generator.h"
+#include "./object.h"
 
 namespace nomic {
 
-	namespace terrain {
+	namespace entity {
 
-		class chunk {
+		class chunk :
+				public nomic::entity::object,
+				protected nomic::terrain::chunk {
 
 			public:
 
-				explicit chunk(
-					__in_opt const glm::ivec2 &position = glm::ivec2()
+				chunk(
+					__in const glm::ivec2 &position,
+					__in nomic::terrain::generator &generator
 					);
 
 				chunk(
@@ -46,20 +48,28 @@ namespace nomic {
 					__in const chunk &other
 					);
 
-				uint8_t attributes(
+				uint8_t block_attributes(
 					__in const glm::uvec3 &position
 					) const;
 
-				uint8_t height(
+				uint8_t block_height(
 					__in const glm::uvec2 &position
+					) const;
+
+				uint8_t block_type(
+					__in const glm::uvec3 &position
 					) const;
 
 				glm::ivec2 position(void) const;
 
-				void set(
-					__in const glm::uvec3 &position,
-					__in uint8_t type,
-					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT
+				virtual void on_render(
+					__in nomic::core::renderer &renderer,
+					__in float delta
+					);
+
+				virtual void on_update(
+					__in void *runtime,
+					__in void *camera
 					);
 
 				uint8_t set_block(
@@ -68,41 +78,27 @@ namespace nomic {
 					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT
 					);
 
-				void set_position(
-					__in const glm::ivec2 &position
-					);
-
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
-				uint8_t type(
-					__in const glm::uvec3 &position
-					) const;
-
-				void update(void);
-
 			protected:
 
-				void clear(void);
-
-				void copy(
-					__in const chunk &other
+				void add_face(
+					__in std::vector<glm::vec3> &vertex,
+					__in std::vector<glm::vec2> &coordinate,
+					__in std::vector<glm::vec4> &color,
+					__in const glm::vec3 &position,
+					__in uint32_t face
 					);
 
-				bool m_active = false;
+				void reconfigure(void);
 
-				uint8_t m_block[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH];
+				bool m_changed;
 
-				uint8_t m_block_attributes[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_WIDTH];
-
-				uint8_t m_height[CHUNK_WIDTH][CHUNK_WIDTH];
-
-				glm::ivec2 m_position;
-
-				std::queue<std::tuple<glm::uvec3, uint8_t, uint8_t>> m_queue;
+				std::vector<uint8_t> m_face;
 		};
 	}
 }
 
-#endif // NOMIC_TERRAIN_CHUNK_H_
+#endif // NOMIC_ENTITY_CHUNK_H_

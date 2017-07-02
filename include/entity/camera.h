@@ -51,9 +51,31 @@ namespace nomic {
 					__in const camera &other
 					);
 
+				void button(
+					__in uint8_t button,
+					__in uint8_t state,
+					__in uint8_t clicks,
+					__in int32_t x,
+					__in int32_t y
+					);
+
 				glm::uvec2 dimensions(void) const;
 
 				float fov(void) const;
+
+				void key(
+					__in uint16_t scancode,
+					__in uint16_t modifier,
+					__in uint8_t state
+					);
+
+				void motion(
+					__in uint32_t state,
+					__in int32_t x,
+					__in int32_t y,
+					__in int32_t x_relative,
+					__in int32_t y_relative
+					);
 
 				void render(
 					__in float delta
@@ -71,7 +93,21 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
+				void wheel(
+					__in uint32_t direction,
+					__in int32_t x,
+					__in int32_t y
+					);
+
 			protected:
+
+				void on_button(
+					__in uint8_t button,
+					__in uint8_t state,
+					__in uint8_t clicks,
+					__in int32_t x,
+					__in int32_t y
+					);
 
 				void on_key(
 					__in uint16_t scancode,

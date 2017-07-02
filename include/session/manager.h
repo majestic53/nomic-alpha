@@ -21,11 +21,13 @@
 
 #include <vector>
 #include "../entity/camera.h"
+#include "../entity/chunk.h"
 #include "../entity/manager.h"
 #include "../font/manager.h"
 #include "../graphic/display.h"
 #include "../graphic/manager.h"
 #include "../render/manager.h"
+#include "../terrain/generator.h"
 
 namespace nomic {
 
@@ -38,11 +40,13 @@ namespace nomic {
 
 				~manager(void);
 
+				nomic::entity::camera *camera(void);
+
+				void pause(void);
+
 				void render(
 					__in float delta
 					);
-
-				void pause(void);
 
 				void set_debug(
 					__in bool debug
@@ -62,6 +66,13 @@ namespace nomic {
 
 				void set_runtime(
 					__in void *runtime
+					);
+
+				void set_seed(
+					__in uint32_t seed,
+					__in_opt uint32_t octaves = NOISE_OCTAVES_DEFAULT,
+					__in_opt double amplitude = NOISE_AMPLITUDE_DEFAULT,
+					__in_opt uint32_t max = CHUNK_MAX_DEFAULT
 					);
 
 				void set_title(
@@ -102,11 +113,19 @@ namespace nomic {
 
 				nomic::entity::camera *m_camera;
 
+				std::vector<nomic::entity::object *> m_chunk_object;
+
+				nomic::core::renderer *m_chunk_renderer;
+
 				bool m_debug;
 
 				std::vector<nomic::entity::object *> m_debug_object;
 
 				std::vector<nomic::core::renderer *> m_debug_renderer;
+
+				std::vector<nomic::entity::object *> m_entity_object;
+
+				std::vector<nomic::core::renderer *> m_entity_renderer;
 
 				nomic::graphic::display &m_manager_display;
 
@@ -119,6 +138,8 @@ namespace nomic {
 				nomic::render::manager &m_manager_render;
 
 				void *m_runtime;
+
+				nomic::terrain::generator m_terrain;
 		};
 	}
 }

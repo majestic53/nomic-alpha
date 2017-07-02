@@ -106,9 +106,11 @@ namespace nomic {
 		if(!m_paused) {
 
 			while(SDL_PollEvent(&event) && result) {
+#ifdef INPUT_EVENT_QUEUING
 				bool send = true;
 				uint8_t *data = nullptr;
 				uint32_t length = 0, subtype = 0;
+#endif // INPUT_EVENT_QUEUING
 
 				switch(event.type) {
 					case SDL_KEYDOWN:
@@ -119,9 +121,14 @@ namespace nomic {
 								(event.key.type == SDL_KEYDOWN) ? "Down" : "Up",
 								(event.key.state == SDL_PRESSED) ? "Press" : "Release",
 								event.key.keysym.scancode);
+#ifdef INPUT_EVENT_QUEUING
 							data = (uint8_t *) &event.key;
 							length = sizeof(SDL_KeyboardEvent);
 							subtype = INPUT_KEY;
+#else
+							m_manager_session.camera()->key(event.key.keysym.scancode, event.key.keysym.mod,
+								event.key.state);
+#endif // INPUT_EVENT_QUEUING
 						}
 						break;
 					case SDL_MOUSEBUTTONDOWN:
@@ -131,34 +138,52 @@ namespace nomic {
 							(event.button.type == SDL_MOUSEBUTTONDOWN) ? "Down" : "Up",
 							(event.button.state == SDL_PRESSED) ? "Press" : "Release",
 							event.button.button, event.button.x, event.button.y, event.button.clicks);
+#ifdef INPUT_EVENT_QUEUING
 						data = (uint8_t *) &event.button;
 						length = sizeof(SDL_MouseButtonEvent);
 						subtype = INPUT_BUTTON;
+#else
+						m_manager_session.camera()->button(event.button.button, event.button.state, event.button.clicks,
+							event.button.x, event.button.y);
+#endif // INPUT_EVENT_QUEUING
 						break;
 					case SDL_MOUSEMOTION:
 						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE,
 							"Encountered mouse motion event=(State=%x, Position={%i, %i}, Relative={%i, %i})",
 							event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+#ifdef INPUT_EVENT_QUEUING
 						data = (uint8_t *) &event.motion;
 						length = sizeof(SDL_MouseMotionEvent);
 						subtype = INPUT_MOTION;
+#else
+						m_manager_session.camera()->motion(event.motion.state, event.motion.x, event.motion.y,
+							event.motion.xrel, event.motion.yrel);
+#endif // INPUT_EVENT_QUEUING
 						break;
 					case SDL_MOUSEWHEEL:
 						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE, "Encountered mouse wheel event=(Mode=%s, Position={%i, %i})",
 							(event.wheel.direction == SDL_MOUSEWHEEL_NORMAL) ? "Normal" : "Flip",
 							event.wheel.x, event.wheel.y);
+#ifdef INPUT_EVENT_QUEUING
 						data = (uint8_t *) &event.wheel;
 						length = sizeof(SDL_MouseWheelEvent);
 						subtype = INPUT_WHEEL;
+#else
+						m_manager_session.camera()->wheel(event.wheel.direction, event.wheel.x, event.wheel.y);
+#endif // INPUT_EVENT_QUEUING
 						break;
 					case SDL_QUIT:
 						TRACE_MESSAGE(LEVEL_INFORMATION, "Encountered quit event");
+#ifdef INPUT_EVENT_QUEUING
 						send = false;
+#endif // INPUT_EVENT_QUEUING
 						result = false;
 						break;
 					case SDL_WINDOWEVENT:
 						TRACE_MESSAGE_FORMAT(LEVEL_VERBOSE, "Encountered window event=%x", event.window.event);
+#ifdef INPUT_EVENT_QUEUING
 						send = false;
+#endif // INPUT_EVENT_QUEUING
 
 						switch(event.window.event) {
 							case SDL_WINDOWEVENT_FOCUS_LOST:
@@ -168,13 +193,17 @@ namespace nomic {
 						}
 						break;
 					default:
+#ifdef INPUT_EVENT_QUEUING
 						send = false;
+#endif // INPUT_EVENT_QUEUING
 						break;
 				}
 
+#ifdef INPUT_EVENT_QUEUING
 				if(send) {
 					SEND_EVENT(nomic::core::event(EVENT_INPUT, subtype, std::vector<uint8_t>(data, data + length)));
 				}
+#endif // INPUT_EVENT_QUEUING
 			}
 		} else {
 

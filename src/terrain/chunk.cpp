@@ -218,7 +218,7 @@ namespace nomic {
 		std::string 
 		chunk::to_string(
 			__in_opt bool verbose
-			)
+			) const
 		{
 			std::stringstream result;
 

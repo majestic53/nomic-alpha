@@ -50,9 +50,9 @@ archive:
 		$(DIR_BUILD)core_entity.o $(DIR_BUILD)core_event.o $(DIR_BUILD)core_font.o $(DIR_BUILD)core_id.o $(DIR_BUILD)core_noise.o \
 			$(DIR_BUILD)core_object.o $(DIR_BUILD)core_primitive.o $(DIR_BUILD)core_renderer.o $(DIR_BUILD)core_signal.o \
 			$(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
-		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_block.o $(DIR_BUILD)entity_camera.o $(DIR_BUILD)entity_diagnostic.o \
-			$(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_object.o $(DIR_BUILD)entity_plain.o $(DIR_BUILD)entity_reticle.o \
-			$(DIR_BUILD)entity_skybox.o \
+		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_block.o $(DIR_BUILD)entity_camera.o $(DIR_BUILD)entity_chunk.o \
+			$(DIR_BUILD)entity_diagnostic.o $(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_object.o $(DIR_BUILD)entity_plain.o \
+			$(DIR_BUILD)entity_reticle.o $(DIR_BUILD)entity_skybox.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)font_manager.o \
 		$(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_character.o $(DIR_BUILD)graphic_cubemap.o $(DIR_BUILD)graphic_display.o \
@@ -126,8 +126,8 @@ core_uniform.o: $(DIR_SRC_CORE)uniform.cpp $(DIR_INC_CORE)uniform.h
 
 ### ENTITY ###
 
-build_entity: entity_axis.o entity_block.o entity_camera.o entity_diagnostic.o entity_manager.o entity_object.o entity_plain.o entity_reticle.o \
-	entity_skybox.o
+build_entity: entity_axis.o entity_block.o entity_camera.o entity_chunk.o entity_diagnostic.o entity_manager.o entity_object.o entity_plain.o \
+	entity_reticle.o entity_skybox.o
 
 entity_axis.o: $(DIR_SRC_ENTITY)axis.cpp $(DIR_INC_ENTITY)axis.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)axis.cpp -o $(DIR_BUILD)entity_axis.o
@@ -137,6 +137,9 @@ entity_block.o: $(DIR_SRC_ENTITY)block.cpp $(DIR_INC_ENTITY)block.h
 
 entity_camera.o: $(DIR_SRC_ENTITY)camera.cpp $(DIR_INC_ENTITY)camera.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)camera.cpp -o $(DIR_BUILD)entity_camera.o
+
+entity_chunk.o: $(DIR_SRC_ENTITY)chunk.cpp $(DIR_INC_ENTITY)chunk.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)chunk.cpp -o $(DIR_BUILD)entity_chunk.o
 
 entity_diagnostic.o: $(DIR_SRC_ENTITY)diagnostic.cpp $(DIR_INC_ENTITY)diagnostic.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)diagnostic.cpp -o $(DIR_BUILD)entity_diagnostic.o

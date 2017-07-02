@@ -95,6 +95,20 @@ namespace nomic {
 			return *this;
 		}
 
+		void 
+		camera::button(
+			__in uint8_t button,
+			__in uint8_t state,
+			__in uint8_t clicks,
+			__in int32_t x,
+			__in int32_t y
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Button=%x, State=%x(%s), Clicks=%u, Position={%i, %i}", button, state,
+				(state == SDL_PRESSED) ? "Press" : "Release", (uint16_t) clicks, x, y);
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		glm::uvec2 
 		camera::dimensions(void) const
 		{
@@ -109,6 +123,51 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%f", m_fov);
 			return m_fov;
+		}
+
+		void 
+		camera::key(
+			__in uint16_t scancode,
+			__in uint16_t modifier,
+			__in uint8_t state
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Scancode=%x, Modifier=%x, State=%x(%s)", scancode, modifier, state,
+				(state == SDL_PRESSED) ? "Press" : "Release");
+
+			on_key(scancode, modifier, state);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		camera::motion(
+			__in uint32_t state,
+			__in int32_t x,
+			__in int32_t y,
+			__in int32_t x_relative,
+			__in int32_t y_relative
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "State=%x, Position={%i, %i}, Relative={%i, %i}", state, x, y, x_relative, y_relative);
+
+			on_motion(state, x, y, x_relative, y_relative);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		camera::on_button(
+			__in uint8_t button,
+			__in uint8_t state,
+			__in uint8_t clicks,
+			__in int32_t x,
+			__in int32_t y
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Button=%x, State=%x(%s), Clicks=%u, Position={%i, %i}", button, state,
+				(state == SDL_PRESSED) ? "Press" : "Release", (uint16_t) clicks, x, y);
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -310,6 +369,21 @@ namespace nomic {
 				std::sin(glm::radians(m_rotation_previous.x)),
 				std::cos(glm::radians(m_rotation_previous.x)) * std::cos(glm::radians(m_rotation_previous.y))));
 			m_view = glm::lookAt(m_position, m_position + m_rotation, m_up);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		camera::wheel(
+			__in uint32_t direction,
+			__in int32_t x,
+			__in int32_t y
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Direction=%x(%s), Position={%i, %i}", direction,
+				(direction == SDL_MOUSEWHEEL_NORMAL) ? "Normal" : "Flipped", x, y);
+
+			on_wheel(direction, x, y);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

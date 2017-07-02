@@ -188,7 +188,7 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
-			for(int32_t y = BLOCK_HEIGHT_WATER; y >= 0; --y) {
+			for(int32_t y = position.y; y >= 0; --y) {
 
 				if(!y) { // boundary
 					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_BOUNDARY,
