@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOMIC_ENTITY_DIAGNOSTIC_H_
-#define NOMIC_ENTITY_DIAGNOSTIC_H_
+#ifndef NOMIC_ENTITY_MESSAGE_H_
+#define NOMIC_ENTITY_MESSAGE_H_
 
 #include "./string.h"
 
@@ -25,25 +25,26 @@ namespace nomic {
 
 	namespace entity {
 
-		class diagnostic :
+		class message :
 				public nomic::entity::string {
 
 			public:
 
-				diagnostic(
-					__in_opt bool verbose = true,
+				explicit message(
+					__in_opt const std::string &path = STRING_FONT_DEFAULT,
+					__in_opt uint32_t size = STRING_FONT_SIZE_DEFAULT,
 					__in_opt const glm::vec4 &color = STRING_COLOR_DEFAULT,
 					__in_opt float scale = STRING_SCALE_DEFAULT
 					);
 
-				diagnostic(
-					__in const diagnostic &other
+				message(
+					__in const message &other
 					);
 
-				virtual ~diagnostic(void);
+				virtual ~message(void);
 
-				diagnostic &operator=(
-					__in const diagnostic &other
+				message &operator=(
+					__in const message &other
 					);
 
 				void on_update(
@@ -51,15 +52,17 @@ namespace nomic {
 					__in void *camera
 					);
 
+				std::string &text(void);
+
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
 
 			protected:
 
-				bool m_verbose;
+				bool m_changed;
 		};
 	}
 }
 
-#endif // NOMIC_ENTITY_DIAGNOSTIC_H_
+#endif // NOMIC_ENTITY_MESSAGE_H_

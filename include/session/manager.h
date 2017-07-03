@@ -45,8 +45,10 @@ namespace nomic {
 				void pause(void);
 
 				void render(
-					__in float delta
+					__in_opt float delta = 1.f
 					);
+
+				uint32_t seed(void);
 
 				void set_debug(
 					__in bool debug
@@ -107,9 +109,13 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
+				void initialize_entities(void);
+
 				bool on_initialize(void);
 
 				void on_uninitialize(void);
+
+				void uninitialize_entities(void);
 
 				nomic::entity::camera *m_camera;
 

@@ -24,7 +24,13 @@ make release
 Changelog
 =========
 
-Version 0.1.1725
+Version 0.1.1727
+----------------
+*Updated: 7/3/2017*
+
+* Added loading screen
+
+Version 0.1.1726
 ----------------
 *Updated: 6/28-30/2017*
 
@@ -33,16 +39,6 @@ Version 0.1.1725
 *Updated: 6/26/2017*
 
 * Integrated terrain generation classes
-
-Version 0.1.1725
-----------------
-*Updated: 6/22/2017*
-
-* Added skybox entity class
-
-*Updated: 6/19/2017*
-
-* Added cubemap graphic primitive class
 
 *Changelog truncated (see file history for full log)*
 

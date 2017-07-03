@@ -255,13 +255,21 @@ namespace nomic {
 							instance.release();
 							iter->second = false;
 						} break;
+					case KEY_DESCEND:
+						m_position.y -= speed;
+						break;
+					case KEY_ELEVATE:
+						m_position.y += speed;
+						break;
 					case KEY_FORWARD:
 						m_position += (m_rotation * speed);
 						break;
 					case KEY_LEFT:
+					case KEY_LEFT_STRAFE:
 						m_position -= (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
 						break;
 					case KEY_RIGHT:
+					case KEY_RIGHT_STRAFE:
 						m_position += (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
 						break;
 					default:

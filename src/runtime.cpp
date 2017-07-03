@@ -261,9 +261,6 @@ namespace nomic {
 		bool result = true;
 
 		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Argv[%u]=%p", argc, argv);
-
-		// TODO: parse input arguments
-
 		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
@@ -301,8 +298,8 @@ namespace nomic {
 
 		TRACE_MESSAGE(LEVEL_INFORMATION, "Runtime loop entered");
 
-		m_manager_session.initialize();
 		m_manager_session.set_runtime(this);
+		m_manager_session.initialize();
 		duration = (MILLISECONDS_PER_SECOND / RUNTIME_TICKS_PER_SECOND);
 		frame = 0;
 		next = SDL_GetTicks();
@@ -489,6 +486,19 @@ namespace nomic {
 		nomic::core::thread::start(false);
 
 		TRACE_EXIT(LEVEL_VERBOSE);
+	}
+
+	uint32_t 
+	runtime::seed(void)
+	{
+		uint32_t result;
+
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
+		result = m_manager_session.seed();
+
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u(%x)", result, result);
+		return result;
 	}
 
 	void 

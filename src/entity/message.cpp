@@ -16,56 +16,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../include/entity/diagnostic.h"
+#include <algorithm>
+#include "../../include/entity/message.h"
 #include "../../include/entity/camera.h"
-#include "../../include/runtime.h"
 #include "../../include/trace.h"
-#include "./diagnostic_type.h"
+#include "./message_type.h"
 
 namespace nomic {
 
 	namespace entity {
 
-		diagnostic::diagnostic(
-			__in_opt bool verbose,
+		message::message(
+			__in_opt const std::string &path,
+			__in_opt uint32_t size,
 			__in_opt const glm::vec4 &color,
 			__in_opt float scale
 			) :
-				nomic::entity::string(DIAGNOSTIC_FONT_DEFAULT, DIAGNOSTIC_FONT_SIZE_DEFAULT,
-					glm::uvec2(DIAGNOSTIC_TEXT_LEFT_DEFAULT, DIAGNOSTIC_TEXT_TOP_DEFAULT), color, scale),
-				m_verbose(verbose)
+				nomic::entity::string(path, size, MESSAGE_POSITION_DEFAULT, color, scale),
+				m_changed(true)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x, Color={%f, %f, %f, %f}, Scale=%f", verbose, color.x, color.y, color.z, color.w,
-				scale);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s, Size=%u, Color={%f, %f, %f, %f}, Scale=%f", path.size(),
+				STRING_CHECK(path), size, color.x, color.y, color.z, color.w, scale);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
-		diagnostic::diagnostic(
-			__in const diagnostic &other
+		message::message(
+			__in const message &other
 			) :
 				nomic::entity::string(other),
-				m_verbose(other.m_verbose)
+				m_changed(other.m_changed)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
-		diagnostic::~diagnostic(void)
+		message::~message(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
-		diagnostic &
-		diagnostic::operator=(
-			__in const diagnostic &other
+		message &
+		message::operator=(
+			__in const message &other
 			)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			if(this != &other) {
 				nomic::entity::string::operator=(other);
-				m_verbose = other.m_verbose;
+				m_changed = other.m_changed;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
@@ -73,46 +73,53 @@ namespace nomic {
 		}
 
 		void 
-		diagnostic::on_update(
+		message::on_update(
 			__in void *runtime,
 			__in void *camera
 			)
 		{
-			std::stringstream result;
-			glm::vec3 position, rotation;
-			nomic::runtime *runtime_ref = (nomic::runtime *) runtime;
 			nomic::entity::camera *camera_ref = (nomic::entity::camera *) camera;
+			glm::uvec2 position = MESSAGE_POSITION_DEFAULT, offset = glm::uvec2(0, 0);
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
-			if(runtime_ref) {
-				result << NOMIC << " " << runtime_ref->version(true) << std::endl << "Seed=" << runtime_ref->seed();
-			}
-
-			if(m_verbose) {
-				result << std::endl << std::endl;
+			if(m_changed) {
+				m_changed = false;
 
 				if(camera_ref) {
-					position = camera_ref->position();
-					rotation = camera_ref->rotation();
-					result << "Pos=" << position.x << "," << position.y << "," << position.z
-						<< std::endl << "Rot=" << rotation.x << "," << rotation.y << "," << rotation.z
-						<< std::endl << "Fov=" << camera_ref->fov();
+					position = camera_ref->dimensions();
+					position /= 2;
+
+					for(std::string::iterator iter = m_text.begin(); iter != m_text.end(); ++iter) {
+						nomic::graphic::character &ch = m_manager_font.character(m_font_id, *iter);
+						offset.x += ((ch.advance() >> STRING_ADVANCE_SHIFT) * m_scale);
+						offset.y = std::max(offset.y, (uint32_t) (ch.dimensions().y * m_scale));
+					}
+
+					offset /= 2;
+					position.x -= offset.x;
+					position.y += offset.y;
 				}
 
-				if(runtime_ref) {
-					result << ", Fps=" << runtime_ref->frame_rate() << ", Tick=" << runtime_ref->tick()
-						<< "(@" << RUNTIME_TICKS_PER_SECOND << "/sec)";
-				}
+				nomic::entity::string::set_position(position);
 			}
-
-			m_text = result.str();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		std::string &
+		message::text(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			m_changed = true;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return m_text;
+		}
+
 		std::string 
-		diagnostic::to_string(
+		message::to_string(
 			__in_opt bool verbose
 			) const
 		{
@@ -120,11 +127,11 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
 
-			result << NOMIC_ENTITY_DIAGNOSTIC_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
+			result << NOMIC_ENTITY_MESSAGE_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
 				result << " Base=" << nomic::entity::string::to_string(verbose)
-					<< ", Mode=" << (m_verbose ? "Verbose" : "Normal");
+					<< ", State=" << (m_changed ? "Changed" : "Unchanged");
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

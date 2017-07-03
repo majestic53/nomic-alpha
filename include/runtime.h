@@ -48,6 +48,8 @@ namespace nomic {
 				__in const char *argv[]
 				);
 
+			uint32_t seed(void);
+
 			void terminate(void);
 
 			uint32_t tick(void);
