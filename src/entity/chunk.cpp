@@ -296,8 +296,8 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			m_face.clear();
-			position.x = (nomic::terrain::chunk::position().x * CHUNK_WIDTH);
-			position.z = (nomic::terrain::chunk::position().y * CHUNK_WIDTH);
+			position.x = (nomic::terrain::chunk::position().x * (CHUNK_WIDTH - 1));
+			position.z = (nomic::terrain::chunk::position().y * (CHUNK_WIDTH - 1));
 
 			for(int32_t z = 0; z < CHUNK_WIDTH; ++z) {
 
@@ -353,10 +353,10 @@ namespace nomic {
 								m_face.push_back(type);
 								++count;
 							}
-						}
 
-						if(!count) {
-							break;
+							if(!count) {
+								break;
+							}
 						}
 					}
 				}
