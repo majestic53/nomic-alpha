@@ -119,7 +119,7 @@ namespace nomic {
 
 				nomic::entity::camera *m_camera;
 
-				std::vector<nomic::entity::object *> m_chunk_object;
+				std::map<std::pair<int32_t, int32_t>, nomic::entity::object *> m_chunk_object;
 
 				nomic::core::renderer *m_chunk_renderer;
 

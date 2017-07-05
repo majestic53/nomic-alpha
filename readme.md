@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1727
 ----------------
+*Updated: 7/5/2017*
+
+* Implemented chunk joining
+
 *Updated: 7/3/2017*
 
 * Added loading screen

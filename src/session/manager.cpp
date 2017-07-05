@@ -155,7 +155,7 @@ namespace nomic {
 		void 
 		manager::initialize_entities(void)
 		{
-			uint32_t completed = 0, current, previous = 0, total = (VIEW_WIDTH * VIEW_WIDTH);
+			uint32_t completed, current, previous = 0, total = (VIEW_WIDTH * VIEW_WIDTH);
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
@@ -257,6 +257,8 @@ namespace nomic {
 			m_chunk_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
 				std::get<RENDERER_DEPTH_MODE>(CHUNK_RENDERER_CONFIGURATION));
 
+			completed = 0;
+
 			for(int32_t z = -VIEW_RADIUS; z < VIEW_RADIUS; ++z) {
 
 				for(int32_t x = -VIEW_RADIUS; x < VIEW_RADIUS; ++x, ++completed) {
@@ -264,7 +266,7 @@ namespace nomic {
 					current = (100 * (completed / (float) total));
 					if(current && (current != previous)) {
 						std::stringstream stream;
-						stream << "Building chunk objects... " << current << "%";
+						stream << "Generating chunk objects... " << current << "%";
 						message.text() = stream.str();
 						update();
 						render();
@@ -272,15 +274,80 @@ namespace nomic {
 					}
 
 					if(((x * x) + (z * z)) <= (VIEW_RADIUS * VIEW_RADIUS)) {
+						glm::ivec2 position_chunk = glm::ivec2(x, z);
 
-						m_chunk_object.push_back(new nomic::entity::chunk(glm::ivec2(x, z), m_terrain));
-						if(!m_chunk_object.back()) {
-							THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+						m_chunk_object.insert(std::make_pair(std::make_pair(x, z), new nomic::entity::chunk(
+							position_chunk, m_terrain)));
+
+						std::map<std::pair<int32_t, int32_t>, nomic::entity::object *>::iterator iter
+							= m_chunk_object.find(std::make_pair(x, z));
+						if((iter == m_chunk_object.end()) || !iter->second) {
+							THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE,
+								"Position={%i, %i}", x, z);
 						}
 
-						m_chunk_object.back()->enable(true);
-						m_chunk_object.back()->show(true);
-						m_chunk_object.back()->register_renderer(m_chunk_renderer->get_id());
+						iter->second->enable(true);
+						iter->second->show(true);
+						iter->second->register_renderer(m_chunk_renderer->get_id());
+					}
+				}
+			}
+
+			completed = 0;
+
+			for(int32_t z = -VIEW_RADIUS; z < VIEW_RADIUS; ++z) {
+
+				for(int32_t x = -VIEW_RADIUS; x < VIEW_RADIUS; ++x, ++completed) {
+
+					current = (100 * (completed / (float) total));
+					if(current && (current != previous)) {
+						std::stringstream stream;
+						stream << "Joining chunk objects... " << current << "%";
+						message.text() = stream.str();
+						update();
+						render();
+						previous = current;
+					}
+
+					if(((x * x) + (z * z)) <= (VIEW_RADIUS * VIEW_RADIUS)) {
+						uint32_t count = 0;
+
+						std::map<std::pair<int32_t, int32_t>, nomic::entity::object *>::iterator iter;
+						nomic::entity::chunk *back = nullptr, *front = nullptr, *left = nullptr, *right = nullptr;
+
+						iter = m_chunk_object.find(std::make_pair(x + 1, z)); // right
+						if(iter != m_chunk_object.end()) {
+							right = (nomic::entity::chunk *) iter->second;
+							++count;
+						}
+
+						iter = m_chunk_object.find(std::make_pair(x - 1, z)); // left
+						if(iter != m_chunk_object.end()) {
+							left = (nomic::entity::chunk *) iter->second;
+							++count;
+						}
+
+						iter = m_chunk_object.find(std::make_pair(x, z + 1)); // back
+						if(iter != m_chunk_object.end()) {
+							back = (nomic::entity::chunk *) iter->second;
+							++count;
+						}
+
+						iter = m_chunk_object.find(std::make_pair(x, z - 1)); // front
+						if(iter != m_chunk_object.end()) {
+							front = (nomic::entity::chunk *) iter->second;
+							++count;
+						}
+
+						iter = m_chunk_object.find(std::make_pair(x, z));
+						if((iter == m_chunk_object.end()) || !iter->second) {
+							THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE,
+								"Position={%i, %i}", x, z);
+						}
+
+						if(count > CHUNK_ADJOIN_MIN) {
+							((nomic::entity::chunk *) iter->second)->rebuild(right, left, back, front);
+						}
 					}
 				}
 			}
@@ -683,11 +750,12 @@ namespace nomic {
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Destroying chunk objects...");
 
 // TODO: replace with chunk manager
-			for(uint32_t iter = 0; iter < m_chunk_object.size(); ++iter) {
+			for(std::map<std::pair<int32_t, int32_t>, nomic::entity::object *>::iterator iter = m_chunk_object.begin();
+					iter != m_chunk_object.end(); ++iter) {
 
-				if(m_chunk_object.at(iter)) {
-					delete m_chunk_object.at(iter);
-					m_chunk_object.at(iter) = nullptr;
+				if(iter->second) {
+					delete iter->second;
+					iter->second = nullptr;
 				}
 			}
 

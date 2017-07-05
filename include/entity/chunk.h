@@ -72,6 +72,13 @@ namespace nomic {
 					__in void *camera
 					);
 
+				void rebuild(
+					__in_opt nomic::entity::chunk *right = nullptr,
+					__in_opt nomic::entity::chunk *left = nullptr,
+					__in_opt nomic::entity::chunk *back = nullptr,
+					__in_opt nomic::entity::chunk *front = nullptr
+					);
+
 				uint8_t set_block(
 					__in const glm::uvec3 &position,
 					__in uint8_t type,
@@ -92,9 +99,15 @@ namespace nomic {
 					__in uint32_t face
 					);
 
-				void reconfigure(void);
-
 				bool m_changed;
+
+				nomic::entity::chunk *m_chunk_back;
+
+				nomic::entity::chunk *m_chunk_front;
+
+				nomic::entity::chunk *m_chunk_left;
+
+				nomic::entity::chunk *m_chunk_right;
 
 				std::vector<uint8_t> m_face;
 		};
