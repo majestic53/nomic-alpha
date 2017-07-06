@@ -48,13 +48,11 @@ namespace nomic {
 
 		typedef std::tuple<std::string, std::string, uint32_t, bool, uint32_t, uint32_t, bool, uint32_t, bool, uint32_t> renderer_config;
 
-// TODO: replace with chunk manager
 		static const renderer_config CHUNK_RENDERER_CONFIGURATION = {
 			"./res/vert_block_color.glsl", "./res/frag_block_color.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_FRONT,
 			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
 			};
-// ---
 
 		enum {
 			DEBUG_OBJECT_AXIS = 0,
@@ -125,6 +123,7 @@ namespace nomic {
 			m_manager_font(nomic::font::manager::acquire()),
 			m_manager_graphic(nomic::graphic::manager::acquire()),
 			m_manager_render(nomic::render::manager::acquire()),
+			m_manager_terrain(nomic::terrain::manager::acquire()),
 			m_runtime(nullptr)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -140,6 +139,7 @@ namespace nomic {
 			m_manager_font.release();
 			m_manager_graphic.release();
 			m_manager_render.release();
+			m_manager_terrain.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -153,10 +153,137 @@ namespace nomic {
 		}
 
 		void 
+		manager::generate_spawn(
+			__in_opt bool status
+			)
+		{
+			nomic::entity::message message;
+			nomic::core::renderer diagnostic_renderer, message_renderer;
+			uint32_t completed = 0, current, previous = 0, total = (VIEW_WIDTH * VIEW_WIDTH);
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(status) {
+				const renderer_config &config = DEBUG_RENDERER_CONFIGURATION.at(DEBUG_OBJECT_DIAGNOSTIC);
+				diagnostic_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
+				diagnostic_renderer.set_mode(std::get<RENDERER_MODE>(config));
+				diagnostic_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
+					std::get<RENDERER_BLEND_DFACTOR>(config));
+				diagnostic_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
+				diagnostic_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
+
+				nomic::entity::diagnostic diagnostic(false);
+				diagnostic.enable(true);
+				diagnostic.show(true);
+				diagnostic.register_renderer(diagnostic_renderer.get_id());
+
+				message_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(MESSAGE_RENDERER_CONFIGURATION),
+					std::get<RENDERER_SHADER_FRAGMENT>(MESSAGE_RENDERER_CONFIGURATION));
+				message_renderer.set_mode(std::get<RENDERER_MODE>(MESSAGE_RENDERER_CONFIGURATION));
+				message_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
+					std::get<RENDERER_BLEND_SFACTOR>(MESSAGE_RENDERER_CONFIGURATION),
+					std::get<RENDERER_BLEND_DFACTOR>(MESSAGE_RENDERER_CONFIGURATION));
+				message_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
+					std::get<RENDERER_CULL_MODE>(MESSAGE_RENDERER_CONFIGURATION));
+				message_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
+					std::get<RENDERER_DEPTH_MODE>(MESSAGE_RENDERER_CONFIGURATION));
+
+				message.enable(true);
+				message.show(true);
+				message.register_renderer(message_renderer.get_id());
+				message.text() = "Generating chunk objects...";
+				update();
+				render();
+			}
+
+			for(int32_t z = -VIEW_RADIUS; z < VIEW_RADIUS; ++z) {
+
+				for(int32_t x = -VIEW_RADIUS; x < VIEW_RADIUS; ++x, ++completed) {
+
+					if(status) {
+
+						current = (100 * (completed / (float) total));
+						if(current && (current != previous)) {
+							std::stringstream stream;
+							stream << "Generating chunk objects... " << current << "%";
+							message.text() = stream.str();
+							update();
+							render();
+							previous = current;
+						}
+					}
+
+					if(((x * x) + (z * z)) <= (VIEW_RADIUS * VIEW_RADIUS)) {
+
+						nomic::entity::object *entry = m_manager_terrain.at(glm::ivec2(x, z));
+						if(!entry) {
+							THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE,
+								"Position={%i, %i}", x, z);
+						}
+
+						entry->enable(true);
+						entry->show(true);
+						entry->register_renderer(m_chunk_renderer->get_id());
+					}
+				}
+			}
+
+			completed = 0;
+
+			for(int32_t z = -VIEW_RADIUS; z < VIEW_RADIUS; ++z) {
+
+				for(int32_t x = -VIEW_RADIUS; x < VIEW_RADIUS; ++x, ++completed) {
+
+					if(status) {
+						current = (100 * (completed / (float) total));
+						if(current && (current != previous)) {
+							std::stringstream stream;
+							stream << "Joining chunk objects... " << current << "%";
+							message.text() = stream.str();
+							update();
+							render();
+							previous = current;
+						}
+					}
+
+					if(((x * x) + (z * z)) <= (VIEW_RADIUS * VIEW_RADIUS)) {
+						uint32_t count = 0;
+
+						nomic::entity::chunk *back = nullptr, *front = nullptr, *left = nullptr, *right = nullptr;
+
+						if(m_manager_terrain.contains(glm::ivec2(x + 1, z))) { // right
+							right = m_manager_terrain.at(glm::ivec2(x + 1, z), false);
+							++count;
+						}
+
+						if(m_manager_terrain.contains(glm::ivec2(x - 1, z))) { // left
+							left = m_manager_terrain.at(glm::ivec2(x - 1, z), false);
+							++count;
+						}
+
+						if(m_manager_terrain.contains(glm::ivec2(x, z + 1))) { // back
+							back = m_manager_terrain.at(glm::ivec2(x, z + 1), false);
+							++count;
+						}
+
+						if(m_manager_terrain.contains(glm::ivec2(x, z - 1))) { // front
+							front = m_manager_terrain.at(glm::ivec2(x, z - 1), false);
+							++count;
+						}
+
+						if(count > CHUNK_ADJOIN_MIN) {
+							m_manager_terrain.at(glm::ivec2(x, z), false)->rebuild(right, left, back, front);
+						}
+					}
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		manager::initialize_entities(void)
 		{
-			uint32_t completed, current, previous = 0, total = (VIEW_WIDTH * VIEW_WIDTH);
-
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building entity objects...");
@@ -204,40 +331,6 @@ namespace nomic {
 				m_entity_object.at(iter)->register_renderer(m_entity_renderer.at(iter)->get_id());
 			}
 
-			nomic::core::renderer diagnostic_renderer, message_renderer;
-
-			const renderer_config &config = DEBUG_RENDERER_CONFIGURATION.at(DEBUG_OBJECT_DIAGNOSTIC);
-			diagnostic_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
-			diagnostic_renderer.set_mode(std::get<RENDERER_MODE>(config));
-			diagnostic_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
-				std::get<RENDERER_BLEND_DFACTOR>(config));
-			diagnostic_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
-			diagnostic_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
-
-			nomic::entity::diagnostic diagnostic(false);
-			diagnostic.enable(true);
-			diagnostic.show(true);
-			diagnostic.register_renderer(diagnostic_renderer.get_id());
-
-			message_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_SHADER_FRAGMENT>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_mode(std::get<RENDERER_MODE>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_BLEND_SFACTOR>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_BLEND_DFACTOR>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_CULL_MODE>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_DEPTH_MODE>(MESSAGE_RENDERER_CONFIGURATION));
-
-			nomic::entity::message message;
-			message.enable(true);
-			message.show(true);
-			message.register_renderer(message_renderer.get_id());
-			message.text() = "Building chunk objects...";
-			update();
-			render();
-
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building chunk objects...");
 
 			m_chunk_renderer = new nomic::core::renderer;
@@ -245,7 +338,6 @@ namespace nomic {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
 			}
 
-// TODO: replace with chunk manager
 			m_chunk_renderer->set_shaders(std::get<RENDERER_SHADER_VERTEX>(CHUNK_RENDERER_CONFIGURATION),
 				std::get<RENDERER_SHADER_FRAGMENT>(CHUNK_RENDERER_CONFIGURATION));
 			m_chunk_renderer->set_mode(std::get<RENDERER_MODE>(CHUNK_RENDERER_CONFIGURATION));
@@ -257,101 +349,7 @@ namespace nomic {
 			m_chunk_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
 				std::get<RENDERER_DEPTH_MODE>(CHUNK_RENDERER_CONFIGURATION));
 
-			completed = 0;
-
-			for(int32_t z = -VIEW_RADIUS; z < VIEW_RADIUS; ++z) {
-
-				for(int32_t x = -VIEW_RADIUS; x < VIEW_RADIUS; ++x, ++completed) {
-
-					current = (100 * (completed / (float) total));
-					if(current && (current != previous)) {
-						std::stringstream stream;
-						stream << "Generating chunk objects... " << current << "%";
-						message.text() = stream.str();
-						update();
-						render();
-						previous = current;
-					}
-
-					if(((x * x) + (z * z)) <= (VIEW_RADIUS * VIEW_RADIUS)) {
-						glm::ivec2 position_chunk = glm::ivec2(x, z);
-
-						m_chunk_object.insert(std::make_pair(std::make_pair(x, z), new nomic::entity::chunk(
-							position_chunk, m_terrain)));
-
-						std::map<std::pair<int32_t, int32_t>, nomic::entity::object *>::iterator iter
-							= m_chunk_object.find(std::make_pair(x, z));
-						if((iter == m_chunk_object.end()) || !iter->second) {
-							THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE,
-								"Position={%i, %i}", x, z);
-						}
-
-						iter->second->enable(true);
-						iter->second->show(true);
-						iter->second->register_renderer(m_chunk_renderer->get_id());
-					}
-				}
-			}
-
-			completed = 0;
-
-			for(int32_t z = -VIEW_RADIUS; z < VIEW_RADIUS; ++z) {
-
-				for(int32_t x = -VIEW_RADIUS; x < VIEW_RADIUS; ++x, ++completed) {
-
-					current = (100 * (completed / (float) total));
-					if(current && (current != previous)) {
-						std::stringstream stream;
-						stream << "Joining chunk objects... " << current << "%";
-						message.text() = stream.str();
-						update();
-						render();
-						previous = current;
-					}
-
-					if(((x * x) + (z * z)) <= (VIEW_RADIUS * VIEW_RADIUS)) {
-						uint32_t count = 0;
-
-						std::map<std::pair<int32_t, int32_t>, nomic::entity::object *>::iterator iter;
-						nomic::entity::chunk *back = nullptr, *front = nullptr, *left = nullptr, *right = nullptr;
-
-						iter = m_chunk_object.find(std::make_pair(x + 1, z)); // right
-						if(iter != m_chunk_object.end()) {
-							right = (nomic::entity::chunk *) iter->second;
-							++count;
-						}
-
-						iter = m_chunk_object.find(std::make_pair(x - 1, z)); // left
-						if(iter != m_chunk_object.end()) {
-							left = (nomic::entity::chunk *) iter->second;
-							++count;
-						}
-
-						iter = m_chunk_object.find(std::make_pair(x, z + 1)); // back
-						if(iter != m_chunk_object.end()) {
-							back = (nomic::entity::chunk *) iter->second;
-							++count;
-						}
-
-						iter = m_chunk_object.find(std::make_pair(x, z - 1)); // front
-						if(iter != m_chunk_object.end()) {
-							front = (nomic::entity::chunk *) iter->second;
-							++count;
-						}
-
-						iter = m_chunk_object.find(std::make_pair(x, z));
-						if((iter == m_chunk_object.end()) || !iter->second) {
-							THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE,
-								"Position={%i, %i}", x, z);
-						}
-
-						if(count > CHUNK_ADJOIN_MIN) {
-							((nomic::entity::chunk *) iter->second)->rebuild(right, left, back, front);
-						}
-					}
-				}
-			}
-// ---
+			generate_spawn();
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building debug objects...");
 
@@ -456,7 +454,7 @@ namespace nomic {
 			m_manager_render.initialize();
 			m_manager_font.initialize();
 			m_manager_entity.initialize();
-			m_terrain.setup(0);
+			m_manager_terrain.initialize();
 
 			m_camera = new nomic::entity::camera(m_manager_display.dimensions());
 			if(!m_camera) {
@@ -489,6 +487,7 @@ namespace nomic {
 			}
 
 			uninitialize_entities();
+			m_manager_terrain.uninitialize();
 			m_manager_entity.uninitialize();
 			m_manager_font.uninitialize();
 			m_manager_render.uninitialize();
@@ -523,7 +522,6 @@ namespace nomic {
 					"Camera is not allocated, Address=%p", m_camera);
 			}
 
-			m_camera->render(delta);
 			m_manager_display.clear();
 			m_manager_render.render(m_camera->projection(), m_camera->view(), m_camera->dimensions(), delta);
 			m_manager_display.show();
@@ -538,7 +536,7 @@ namespace nomic {
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			result = m_terrain.seed();
+			result = m_manager_terrain.generator().seed();
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u(%x)", result, result);
 			return result;
@@ -646,7 +644,11 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Seed=%u(%x), Octaves=%u, Amplitude=%g, Max=%u", seed, octaves, amplitude, max);
 
-			m_terrain.setup(seed, octaves, amplitude, max);
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_manager_terrain.generator().setup(seed, octaves, amplitude, max);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -749,23 +751,10 @@ namespace nomic {
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Destroying chunk objects...");
 
-// TODO: replace with chunk manager
-			for(std::map<std::pair<int32_t, int32_t>, nomic::entity::object *>::iterator iter = m_chunk_object.begin();
-					iter != m_chunk_object.end(); ++iter) {
-
-				if(iter->second) {
-					delete iter->second;
-					iter->second = nullptr;
-				}
-			}
-
-			m_chunk_object.clear();
-
 			if(m_chunk_renderer) {
 				delete m_chunk_renderer;
 				m_chunk_renderer = nullptr;
 			}
-// ---
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Destroying entity objects...");
 
@@ -807,6 +796,7 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			m_camera->update();
 			m_manager_entity.update(m_runtime, m_camera);
 
 			TRACE_EXIT(LEVEL_VERBOSE);

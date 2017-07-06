@@ -60,7 +60,7 @@ archive:
 			$(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
 		$(DIR_BUILD)render_manager.o \
 		$(DIR_BUILD)session_manager.o \
-		$(DIR_BUILD)terrain_chunk.o $(DIR_BUILD)terrain_generator.o \
+		$(DIR_BUILD)terrain_chunk.o $(DIR_BUILD)terrain_generator.o $(DIR_BUILD)terrain_manager.o \
 		$(DIR_BUILD)uuid_manager.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
@@ -236,13 +236,16 @@ session_manager.o: $(DIR_SRC_SESSION)manager.cpp $(DIR_INC_SESSION)manager.h
 
 ### TERRAIN ###
 
-build_terrain: terrain_chunk.o terrain_generator.o
+build_terrain: terrain_chunk.o terrain_generator.o terrain_manager.o
 
 terrain_chunk.o: $(DIR_SRC_TERRAIN)chunk.cpp $(DIR_INC_TERRAIN)chunk.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TERRAIN)chunk.cpp -o $(DIR_BUILD)terrain_chunk.o
 
 terrain_generator.o: $(DIR_SRC_TERRAIN)generator.cpp $(DIR_INC_TERRAIN)generator.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TERRAIN)generator.cpp -o $(DIR_BUILD)terrain_generator.o
+
+terrain_manager.o: $(DIR_SRC_TERRAIN)manager.cpp $(DIR_INC_TERRAIN)manager.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TERRAIN)manager.cpp -o $(DIR_BUILD)terrain_manager.o
 
 ### UUID ###
 

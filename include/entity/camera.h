@@ -77,10 +77,6 @@ namespace nomic {
 					__in int32_t y_relative
 					);
 
-				void render(
-					__in float delta
-					);
-
 				void set_dimensions(
 					__in const glm::uvec2 &dimensions
 					);
@@ -98,6 +94,10 @@ namespace nomic {
 					__in int32_t x,
 					__in int32_t y
 					);
+
+				void update(void);
+
+				glm::mat4 &view(void);
 
 			protected:
 

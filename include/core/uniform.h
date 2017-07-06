@@ -45,14 +45,14 @@ namespace nomic {
 					__in const uniform &other
 					);
 
-				glm::mat4 &model(void);
+				virtual glm::mat4 &model(void);
 
-				glm::mat4 &model(
+				virtual glm::mat4 &model(
 					__in const glm::vec3 &position,
 					__in const glm::vec3 &rotation
 					);
 
-				glm::mat4 &projection(void);
+				virtual glm::mat4 &projection(void);
 
 				void reset(void);
 
@@ -60,7 +60,7 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
-				glm::mat4 &view(void);
+				virtual glm::mat4 &view(void);
 
 			protected:
 

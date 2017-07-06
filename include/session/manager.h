@@ -27,7 +27,7 @@
 #include "../graphic/display.h"
 #include "../graphic/manager.h"
 #include "../render/manager.h"
-#include "../terrain/generator.h"
+#include "../terrain/manager.h"
 
 namespace nomic {
 
@@ -109,6 +109,10 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
+				void generate_spawn(
+					__in_opt bool status = true
+					);
+
 				void initialize_entities(void);
 
 				bool on_initialize(void);
@@ -118,8 +122,6 @@ namespace nomic {
 				void uninitialize_entities(void);
 
 				nomic::entity::camera *m_camera;
-
-				std::map<std::pair<int32_t, int32_t>, nomic::entity::object *> m_chunk_object;
 
 				nomic::core::renderer *m_chunk_renderer;
 
@@ -143,9 +145,9 @@ namespace nomic {
 
 				nomic::render::manager &m_manager_render;
 
-				void *m_runtime;
+				nomic::terrain::manager &m_manager_terrain;
 
-				nomic::terrain::generator m_terrain;
+				void *m_runtime;
 		};
 	}
 }

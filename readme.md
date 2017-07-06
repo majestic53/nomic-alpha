@@ -26,6 +26,11 @@ Changelog
 
 Version 0.1.1727
 ----------------
+*Updated: 7/6/2017*
+
+* Added chunk manager class
+* Tied camera to update tick
+
 *Updated: 7/5/2017*
 
 * Implemented chunk joining

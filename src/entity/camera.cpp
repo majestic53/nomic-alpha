@@ -225,13 +225,58 @@ namespace nomic {
 		}
 
 		void 
-		camera::render(
-			__in float delta
+		camera::set_dimensions(
+			__in const glm::uvec2 &dimensions
 			)
 		{
-			float sensitivity = (CAMERA_SENSITIVITY * delta), speed = (CAMERA_SPEED * delta), strafe = (CAMERA_STRAFE * delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimensions.x, dimensions.y);
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
+			m_dimensions = dimensions;
+			update_perspective();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		camera::set_fov(
+			__in float fov
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Fov=%f", fov);
+
+			m_fov = fov;
+			update_perspective();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		std::string 
+		camera::to_string(
+			__in_opt bool verbose
+			) const
+		{
+			std::stringstream result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
+
+			result << NOMIC_ENTITY_CAMERA_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
+
+			if(verbose) {
+				result << " Base=" << nomic::entity::object::to_string(verbose)
+					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
+					<< ", FOV=" << m_fov;
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return result.str();
+		}
+
+		void 
+		camera::update(void)
+		{
+			float sensitivity = CAMERA_SENSITIVITY, speed = CAMERA_SPEED, strafe = CAMERA_STRAFE;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::event::input::poll_input();
 
@@ -313,56 +358,7 @@ namespace nomic {
 				m_wheel = 0.f;
 			}
 
-			m_view = glm::lookAt(m_position, m_position + m_rotation, m_up);
-
 			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		void 
-		camera::set_dimensions(
-			__in const glm::uvec2 &dimensions
-			)
-		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%u, %u}", dimensions.x, dimensions.y);
-
-			m_dimensions = dimensions;
-			update_perspective();
-
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		void 
-		camera::set_fov(
-			__in float fov
-			)
-		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Fov=%f", fov);
-
-			m_fov = fov;
-			update_perspective();
-
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		std::string 
-		camera::to_string(
-			__in_opt bool verbose
-			) const
-		{
-			std::stringstream result;
-
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Verbose=%x", verbose);
-
-			result << NOMIC_ENTITY_CAMERA_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
-
-			if(verbose) {
-				result << " Base=" << nomic::entity::object::to_string(verbose)
-					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
-					<< ", FOV=" << m_fov;
-			}
-
-			TRACE_EXIT(LEVEL_VERBOSE);
-			return result.str();
 		}
 
 		void 
@@ -376,9 +372,19 @@ namespace nomic {
 				std::cos(glm::radians(m_rotation_previous.x)) * std::sin(glm::radians(m_rotation_previous.y)),
 				std::sin(glm::radians(m_rotation_previous.x)),
 				std::cos(glm::radians(m_rotation_previous.x)) * std::cos(glm::radians(m_rotation_previous.y))));
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		glm::mat4 &
+		camera::view(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
 			m_view = glm::lookAt(m_position, m_position + m_rotation, m_up);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
+			return m_view;
 		}
 
 		void 
