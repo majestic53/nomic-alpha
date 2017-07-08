@@ -342,8 +342,8 @@ namespace nomic {
 				}
 			}
 
-			m_position_chunk.x = (m_position.x / CHUNK_WIDTH);
-			m_position_chunk.y = (m_position.z / CHUNK_WIDTH);
+			m_position_chunk.x = (m_position.x / (CHUNK_WIDTH - 1));
+			m_position_chunk.y = (m_position.z / (CHUNK_WIDTH - 1));
 
 			if(m_motion != glm::vec2()) {
 

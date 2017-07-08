@@ -50,6 +50,8 @@ namespace nomic {
 
 			uint32_t seed(void);
 
+			nomic::session::manager &session(void);
+
 			void terminate(void);
 
 			uint32_t tick(void);

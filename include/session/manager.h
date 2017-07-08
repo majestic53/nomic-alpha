@@ -20,6 +20,7 @@
 #define NOMIC_SESSION_MANAGER_H_
 
 #include <vector>
+#include "../core/thread.h"
 #include "../entity/camera.h"
 #include "../entity/chunk.h"
 #include "../entity/manager.h"
@@ -34,7 +35,8 @@ namespace nomic {
 	namespace session {
 
 		class manager :
-				public SINGLETON_CLASS(nomic::session::manager) {
+				public SINGLETON_CLASS(nomic::session::manager),
+				protected nomic::core::thread {
 
 			public:
 
@@ -85,6 +87,8 @@ namespace nomic {
 					__in bool vsync
 					);
 
+				nomic::terrain::manager &terrain(void);
+
 				std::string to_string(
 					__in_opt bool verbose = false
 					) const;
@@ -109,13 +113,15 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
-				void generate_chunks_relative(void);
+				void generate_chunks_runtime(void);
 
-				void generate_chunks_static(void);
+				void generate_chunks_spawn(void);
 
 				void initialize_entities(void);
 
 				bool on_initialize(void);
+
+				bool on_run(void);
 
 				void on_uninitialize(void);
 

@@ -86,7 +86,7 @@ namespace nomic {
 
 			protected:
 
-				nomic::graphic::vao m_vao;
+				nomic::graphic::vao *m_vao;
 
 				glm::uvec2 m_view_dimensions;
 		};

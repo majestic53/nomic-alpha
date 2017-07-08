@@ -92,11 +92,10 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}", position.x, position.y, position.z);
 
 			if((position.x >= CHUNK_WIDTH) || (position.y >= CHUNK_HEIGHT) || (position.z >= CHUNK_WIDTH)) {
-				THROW_NOMIC_TERRAIN_CHUNK_EXCEPTION_FORMAT(NOMIC_TERRAIN_CHUNK_EXCEPTION_POSITION_INVALID,
-					"Position={%u, %u, %u}", position.x, position.y, position.z);
+				result = 0;
+			} else {
+				result = m_block_attributes[position.x][position.y][position.z];
 			}
-
-			result = m_block_attributes[position.x][position.y][position.z];
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", (uint16_t) result);
 			return result;
@@ -138,11 +137,10 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u}", position.x, position.y);
 
 			if((position.x >= CHUNK_WIDTH) || (position.y >= CHUNK_HEIGHT)) {
-				THROW_NOMIC_TERRAIN_CHUNK_EXCEPTION_FORMAT(NOMIC_TERRAIN_CHUNK_EXCEPTION_POSITION_INVALID,
-					"Position={%u, %u}", position.x, position.y);
+				result = 0;
+			} else {
+				result = m_height[position.x][position.y];
 			}
-
-			result = m_height[position.x][position.y];
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", (uint16_t) result);
 			return result;
@@ -245,11 +243,10 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}", position.x, position.y, position.z);
 
 			if((position.x >= CHUNK_WIDTH) || (position.y >= CHUNK_HEIGHT) || (position.z >= CHUNK_WIDTH)) {
-				THROW_NOMIC_TERRAIN_CHUNK_EXCEPTION_FORMAT(NOMIC_TERRAIN_CHUNK_EXCEPTION_POSITION_INVALID,
-					"Position={%u, %u, %u}", position.x, position.y, position.z);
+				result = 0;
+			} else {
+				result = m_block[position.x][position.y][position.z];
 			}
-
-			result = m_block[position.x][position.y][position.z];
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;

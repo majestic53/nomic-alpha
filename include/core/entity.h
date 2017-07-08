@@ -54,6 +54,12 @@ namespace nomic {
 					__in const entity &other
 					);
 
+				void defer(
+					__in bool state
+					);
+
+				bool deferred(void) const;
+
 				void enable(
 					__in bool state
 					);
@@ -109,6 +115,8 @@ namespace nomic {
 					);
 
 				void remove(void);
+
+				bool m_deferred;
 
 				bool m_enabled;
 

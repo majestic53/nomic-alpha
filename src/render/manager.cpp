@@ -303,6 +303,8 @@ namespace nomic {
 			__in float delta
 			)
 		{
+			std::map<nomic::core::renderer *, std::set<nomic::core::entity *>> deferred;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p, Delta=%f", &projection, &view, delta);
 
 			std::lock_guard<std::mutex> lock(m_mutex);
@@ -332,11 +334,50 @@ namespace nomic {
 
 						if(!*iter_entity || !(*iter_entity)->shown()) {
 							continue;
-						}
+						} else if((*iter_entity)->deferred()) {
+							std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>::iterator iter_deferred;
 
-						iter_handle->first->set_model((*iter_entity)->model());
-						(*iter_entity)->on_render(*iter_handle->first, delta);
+							iter_deferred = deferred.find(iter_handle->first);
+							if(iter_deferred == deferred.end()) {
+								deferred.insert(std::make_pair(iter_handle->first, std::set<nomic::core::entity *>()));
+								iter_deferred = deferred.find(iter_handle->first);
+							}
+
+							iter_deferred->second.insert(*iter_entity);
+						} else {
+							iter_handle->first->set_model((*iter_entity)->model());
+							(*iter_entity)->on_render(*iter_handle->first, delta);
+						}
 					}
+				}
+			}
+
+			for(std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>::iterator iter_handle = deferred.begin();
+					iter_handle != deferred.end(); ++iter_handle) {
+
+				if(!iter_handle->first || iter_handle->second.empty()) {
+					continue;
+				}
+
+				switch(iter_handle->first->mode()) {
+					case RENDER_PERSPECTIVE:
+						iter_handle->first->use(projection, view);
+						break;
+					default:
+						iter_handle->first->use(glm::ortho(0.f, (float) view_dimensions.x, 0.f, (float) view_dimensions.y,
+							-1.f, 1.f));
+						break;
+				}
+
+				for(std::set<nomic::core::entity *>::iterator iter_entity = iter_handle->second.begin();
+						iter_entity != iter_handle->second.end(); ++iter_entity) {
+
+					if(!*iter_entity || !(*iter_entity)->shown()) {
+						continue;
+					}
+
+					iter_handle->first->set_model((*iter_entity)->model());
+					(*iter_entity)->on_render(*iter_handle->first, delta);
 				}
 			}
 

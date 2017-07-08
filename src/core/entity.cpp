@@ -35,6 +35,7 @@ namespace nomic {
 			) :
 				nomic::core::object(type, subtype),
 				nomic::core::transform(position, rotation, up),
+				m_deferred(false),
 				m_enabled(true),
 				m_shown(true)
 		{
@@ -51,6 +52,7 @@ namespace nomic {
 				nomic::core::id(other),
 				nomic::core::object(other),
 				nomic::core::transform(other),
+				m_deferred(other.m_deferred),
 				m_enabled(other.m_enabled),
 				m_shown(other.m_shown)
 		{
@@ -85,6 +87,7 @@ namespace nomic {
 				nomic::core::id::operator=(other);
 				nomic::core::object::operator=(other);
 				nomic::core::transform::operator=(other);
+				m_deferred = other.m_deferred;
 				m_enabled = other.m_enabled;
 				m_shown = other.m_shown;
 				add();
@@ -108,6 +111,26 @@ namespace nomic {
 			instance.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		entity::defer(
+			__in bool state
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "State=%x", state);
+
+			m_deferred = state;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		bool 
+		entity::deferred(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_deferred);
+			return m_deferred;
 		}
 
 		void 
@@ -265,6 +288,7 @@ namespace nomic {
 					<< ", Transform=" << nomic::core::transform::to_string(verbose)
 					<< ", Id=" << nomic::core::id::to_string(verbose)
 					<< ", State=" << (m_enabled ? "Enabled" : "Disabled") << "/" << (m_shown ? "Shown" : "Hidden")
+						<< "/" << (m_deferred ? "Deferred" : "Immediate")
 					<< ", Renderer[" << m_renderer.size() << "]";
 
 				if(!m_renderer.empty()) {

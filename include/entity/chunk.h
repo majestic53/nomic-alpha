@@ -91,6 +91,13 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
+				void update(
+					__in_opt nomic::entity::chunk *right,
+					__in_opt nomic::entity::chunk *left,
+					__in_opt nomic::entity::chunk *back,
+					__in_opt nomic::entity::chunk *front
+					);
+
 			protected:
 
 				void add_face(
@@ -112,6 +119,12 @@ namespace nomic {
 				nomic::entity::chunk *m_chunk_right;
 
 				std::vector<uint8_t> m_face;
+
+				std::vector<glm::vec4> m_vao_color;
+
+				std::vector<glm::vec2> m_vao_coordinate;
+
+				std::vector<glm::vec3> m_vao_vertex;
 		};
 	}
 }

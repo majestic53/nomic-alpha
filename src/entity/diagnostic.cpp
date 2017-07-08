@@ -93,9 +93,21 @@ namespace nomic {
 				result << std::endl << std::endl;
 
 				if(camera_ref) {
+					glm::uvec2 position_block;
+					glm::ivec2 position_chunk;
 					position = camera_ref->position();
+					position_block.x = position.x;
+					position_block.x %= CHUNK_WIDTH;
+					position_block.y = position.z;
+					position_block.y %= CHUNK_WIDTH;
+					position_chunk.x = position.x;
+					position_chunk.x /= CHUNK_WIDTH;
+					position_chunk.y = position.z;
+					position_chunk.y /= CHUNK_WIDTH;
 					rotation = camera_ref->rotation();
-					result << "Pos=" << position.x << "," << position.y << "," << position.z
+					result << "Chunk=" << position_chunk.x << "," << position_chunk.y
+						<< ", Block=" << position_block.x << "," << position_block.y
+						<< std::endl << "Pos=" << position.x << "," << position.y << "," << position.z
 						<< std::endl << "Rot=" << rotation.x << "," << rotation.y << "," << rotation.z
 						<< std::endl << "Fov=" << camera_ref->fov();
 				}

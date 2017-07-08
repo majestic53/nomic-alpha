@@ -83,12 +83,6 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}, Chunk=%p", position.x, position.y, &chunk);
 
-			if((position.x > (int32_t) m_max) || (position.x < (int32_t) -m_max) || (position.y > (int32_t) m_max)
-					|| (position.y < (int32_t) -m_max)) {
-				THROW_NOMIC_TERRAIN_GENERATOR_EXCEPTION_FORMAT(NOMIC_TERRAIN_GENERATOR_EXCEPTION_POSITION_INVALID,
-					"Position={%i, %i}", position.x, position.y);
-			}
-
 			chunk.set_position(position);
 
 			for(int32_t z = (CHUNK_WIDTH - 1); z >= 0; --z) {

@@ -501,6 +501,14 @@ namespace nomic {
 		return result;
 	}
 
+	nomic::session::manager &
+	runtime::session(void)
+	{
+		TRACE_ENTRY(LEVEL_VERBOSE);
+		TRACE_EXIT(LEVEL_VERBOSE);
+		return m_manager_session;
+	}
+
 	void 
 	runtime::set_frame_rate(
 		__in uint32_t frame_rate

@@ -187,7 +187,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 5
+	#define NOMIC_VERSION_REVISION 6
 	#define NOMIC_VERSION_WEEK 1727
 
 	#define OBJECT_COUNT 1
@@ -309,7 +309,8 @@ namespace nomic {
 	#define UNIFORM_PROJECTION "projection"
 	#define UNIFORM_VIEW "view"
 
-	#define VIEW_RADIUS (VIEW_WIDTH / 2)
+	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
+	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_WIDTH 20
 
 	enum {

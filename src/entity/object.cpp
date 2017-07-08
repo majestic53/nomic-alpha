@@ -36,6 +36,7 @@ namespace nomic {
 			) :
 				nomic::core::entity(type, subtype, position, rotation, up),
 				nomic::core::uniform(model, projection, view),
+				m_vao(nullptr),
 				m_view_dimensions(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x", type, subtype);
@@ -57,6 +58,12 @@ namespace nomic {
 		object::~object(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(m_vao) {
+				delete m_vao;
+				m_vao = nullptr;
+			}
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -150,8 +157,17 @@ namespace nomic {
 		object::vertex_array(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_vao) {
+
+				m_vao = new nomic::graphic::vao;
+				if(!m_vao) {
+					THROW_NOMIC_ENTITY_OBJECT_EXCEPTION(NOMIC_ENTITY_OBJECT_EXCEPTION_ALLOCATE);
+				}
+			}
+
 			TRACE_EXIT(LEVEL_VERBOSE);
-			return m_vao;
+			return *m_vao;
 		}
 
 		glm::uvec2 
