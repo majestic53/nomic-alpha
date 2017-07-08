@@ -71,6 +71,19 @@ namespace nomic {
 			return result;
 		}
 
+		std::map<std::pair<int32_t, int32_t>, nomic::entity::chunk *> &
+		manager::chunks(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_initialized) {
+				THROW_NOMIC_TERRAIN_MANAGER_EXCEPTION(NOMIC_TERRAIN_MANAGER_EXCEPTION_UNINITIALIZED);
+			}			
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return m_chunk;
+		}
+
 		bool 
 		manager::contains(
 			__in const glm::ivec2 &position

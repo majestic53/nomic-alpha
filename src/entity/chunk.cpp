@@ -424,6 +424,7 @@ namespace nomic {
 			nomic::graphic::vao &arr = vertex_array();
 			arr.disable_all();
 			arr.remove_all();
+			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
 				((uint8_t *) &color[0]) + ((color.size() * CHUNK_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))),
 				GL_STATIC_DRAW), CHUNK_INDEX_COLOR, CHUNK_SEGMENT_WIDTH_COLOR, GL_FLOAT);
@@ -457,6 +458,19 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x(%u)", (uint16_t) result, (uint16_t) result);
 			return result;
+		}
+
+		void 
+		chunk::teardown(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::vao &arr = vertex_array();
+			arr.disable_all();
+			arr.remove_all();
+			arr.clear();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		std::string 

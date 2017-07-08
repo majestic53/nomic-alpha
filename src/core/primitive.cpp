@@ -79,6 +79,16 @@ namespace nomic {
 		}
 
 		void 
+		primitive::clear(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			regenerate();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		primitive::decrement(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -120,6 +130,19 @@ namespace nomic {
 			nomic::graphic::manager &instance = nomic::graphic::manager::acquire();
 			if(instance.initialized() && instance.contains(m_type, m_handle)) {
 				instance.increment(m_type, m_handle);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		primitive::regenerate(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::manager &instance = nomic::graphic::manager::acquire();
+			if(instance.initialized() && instance.contains(m_type, m_handle)) {
+				m_handle = instance.regenerate(m_type, m_subtype, m_handle);
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

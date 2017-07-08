@@ -219,6 +219,40 @@ namespace nomic {
 			return result;
 		}
 
+		GLuint 
+		manager::regenerate(
+			__in uint32_t type,
+			__in_opt GLenum subtype,
+			__in_opt GLuint handle
+			)
+		{
+			GLuint result = HANDLE_INVALID;
+			std::map<GLuint, std::pair<size_t, GLenum>>::iterator iter_handle;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Subtype=%x, Handle=%x", type, subtype, handle);
+
+			if(handle != HANDLE_INVALID) {
+				std::lock_guard<std::mutex> lock(m_mutex);
+
+				iter_handle = find(type, handle);
+				destroy(type, iter_handle);
+
+				std::map<uint32_t, std::map<GLuint, std::pair<size_t, GLenum>>>::iterator iter_type = m_handle.find(type);
+				if(iter_type != m_handle.end()) {
+					iter_type->second.erase(iter_handle);
+
+					if(iter_type->second.empty()) {
+						m_handle.erase(iter_type);
+					}
+				}
+			}
+
+			result = generate(type, subtype);
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
 		size_t 
 		manager::increment(
 			__in uint32_t type,

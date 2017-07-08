@@ -109,9 +109,9 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
-				void generate_spawn(
-					__in_opt bool status = true
-					);
+				void generate_chunks_relative(void);
+
+				void generate_chunks_static(void);
 
 				void initialize_entities(void);
 

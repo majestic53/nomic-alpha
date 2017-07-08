@@ -58,6 +58,12 @@ namespace nomic {
 					__in GLuint handle
 					);
 
+				GLuint regenerate(
+					__in uint32_t type,
+					__in_opt GLenum subtype = SUBTYPE_UNDEFINED,
+					__in_opt GLuint handle = HANDLE_INVALID
+					);
+
 				std::string to_string(
 					__in_opt bool verbose = false
 					) const;

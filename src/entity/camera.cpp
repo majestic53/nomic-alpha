@@ -55,6 +55,8 @@ namespace nomic {
 				m_fov(other.m_fov),
 				m_key(other.m_key),
 				m_motion(other.m_motion),
+				m_position_chunk(other.m_position_chunk),
+				m_position_chunk_previous(other.m_position_chunk_previous),
 				m_rotation_previous(other.m_rotation_previous),
 				m_wheel(other.m_wheel)
 		{
@@ -87,6 +89,8 @@ namespace nomic {
 				m_fov = other.m_fov;
 				m_key = other.m_key;
 				m_motion = other.m_motion;
+				m_position_chunk = other.m_position_chunk;
+				m_position_chunk_previous = other.m_position_chunk_previous;
 				m_rotation_previous = other.m_rotation_previous;
 				m_wheel = other.m_wheel;
 			}
@@ -154,6 +158,22 @@ namespace nomic {
 			on_motion(state, x, y, x_relative, y_relative);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		bool 
+		camera::moved(void)
+		{
+			bool result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = (m_position_chunk != m_position_chunk_previous);
+			if(result) {
+				m_position_chunk_previous = m_position_chunk;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 
 		void 
@@ -321,6 +341,9 @@ namespace nomic {
 						break;
 				}
 			}
+
+			m_position_chunk.x = (m_position.x / CHUNK_WIDTH);
+			m_position_chunk.y = (m_position.z / CHUNK_WIDTH);
 
 			if(m_motion != glm::vec2()) {
 

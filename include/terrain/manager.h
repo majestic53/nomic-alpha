@@ -41,6 +41,8 @@ namespace nomic {
 					__in_opt bool generate = true
 					);
 
+				std::map<std::pair<int32_t, int32_t>, nomic::entity::chunk *> &chunks(void);
+
 				bool contains(
 					__in const glm::ivec2 &position
 					);

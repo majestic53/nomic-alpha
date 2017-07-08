@@ -85,6 +85,8 @@ namespace nomic {
 					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT
 					);
 
+				void teardown(void);
+
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;

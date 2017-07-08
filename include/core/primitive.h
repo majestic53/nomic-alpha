@@ -45,6 +45,8 @@ namespace nomic {
 					__in const primitive &other
 					);
 
+				void clear(void);
+
 				GLuint handle(void) const;
 
 				virtual std::string to_string(
@@ -58,6 +60,8 @@ namespace nomic {
 				void generate(void);
 
 				void increment(void);
+
+				void regenerate(void);
 
 				GLuint m_handle;
 		};

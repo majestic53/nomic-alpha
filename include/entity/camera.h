@@ -77,6 +77,8 @@ namespace nomic {
 					__in int32_t y_relative
 					);
 
+				bool moved(void);
+
 				void set_dimensions(
 					__in const glm::uvec2 &dimensions
 					);
@@ -138,6 +140,10 @@ namespace nomic {
 				std::map<std::pair<uint16_t, uint16_t>, bool> m_key;
 
 				glm::vec2 m_motion;
+
+				glm::ivec2 m_position_chunk;
+
+				glm::ivec2 m_position_chunk_previous;
 
 				glm::vec2 m_rotation_previous;
 
