@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1727
 ----------------
+*Updated: 7/9/2017*
+
+* Added infinite terrain generation
+
 *Updated: 7/6/2017*
 
 * Added chunk manager class

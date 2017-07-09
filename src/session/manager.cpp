@@ -186,31 +186,40 @@ namespace nomic {
 			for(int32_t z = -VIEW_RADIUS_RUNTIME; z < VIEW_RADIUS_RUNTIME; ++z) {
 
 				for(int32_t x = -VIEW_RADIUS_RUNTIME; x < VIEW_RADIUS_RUNTIME; ++x) {
+					glm::ivec2 position_chunk_offset = glm::ivec2(position_chunk.x + x, position_chunk.y + z);
+					nomic::entity::chunk *chunk_ref = m_manager_terrain.at(glm::ivec2(position_chunk_offset.x,
+						position_chunk_offset.y), false);
+
+					if(!chunk_ref || chunk_ref->enabled()) {
+						continue;
+					}
+
 					uint32_t count = 0;
 					nomic::entity::chunk *back = nullptr, *front = nullptr, *left = nullptr, *right = nullptr;
 
-					if(m_manager_terrain.contains(glm::ivec2(x + 1, z))) { // right
-						right = m_manager_terrain.at(glm::ivec2(x + 1, z), false);
+					if(m_manager_terrain.contains(glm::ivec2(position_chunk_offset.x + 1, position_chunk_offset.y))) { // right
+						right = m_manager_terrain.at(glm::ivec2(position_chunk_offset.x + 1, position_chunk_offset.y), false);
 						++count;
 					}
 
-					if(m_manager_terrain.contains(glm::ivec2(x - 1, z))) { // left
-						left = m_manager_terrain.at(glm::ivec2(x - 1, z), false);
+					if(m_manager_terrain.contains(glm::ivec2(position_chunk_offset.x - 1, position_chunk_offset.y))) { // left
+						left = m_manager_terrain.at(glm::ivec2(position_chunk_offset.x - 1, position_chunk_offset.y), false);
 						++count;
 					}
 
-					if(m_manager_terrain.contains(glm::ivec2(x, z + 1))) { // back
-						back = m_manager_terrain.at(glm::ivec2(x, z + 1), false);
+					if(m_manager_terrain.contains(glm::ivec2(position_chunk_offset.x, position_chunk_offset.y + 1))) { // back
+						back = m_manager_terrain.at(glm::ivec2(position_chunk_offset.x, position_chunk_offset.y + 1), false);
 						++count;
 					}
 
-					if(m_manager_terrain.contains(glm::ivec2(x, z - 1))) { // front
-						front = m_manager_terrain.at(glm::ivec2(x, z - 1), false);
+					if(m_manager_terrain.contains(glm::ivec2(position_chunk_offset.x, position_chunk_offset.y - 1))) { // front
+						front = m_manager_terrain.at(glm::ivec2(position_chunk_offset.x, position_chunk_offset.y - 1), false);
 						++count;
 					}
 
 					if(count > CHUNK_ADJOIN_MIN) {
-						m_manager_terrain.at(glm::ivec2(x, z), false)->update(right, left, back, front);
+						chunk_ref->update(right, left, back, front);
+						chunk_ref->enable(true);
 					}
 				}
 			}
@@ -289,8 +298,6 @@ namespace nomic {
 			for(int32_t z = -VIEW_RADIUS_SPAWN; z < VIEW_RADIUS_SPAWN; ++z) {
 
 				for(int32_t x = -VIEW_RADIUS_SPAWN; x < VIEW_RADIUS_SPAWN; ++x, ++completed) {
-					uint32_t count = 0;
-					nomic::entity::chunk *back = nullptr, *front = nullptr, *left = nullptr, *right = nullptr;
 
 					current = (100 * (completed / (float) total));
 					if(current && (current != previous)) {
@@ -301,6 +308,14 @@ namespace nomic {
 						render();
 						previous = current;
 					}
+
+					nomic::entity::chunk *chunk_ref = m_manager_terrain.at(glm::ivec2(x, z), false);
+					if(!chunk_ref || chunk_ref->enabled()) {
+						continue;
+					}
+
+					uint32_t count = 0;
+					nomic::entity::chunk *back = nullptr, *front = nullptr, *left = nullptr, *right = nullptr;
 
 					if(m_manager_terrain.contains(glm::ivec2(x + 1, z))) { // right
 						right = m_manager_terrain.at(glm::ivec2(x + 1, z), false);
@@ -323,7 +338,8 @@ namespace nomic {
 					}
 
 					if(count > CHUNK_ADJOIN_MIN) {
-						m_manager_terrain.at(glm::ivec2(x, z), false)->update(right, left, back, front);
+						chunk_ref->update(right, left, back, front);
+						chunk_ref->enable(true);
 					}
 				}
 			}
@@ -536,44 +552,10 @@ namespace nomic {
 		manager::on_run(void)
 		{
 			bool result = true;
-			glm::vec3 position;
-			glm::ivec2 position_chunk;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			//generate_chunks_runtime();
-
-			position = m_camera->position();
-			position_chunk = glm::ivec2(position.x / CHUNK_WIDTH, position.z / CHUNK_WIDTH);
-
-			std::map<std::pair<int32_t, int32_t>, nomic::entity::chunk *> &chunk_ref = m_manager_terrain.chunks();
-			for(std::map<std::pair<int32_t, int32_t>, nomic::entity::chunk *>::iterator iter = chunk_ref.begin();
-					iter != chunk_ref.end(); ++iter) {
-				int32_t dx = ((iter->first.first > position_chunk.x) ? (iter->first.first - position_chunk.x) :
-					(position_chunk.x - iter->first.first));
-				int32_t dz = ((iter->first.second > position_chunk.y) ? (iter->first.second - position_chunk.y) :
-					(position_chunk.y - iter->first.second));
-
-				if((std::abs(dx * dx) + std::abs(dz * dz)) <= (VIEW_RADIUS_RUNTIME * VIEW_RADIUS_RUNTIME)) {
-
-					if(!iter->second->enabled()) {
-						iter->second->enable(true);
-					}
-
-					if(!iter->second->shown()) {
-						iter->second->show(true);
-					}
-				} else {
-
-					if(iter->second->enabled()) {
-						iter->second->enable(false);
-					}
-
-					if(iter->second->shown()) {
-						iter->second->show(false);
-					}
-				}
-			}
+			generate_chunks_runtime();
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -911,9 +893,10 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			m_camera->update();			
+			m_camera->update();
 			if(m_camera->moved()) {
-				nomic::core::thread::notify();
+				generate_chunks_runtime();
+				//nomic::core::thread::notify();
 			}
 
 			m_manager_entity.update(m_runtime, m_camera);

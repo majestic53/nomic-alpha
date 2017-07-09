@@ -17,6 +17,7 @@
  */
 
 #include "../../include/entity/chunk.h"
+#include "../../include/entity/camera.h"
 #include "../../include/trace.h"
 #include "./chunk_type.h"
 
@@ -252,19 +253,6 @@ namespace nomic {
 			return result;
 		}
 
-		glm::ivec2 
-		chunk::position(void) const
-		{
-			glm::ivec2 result;
-
-			TRACE_ENTRY(LEVEL_VERBOSE);
-
-			result = nomic::terrain::chunk::position();
-
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}", result.x, result.y);
-			return result;
-		}
-
 		void 
 		chunk::on_render(
 			__in nomic::core::renderer &renderer,
@@ -290,6 +278,10 @@ namespace nomic {
 			__in void *camera
 			)
 		{
+			int32_t dx, dz;
+			glm::vec3 camera_position;
+			glm::ivec2 camera_position_chunk, position_chunk;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
 			nomic::terrain::chunk::update();
@@ -316,7 +308,29 @@ namespace nomic {
 				arr.enable(CHUNK_INDEX_VERTEX);
 			}
 
+			camera_position = ((nomic::entity::camera *) camera)->position();
+			camera_position_chunk = glm::ivec2(camera_position.x / CHUNK_WIDTH, camera_position.z / CHUNK_WIDTH);
+			position_chunk = nomic::entity::chunk::position();
+			dx = ((position_chunk.x > camera_position_chunk.x) ? (position_chunk.x - camera_position_chunk.x) :
+				(camera_position_chunk.x - position_chunk.x));
+			dz = ((position_chunk.y > camera_position_chunk.y) ? (position_chunk.y - camera_position_chunk.y) :
+				(camera_position_chunk.y - position_chunk.y));
+			show((std::abs(dx * dx) + std::abs(dz * dz)) <= (VIEW_RADIUS_RUNTIME * VIEW_RADIUS_RUNTIME));
+
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		glm::ivec2 
+		chunk::position(void) const
+		{
+			glm::ivec2 result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = nomic::terrain::chunk::position();
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}", result.x, result.y);
+			return result;
 		}
 
 		void 
