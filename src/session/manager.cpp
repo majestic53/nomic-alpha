@@ -895,8 +895,7 @@ namespace nomic {
 
 			m_camera->update();
 			if(m_camera->moved()) {
-				generate_chunks_runtime();
-				//nomic::core::thread::notify();
+				nomic::core::thread::notify();
 			}
 
 			m_manager_entity.update(m_runtime, m_camera);

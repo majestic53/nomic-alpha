@@ -111,7 +111,9 @@ namespace nomic {
 
 			nomic::graphic::cubemap::bind();
 			vertex_array().bind();
+			GL_CHECK(LEVEL_WARNING, glEnable, GL_TEXTURE_CUBE_MAP_SEAMLESS);
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, SKYBOX_SEGMENT_COUNT);
+			GL_CHECK(LEVEL_WARNING, glDisable, GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

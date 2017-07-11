@@ -128,7 +128,7 @@ namespace nomic {
 			) :
 				nomic::entity::object(ENTITY_CHUNK, SUBTYPE_UNDEFINED, glm::vec3(position.x, 0.0, position.y)),
 				nomic::terrain::chunk(position),
-				m_changed(true),
+				m_changed(false),
 				m_chunk_back(nullptr),
 				m_chunk_front(nullptr),
 				m_chunk_left(nullptr),
