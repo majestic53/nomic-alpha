@@ -306,12 +306,13 @@ namespace nomic {
 
 	#define UNIFORM_COLOR "color"
 	#define UNIFORM_MODEL "model"
+	#define UNIFORM_POSITION "position"
 	#define UNIFORM_PROJECTION "projection"
 	#define UNIFORM_VIEW "view"
 
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
-	#define VIEW_WIDTH 20
+	#define VIEW_WIDTH 30
 
 	enum {
 		BITMAP_DEPTH_8 = 1,

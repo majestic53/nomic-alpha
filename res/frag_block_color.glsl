@@ -20,9 +20,25 @@
 
 in vec4 out_color;
 in vec2 out_coordinate;
+in vec3 out_position;
+in vec3 out_vertex;
+
+const vec4 fog_color = vec4(0.52f, 0.64f, 0.99f, 1.f);
+const float fog_falloff = 0.005f;
+
+vec4 
+add_fog(
+	in vec4 color,
+	in float dist
+	)
+{
+	float fog_density = (1.f - exp(-dist * fog_falloff));
+
+	return mix(color, fog_color, fog_density);
+}
 
 void
 main(void)
 {
-	gl_FragColor = out_color;
+	gl_FragColor = add_fog(out_color, distance(out_vertex, out_position));
 }

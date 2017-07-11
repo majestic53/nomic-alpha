@@ -84,6 +84,10 @@ namespace nomic {
 					__in const glm::mat4 &model
 					);
 
+				void set_position(
+					__in const glm::vec3 &position
+					);
+
 				void set_projection(
 					__in const glm::mat4 &projection
 					);
@@ -104,15 +108,18 @@ namespace nomic {
 				void use(void);
 
 				void use(
+					__in const glm::vec3 &position,
 					__in const glm::mat4 &projection
 					);
 
 				void use(
+					__in const glm::vec3 &position,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view
 					);
 
 				void use(
+					__in const glm::vec3 &position,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view,
 					__in const glm::mat4 &model
@@ -143,6 +150,8 @@ namespace nomic {
 				uint32_t m_mode;
 
 				GLint m_uniform_model;
+
+				GLint m_uniform_position;
 
 				GLint m_uniform_projection;
 

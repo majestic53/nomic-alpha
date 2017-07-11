@@ -24,6 +24,13 @@ make release
 Changelog
 =========
 
+Version 0.1.1728
+----------------
+*Updated: 7/11/2017*
+
+* Added fog to chunk shader
+* Fixed chunk generation threading issue
+
 Version 0.1.1727
 ----------------
 *Updated: 7/9/2017*
@@ -42,16 +49,6 @@ Version 0.1.1727
 *Updated: 7/3/2017*
 
 * Added loading screen
-
-Version 0.1.1726
-----------------
-*Updated: 6/28-30/2017*
-
-* Added block entity class <s>(incomplete)</s>
-
-*Updated: 6/26/2017*
-
-* Integrated terrain generation classes
 
 *Changelog truncated (see file history for full log)*
 

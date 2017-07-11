@@ -297,6 +297,7 @@ namespace nomic {
 
 		void 
 		manager::render(
+			__in const glm::vec3 &position,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view,
 			__in const glm::uvec2 &view_dimensions,
@@ -321,10 +322,10 @@ namespace nomic {
 
 					switch(iter_handle->first->mode()) {
 						case RENDER_PERSPECTIVE:
-							iter_handle->first->use(projection, view);
+							iter_handle->first->use(position, projection, view);
 							break;
 						default:
-							iter_handle->first->use(glm::ortho(0.f, (float) view_dimensions.x, 0.f,
+							iter_handle->first->use(position, glm::ortho(0.f, (float) view_dimensions.x, 0.f,
 								(float) view_dimensions.y, -1.f, 1.f));
 							break;
 					}
@@ -361,11 +362,11 @@ namespace nomic {
 
 				switch(iter_handle->first->mode()) {
 					case RENDER_PERSPECTIVE:
-						iter_handle->first->use(projection, view);
+						iter_handle->first->use(position, projection, view);
 						break;
 					default:
-						iter_handle->first->use(glm::ortho(0.f, (float) view_dimensions.x, 0.f, (float) view_dimensions.y,
-							-1.f, 1.f));
+						iter_handle->first->use(position, glm::ortho(0.f, (float) view_dimensions.x, 0.f,
+							(float) view_dimensions.y, -1.f, 1.f));
 						break;
 				}
 

@@ -612,7 +612,7 @@ namespace nomic {
 			}
 
 			m_manager_display.clear();
-			m_manager_render.render(m_camera->projection(), m_camera->view(), m_camera->dimensions(), delta);
+			m_manager_render.render(m_camera->position(), m_camera->projection(), m_camera->view(), m_camera->dimensions(), delta);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);

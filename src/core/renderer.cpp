@@ -43,6 +43,7 @@ namespace nomic {
 				m_depth_mode(depth_mode),
 				m_mode(RENDER_PERSPECTIVE),
 				m_uniform_model(0),
+				m_uniform_position(0),
 				m_uniform_projection(0),
 				m_uniform_view(0)
 		{
@@ -67,6 +68,7 @@ namespace nomic {
 				m_depth_mode(other.m_depth_mode),
 				m_mode(other.m_mode),
 				m_uniform_model(other.m_uniform_model),
+				m_uniform_position(other.m_uniform_position),
 				m_uniform_projection(other.m_uniform_projection),
 				m_uniform_view(other.m_uniform_view)
 		{
@@ -109,6 +111,7 @@ namespace nomic {
 				m_depth_mode = other.m_depth_mode;
 				m_mode = other.m_mode;
 				m_uniform_model = other.m_uniform_model;
+				m_uniform_position = other.m_uniform_position;
 				m_uniform_projection = other.m_uniform_projection;
 				m_uniform_view = other.m_uniform_view;
 				add();
@@ -291,6 +294,18 @@ namespace nomic {
 		}
 
 		void 
+		renderer::set_position(
+			__in const glm::vec3 &position
+			)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::program::set_uniform(m_uniform_position, position);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		renderer::set_projection(
 			__in const glm::mat4 &projection
 			)
@@ -327,6 +342,7 @@ namespace nomic {
 			nomic::graphic::program::add_shader(nomic::graphic::shader(GL_FRAGMENT_SHADER, fragment));
 			nomic::graphic::program::link();
 			m_uniform_model = nomic::graphic::program::uniform_location(UNIFORM_MODEL);
+			m_uniform_position = nomic::graphic::program::uniform_location(UNIFORM_POSITION);
 			m_uniform_projection = nomic::graphic::program::uniform_location(UNIFORM_PROJECTION);
 			m_uniform_view = nomic::graphic::program::uniform_location(UNIFORM_VIEW);
 
@@ -352,7 +368,8 @@ namespace nomic {
 					<< ", Depth=" << m_depth << ", Depth Mode=" << SCALAR_AS_HEX(GLenum, m_depth_mode)
 					<< ", Mode=" << SCALAR_AS_HEX(uint32_t, m_mode)
 						<< "(" << ((m_mode == RENDER_PERSPECTIVE) ? "Perspective" : "Orthogonal") << ")"
-					<< ", Model=" << m_uniform_model << ", Projection=" << m_uniform_projection << ", View=" << m_uniform_view;
+					<< ", Model=" << m_uniform_model << ", Position=" << m_uniform_position
+					<< ", Projection=" << m_uniform_projection << ", View=" << m_uniform_view;
 			}
 
 			return result.str();
@@ -371,12 +388,14 @@ namespace nomic {
 
 		void 
 		renderer::use(
+			__in const glm::vec3 &position,
 			__in const glm::mat4 &projection
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p", &projection);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Projection=%p", position.x, position.y, position.z, &projection);
 
 			nomic::graphic::program::use();
+			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
 			set_attributes();
 
@@ -385,13 +404,16 @@ namespace nomic {
 
 		void 
 		renderer::use(
+			__in const glm::vec3 &position,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p", &projection, &view);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Projection=%p, View=%p", position.x, position.y, position.z,
+				&projection, &view);
 
 			nomic::graphic::program::use();
+			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
 			nomic::graphic::program::set_uniform(m_uniform_view, view);
 			set_attributes();
@@ -401,15 +423,18 @@ namespace nomic {
 
 		void 
 		renderer::use(
+			__in const glm::vec3 &position,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view,
 			__in const glm::mat4 &model
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p, Model=%p", &projection, &view, &model);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Projection=%p, View=%p, Model=%p", position.x, position.y, position.z,
+				&projection, &view, &model);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_model, model);
+			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
 			nomic::graphic::program::set_uniform(m_uniform_view, view);
 			set_attributes();

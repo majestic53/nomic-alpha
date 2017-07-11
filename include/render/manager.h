@@ -59,6 +59,7 @@ namespace nomic {
 					);
 
 				void render(
+					__in const glm::vec3 &position,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view,
 					__in const glm::uvec2 &view_dimensions,
