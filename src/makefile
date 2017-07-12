@@ -55,9 +55,9 @@ archive:
 			$(DIR_BUILD)entity_plain.o $(DIR_BUILD)entity_reticle.o $(DIR_BUILD)entity_skybox.o $(DIR_BUILD)entity_string.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)font_manager.o \
-		$(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_character.o $(DIR_BUILD)graphic_cubemap.o $(DIR_BUILD)graphic_display.o \
-			$(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_texture.o \
-			$(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
+		$(DIR_BUILD)graphic_atlas.o $(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_character.o $(DIR_BUILD)graphic_cubemap.o \
+			$(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o \
+			$(DIR_BUILD)graphic_texture.o $(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
 		$(DIR_BUILD)render_manager.o \
 		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)terrain_chunk.o $(DIR_BUILD)terrain_generator.o $(DIR_BUILD)terrain_manager.o \
@@ -187,8 +187,11 @@ font_manager.o: $(DIR_SRC_FONT)manager.cpp $(DIR_INC_FONT)manager.h
 
 ### GRAPHIC ###
 
-build_graphic: graphic_bitmap.o graphic_character.o graphic_cubemap.o graphic_display.o graphic_manager.o graphic_program.o graphic_shader.o \
-	graphic_texture.o graphic_vao.o graphic_vbo.o
+build_graphic: graphic_atlas.o graphic_bitmap.o graphic_character.o graphic_cubemap.o graphic_display.o graphic_manager.o graphic_program.o \
+	graphic_shader.o graphic_texture.o graphic_vao.o graphic_vbo.o
+
+graphic_atlas.o: $(DIR_SRC_GRAPHIC)atlas.cpp $(DIR_INC_GRAPHIC)atlas.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)atlas.cpp -o $(DIR_BUILD)graphic_atlas.o
 
 graphic_bitmap.o: $(DIR_SRC_GRAPHIC)bitmap.cpp $(DIR_INC_GRAPHIC)bitmap.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)bitmap.cpp -o $(DIR_BUILD)graphic_bitmap.o

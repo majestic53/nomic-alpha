@@ -51,6 +51,9 @@ namespace nomic {
 	#define __inout_opt
 #endif // __inout_opt
 
+	#define ATLAS_DIMENSIONS_DEFAULT glm::uvec2(16, 16)
+	#define ATLAS_WIDTH_DEFAULT 8
+
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
 	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
 	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
@@ -187,7 +190,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1728
 
 	#define OBJECT_COUNT 1
@@ -324,12 +327,14 @@ namespace nomic {
 	enum {
 		BLOCK_AIR = 0,
 		BLOCK_BOUNDARY,
-		BLOCK_WATER,
-		BLOCK_SAND,
 		BLOCK_DIRT,
-		BLOCK_STONE,
+		BLOCK_DIRT_GRASS_SIDE,
 		BLOCK_GRASS,
+		BLOCK_SAND,
 		BLOCK_SNOW,
+		BLOCK_STONE,
+		BLOCK_STONE_SNOW_SIDE,
+		BLOCK_WATER,
 	};
 
 	enum {

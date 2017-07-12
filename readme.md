@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1728
 ----------------
+*Updated: 7/12/2017*
+
+* Added texture atlas class (incomplete)
+
 *Updated: 7/11/2017*
 
 * Added fog to chunk shader

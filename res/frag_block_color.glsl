@@ -24,7 +24,8 @@ in vec3 out_position;
 in vec3 out_vertex;
 
 const vec4 fog_color = vec4(0.52f, 0.64f, 0.99f, 1.f);
-const float fog_falloff = 0.005f;
+const float fog_falloff = 0.01f;
+const float fog_scale = 0.8f;
 
 vec4 
 add_fog(
@@ -32,7 +33,7 @@ add_fog(
 	in float dist
 	)
 {
-	float fog_density = (1.f - exp(-dist * fog_falloff));
+	float fog_density = fog_scale * (1.f - exp(-dist * fog_falloff));
 
 	return mix(color, fog_color, fog_density);
 }

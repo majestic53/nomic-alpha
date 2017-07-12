@@ -101,10 +101,12 @@ namespace nomic {
 			protected:
 
 				void add_face(
-					__in std::vector<glm::vec3> &vertex,
-					__in std::vector<glm::vec2> &coordinate,
-					__in std::vector<glm::vec4> &color,
 					__in const glm::vec3 &position,
+					__in uint32_t face
+					);
+
+				void add_face_type(
+					__in uint8_t type,
 					__in uint32_t face
 					);
 
