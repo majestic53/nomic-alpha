@@ -26,9 +26,9 @@ Changelog
 
 Version 0.1.1728
 ----------------
-*Updated: 7/12/2017*
+*Updated: 7/12-13/2017*
 
-* Added texture atlas class (incomplete)
+* Added texture atlas class <s>(incomplete)</s>
 
 *Updated: 7/11/2017*
 

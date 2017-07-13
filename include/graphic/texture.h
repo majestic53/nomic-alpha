@@ -19,6 +19,7 @@
 #ifndef NOMIC_GRAPHIC_TEXTURE_H_
 #define NOMIC_GRAPHIC_TEXTURE_H_
 
+#include <vector>
 #include "../core/primitive.h"
 
 namespace nomic {
@@ -32,6 +33,16 @@ namespace nomic {
 
 				explicit texture(
 					__in_opt const std::string &path = std::string(),
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
+					);
+
+				texture(
+					__in const std::vector<uint8_t> &data,
+					__in const glm::uvec2 &dimensions,
+					__in uint32_t depth,
 					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
 					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
 					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
@@ -64,6 +75,16 @@ namespace nomic {
 
 				void set(
 					__in const std::string &path,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
+					);
+
+				void set(
+					__in const std::vector<uint8_t> &data,
+					__in const glm::uvec2 &dimensions,
+					__in uint32_t depth,
 					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
 					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
 					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,

@@ -38,7 +38,7 @@ namespace nomic {
 		static const glm::vec4 CHUNK_COLOR[] = {
 			{ BLOCK_COLOR_RGBA_DEFAULT }, // bottom left corner
 			{ BLOCK_COLOR_RGBA_DEFAULT }, // top left corner
-			{ 1.f, 0.f, 0.f, 1.f }, // top right corner
+			{ BLOCK_COLOR_RGBA_DEFAULT }, // top right corner
 			{ BLOCK_COLOR_RGBA_DEFAULT }, // bottom left corner
 			{ BLOCK_COLOR_RGBA_DEFAULT }, // top right corner
 			{ BLOCK_COLOR_RGBA_DEFAULT }, // bottom right corner

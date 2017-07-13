@@ -115,6 +115,7 @@ namespace nomic {
 			};
 
 		manager::manager(void) :
+			m_atlas(nullptr),
 			m_camera(nullptr),
 			m_chunk_renderer(nullptr),
 			m_debug(SESSION_DEBUG_DEFAULT),
@@ -528,6 +529,14 @@ namespace nomic {
 			m_manager_entity.initialize();
 			m_manager_terrain.initialize();
 
+			m_atlas = new nomic::graphic::atlas;
+			if(!m_atlas) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
+					"Failed to allocate atlas, Address=%p", m_atlas);
+			}
+
+			m_atlas->load(ATLAS_PATH_DEFAULT);
+
 			m_camera = new nomic::entity::camera(m_manager_display.dimensions());
 			if(!m_camera) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
@@ -570,12 +579,18 @@ namespace nomic {
 
 			nomic::core::thread::stop();
 
+			uninitialize_entities();
+
 			if(m_camera) {
 				delete m_camera;
 				m_camera = nullptr;
 			}
 
-			uninitialize_entities();
+			if(m_atlas) {
+				delete m_atlas;
+				m_atlas = nullptr;
+			}
+
 			m_manager_terrain.uninitialize();
 			m_manager_entity.uninitialize();
 			m_manager_font.uninitialize();

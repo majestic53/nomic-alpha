@@ -52,7 +52,8 @@ namespace nomic {
 #endif // __inout_opt
 
 	#define ATLAS_DIMENSIONS_DEFAULT glm::uvec2(16, 16)
-	#define ATLAS_WIDTH_DEFAULT 8
+	#define ATLAS_PATH_DEFAULT "./res/atlas.bmp"
+	#define ATLAS_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
 	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
@@ -81,7 +82,7 @@ namespace nomic {
 	#define CAMERA_FOV_MIN 10.f
 	#define CAMERA_PITCH_MAX 89.f
 	#define CAMERA_PITCH_MIN -CAMERA_PITCH_MAX
-	#define CAMERA_POSITION_DEFAULT glm::vec3(0.f, -200.f, 8.f)
+	#define CAMERA_POSITION_DEFAULT glm::vec3(0.f, -200.f, 0.f)
 	#define CAMERA_ROTATION_DEFAULT glm::vec3(0.f, 0.f, 0.f)
 	#define CAMERA_SENSITIVITY 0.55f
 	#define CAMERA_SPEED 0.35f
@@ -190,7 +191,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_REVISION 3
 	#define NOMIC_VERSION_WEEK 1728
 
 	#define OBJECT_COUNT 1
@@ -336,6 +337,8 @@ namespace nomic {
 		BLOCK_STONE_SNOW_SIDE,
 		BLOCK_WATER,
 	};
+
+	#define BLOCK_MAX BLOCK_WATER
 
 	enum {
 		BLOCK_ATTRIBUTE_STATIC = 1,

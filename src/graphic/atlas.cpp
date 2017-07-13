@@ -86,6 +86,16 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			for(std::vector<nomic::graphic::texture *>::iterator iter = m_texture.begin(); iter != m_texture.end(); ++iter) {
+
+				if(!*iter) {
+					continue;
+				}
+
+				delete *iter;
+				*iter = nullptr;
+			}
+
 			m_texture.clear();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -102,7 +112,7 @@ namespace nomic {
 				THROW_NOMIC_GRAPHIC_ATLAS_EXCEPTION_FORMAT(NOMIC_GRAPHIC_ATLAS_EXCEPTION_TYPE_INVALID, "Type=%x", type);
 			}
 
-			m_texture.at(type).disable();
+			m_texture.at(type)->disable();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -118,7 +128,7 @@ namespace nomic {
 				THROW_NOMIC_GRAPHIC_ATLAS_EXCEPTION_FORMAT(NOMIC_GRAPHIC_ATLAS_EXCEPTION_TYPE_INVALID, "Type=%x", type);
 			}
 
-			m_texture.at(type).enable();
+			m_texture.at(type)->enable();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -157,7 +167,31 @@ namespace nomic {
 			m_dimensions = dimensions;
 			m_width = width;
 
-			// TODO: create textures
+			for(uint32_t z = 0; z < (m_bitmap.height() / m_dimensions.y); ++z) {
+
+				for(uint32_t x = 0; x < (m_bitmap.width() / m_dimensions.x); ++x) {
+					std::vector<uint8_t> buffer;
+					uint32_t base_x = (x * m_dimensions.x), base_z = (z * m_dimensions.y);
+
+					for(uint32_t offset_z = 0; offset_z < m_dimensions.y; ++offset_z) {
+
+						for(uint32_t offset_x = 0; offset_x < m_dimensions.x; ++offset_x) {
+							uint32_t pixel = m_bitmap.pixel(base_x + offset_x, base_z + offset_z);
+							buffer.insert(buffer.end(), (uint8_t *) &pixel, ((uint8_t *) &pixel) + sizeof(uint32_t));
+						}
+					}
+
+					nomic::graphic::texture *texture_ref = new nomic::graphic::texture;
+					if(!texture_ref) {
+						THROW_NOMIC_GRAPHIC_ATLAS_EXCEPTION_FORMAT(NOMIC_GRAPHIC_ATLAS_EXCEPTION_ALLOCATE,
+							"Path[%u]=%s, Position={%u, %u}", path.size(), STRING_CHECK(path), x, z);
+					}
+
+					texture_ref->set(buffer, m_dimensions, sizeof(uint32_t));
+					m_texture.push_back(texture_ref);
+					buffer.clear();
+				}
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

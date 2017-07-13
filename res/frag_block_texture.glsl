@@ -18,13 +18,29 @@
 
 #version 330 core
 
+const vec4 fog_color = vec4(0.52f, 0.64f, 0.99f, 1.f);
+const float fog_falloff = 0.01f;
+
 in vec4 out_color;
 in vec2 out_coordinate;
+in vec3 out_position;
+in vec3 out_vertex;
 
 uniform sampler2D out_texture;
+
+vec4 
+add_fog(
+	in vec4 color,
+	in float dist
+	)
+{
+	float fog_density = (1.f - exp(-dist * fog_falloff));
+
+	return mix(color, fog_color, fog_density);
+}
 
 void
 main(void)
 {
-	gl_FragColor = texture(out_texture, out_coordinate);
+	gl_FragColor = add_fog(texture(out_texture, out_coordinate), distance(out_vertex, out_position));
 }

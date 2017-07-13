@@ -25,6 +25,7 @@
 #include "../entity/chunk.h"
 #include "../entity/manager.h"
 #include "../font/manager.h"
+#include "../graphic/atlas.h"
 #include "../graphic/display.h"
 #include "../graphic/manager.h"
 #include "../render/manager.h"
@@ -126,6 +127,8 @@ namespace nomic {
 				void on_uninitialize(void);
 
 				void uninitialize_entities(void);
+
+				nomic::graphic::atlas *m_atlas;
 
 				nomic::entity::camera *m_camera;
 

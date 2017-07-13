@@ -48,6 +48,27 @@ namespace nomic {
 		}
 
 		texture::texture(
+			__in const std::vector<uint8_t> &data,
+			__in const glm::uvec2 &dimensions,
+			__in uint32_t depth,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag
+			) :
+				nomic::core::primitive(PRIMITIVE_TEXTURE),
+				m_depth(0),
+				m_mode(0)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Data[%u]=%p, Dimensions={%u, %u}, Depth=%u, Wrap={%x, %x}, Filter={%x, %x}",
+				data.size(), &data[0], dimensions.x, dimensions.y, depth, wrap_s, wrap_t, filter_min, filter_mag);
+
+			set(data, dimensions, depth, wrap_s, wrap_t, filter_min, filter_mag);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		texture::texture(
 			__in const texture &other
 			) :
 				nomic::core::primitive(other),
@@ -190,6 +211,50 @@ namespace nomic {
 			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mag);
 			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimensions.x, m_dimensions.y, 0, m_mode, format,
 				image.pixels());
+			GL_CHECK(LEVEL_WARNING, glGenerateMipmap, GL_TEXTURE_2D);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		texture::set(
+			__in const std::vector<uint8_t> &data,
+			__in const glm::uvec2 &dimensions,
+			__in uint32_t depth,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag
+			)
+		{
+			GLenum format = GL_UNSIGNED_BYTE;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Data[%u]=%p, Dimensions={%u, %u}, Depth=%u, Wrap={%x, %x}, Filter={%x, %x}",
+				data.size(), &data[0], dimensions.x, dimensions.y, depth, wrap_s, wrap_t, filter_min, filter_mag);
+
+			m_depth = (depth * CHAR_WIDTH);
+			switch(m_depth / CHAR_WIDTH) {
+				case BITMAP_DEPTH_24:
+					m_mode = GL_RGB;
+					format = GL_UNSIGNED_BYTE;
+					break;
+				case BITMAP_DEPTH_32:
+					m_mode = GL_RGBA;
+					format = GL_UNSIGNED_INT_8_8_8_8;
+					break;
+				default:
+					THROW_NOMIC_GRAPHIC_TEXTURE_EXCEPTION_FORMAT(NOMIC_GRAPHIC_TEXTURE_EXCEPTION_DEPTH_INVALID,
+						"Depth=%u", m_depth);
+			}
+
+			m_dimensions = dimensions;
+			GL_CHECK(LEVEL_WARNING, glBindTexture, GL_TEXTURE_2D, m_handle);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mag);
+			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimensions.x, m_dimensions.y, 0, m_mode, format,
+				&data[0]);
 			GL_CHECK(LEVEL_WARNING, glGenerateMipmap, GL_TEXTURE_2D);
 
 			TRACE_EXIT(LEVEL_VERBOSE);

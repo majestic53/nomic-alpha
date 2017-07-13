@@ -75,7 +75,7 @@ namespace nomic {
 
 				glm::uvec2 m_dimensions;
 
-				std::vector<nomic::graphic::texture> m_texture;
+				std::vector<nomic::graphic::texture *> m_texture;
 
 				uint8_t m_width;
 		};
