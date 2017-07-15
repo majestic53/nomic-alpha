@@ -230,6 +230,7 @@ namespace nomic {
 				case BLOCK_AIR:
 				case BLOCK_BOUNDARY:
 				case BLOCK_DIRT:
+				case BLOCK_GRAVEL:
 				case BLOCK_SAND:
 				case BLOCK_STONE:
 				case BLOCK_WATER:

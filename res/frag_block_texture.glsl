@@ -42,5 +42,5 @@ add_fog(
 void
 main(void)
 {
-	gl_FragColor = add_fog(texture(out_texture, out_coordinate), distance(out_vertex, out_position));
+	gl_FragColor = /*add_fog(*/texture(out_texture, out_coordinate)/*, distance(out_vertex, out_position))*/;
 }

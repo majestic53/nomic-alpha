@@ -36,8 +36,8 @@ namespace nomic {
 		};
 
 		static const float RETICLE_COLOR[] = {
-			0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
-			0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, // grey
+			1.f, 1.f, 1.f, 1.f, 1.f, 1.f, // white
+			1.f, 1.f, 1.f, 1.f, 1.f, 1.f, // white
 			};
 
 		static const float RETICLE_VERTEX[] = {

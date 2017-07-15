@@ -138,35 +138,47 @@ namespace nomic {
 			}
 
 			if(position > max) {
-				result = b;
-			} else if(position < min) {
 				result = a;
+			} else if(position < min) {
+				result = b;
 			} else {
-				uint32_t first, second;
+				uint32_t lower, upper;
 				std::vector<double> interval, weight;
 
-				if(a <= b) {
-					first = a;
-					second = b;
+				lower = ((a <= b) ? a : b);
+				upper = ((a > b) ? a : b);
+
+				if(min < (max - 1)) {
+
+					for(uint32_t iter = lower; iter <= upper; ++iter) {
+						interval.push_back(iter);
+
+						if(iter == a) {
+							weight.push_back((position - min) / (double) (max - min));
+						} else if(iter == b) {
+							weight.push_back(1.0 - ((position - min) / (double) (max - min)));
+						} else {
+							weight.push_back(0.0);
+						}
+					}
+
+					result = (uint32_t) std::piecewise_linear_distribution<>(interval.begin(), interval.end(), weight.begin())(
+						m_random.generator());
+
+					if((result != lower) && (result != upper)) {
+						result = ((((lower <= result) ? (result - lower) : (lower - result))
+							<= ((upper <= result) ? (result - upper) : (upper - result))) ?
+							lower : upper);
+					}
 				} else {
-					first = b;
-					second = a;
-				}
 
-				for(uint32_t iter = first; iter <= second; ++iter) {
-					interval.push_back(iter);
-
-					if(iter == first) {
-						weight.push_back((min < max) ? ((position - min) / (double) (max - min)) : 0.5);
-					} else if(iter == second) {
-						weight.push_back((min < max) ? (1.0 - ((position - min) / (double) (max - min))) : 0.5);
+					std::uniform_int_distribution<> distribution(0, 1);
+					if(distribution(m_random.generator())) {
+						result = a;
 					} else {
-						weight.push_back(0.0);
+						result = b;
 					}
 				}
-
-				result = (uint32_t) std::piecewise_linear_distribution<>(interval.begin(), interval.end(), weight.begin())(
-					m_random.generator());
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
@@ -179,59 +191,59 @@ namespace nomic {
 			__in nomic::terrain::chunk &chunk
 			)
 		{
+			uint8_t type;
 			bool top = true;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
 			for(int32_t y = position.y; y >= 0; --y) {
 
-				if(!y) { // boundary
+				// TODO: move this code out of for loop and populate block columns
+				if(!y) {
 					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_BOUNDARY,
 						BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE);
-				} else if(position.y >= BLOCK_HEIGHT_DIRT) { // above-water
+				} else if(y >= BLOCK_LEVEL_ALPINE_PEAK) { // snow/stone
+					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_SNOW);
+				} else if((y < BLOCK_LEVEL_ALPINE_PEAK) && (y >= BLOCK_LEVEL_ALPINE)) { // stone/gravel
+					chunk.set_block(glm::uvec3(position.x, y, position.z), chunk_block_blend(y,
+						((BLOCK_LEVEL_ALPINE_PEAK - 1) - ((BLOCK_LEVEL_ALPINE_PEAK - 1) - BLOCK_LEVEL_ALPINE)),
+						BLOCK_LEVEL_ALPINE_PEAK - 1, BLOCK_STONE, BLOCK_GRAVEL));
+				} else if((y < BLOCK_LEVEL_ALPINE) && (y >= BLOCK_LEVEL_GRASS_STEP)) { // gravel/dirt
+					type = chunk_block_blend(y, ((BLOCK_LEVEL_ALPINE - 1) - ((BLOCK_LEVEL_ALPINE - 1) - BLOCK_LEVEL_GRASS_STEP)),
+						BLOCK_LEVEL_ALPINE - 1, BLOCK_GRAVEL, BLOCK_DIRT);
 
-					if(position.y >= BLOCK_HEIGHT_STONE) { // snow/stone
-
-						if(top && (position.y >= BLOCK_HEIGHT_SNOW)) {
-							top = false;
-							chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_SNOW);
-						} else {
-							chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_STONE);
-						}
-					} else {
-
-						if((y <= position.y) && (y > (position.y - BLOCK_DEPTH_DIRT))) { // dirt/stone
-
-							if(top) { // grass
-								top = false;
-								chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_GRASS);
-							} else { // dirt/stone
-								chunk.set_block(glm::uvec3(position.x, y, position.z), chunk_block_blend(y,
-									(position.y - BLOCK_DEPTH_DIRT), position.y, BLOCK_DIRT, BLOCK_STONE));
-							}
-						} else { // stone
-							chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_STONE);
-						}
+					if(top && (type == BLOCK_DIRT)) { // grass
+						top = false;
+						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_GRASS);
+					} else { // gravel/dirt
+						chunk.set_block(glm::uvec3(position.x, y, position.z), type);
 					}
+				} else if((y < BLOCK_LEVEL_GRASS_STEP) && (y >= BLOCK_LEVEL_GRASS)) { // dirt
 
-				} else { // underwater
-
-					if((y <= position.y) && (y > (position.y - BLOCK_DEPTH_SAND))) { // sand/stone
-
-						if(top) { // sand
-							top = false;
-							chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_SAND);
-						} else { // sand/stone
-							chunk.set_block(glm::uvec3(position.x, y, position.z), chunk_block_blend(y,
-								(position.y - BLOCK_DEPTH_SAND), position.y, BLOCK_SAND, BLOCK_STONE));
-						}
-					} else if(y < position.y) { // stone
-						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_STONE);
-					} else { // water
-						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_WATER,
-							BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE);
+					if(top) { // grass
+						top = false;
+						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_GRASS);
+					} else { // dirt
+						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_DIRT);
 					}
+				} else if((y < BLOCK_LEVEL_GRASS) && (y >= BLOCK_LEVEL_BEACH_ROCKS)) { // dirt/stone
+					type = chunk_block_blend(y, ((BLOCK_LEVEL_GRASS - 1) - ((BLOCK_LEVEL_GRASS - 1) - BLOCK_LEVEL_BEACH_ROCKS)),
+						BLOCK_LEVEL_GRASS - 1, BLOCK_DIRT, BLOCK_STONE);
+
+					if(top && (type == BLOCK_DIRT)) { // grass
+						top = false;
+						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_GRASS);
+					} else { // stone
+						chunk.set_block(glm::uvec3(position.x, y, position.z), type);
+					}
+				} else if((y < BLOCK_LEVEL_BEACH_ROCKS) && (y >= BLOCK_LEVEL_BEACH_GRAVEL)) { // stone/gravel
+					chunk.set_block(glm::uvec3(position.x, y, position.z), chunk_block_blend(y,
+						((BLOCK_LEVEL_BEACH_ROCKS - 1) - ((BLOCK_LEVEL_BEACH_ROCKS - 1) - BLOCK_LEVEL_BEACH_GRAVEL)),
+						BLOCK_LEVEL_BEACH_ROCKS - 1, BLOCK_STONE, BLOCK_GRAVEL));
+				} else { // sand (underwater)
+					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_SAND);
 				}
+				// ---
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
