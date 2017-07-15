@@ -49,7 +49,7 @@ namespace nomic {
 		typedef std::tuple<std::string, std::string, uint32_t, bool, uint32_t, uint32_t, bool, uint32_t, bool, uint32_t> renderer_config;
 
 		static const renderer_config CHUNK_RENDERER_CONFIGURATION = {
-			"./res/vert_block_color.glsl", "./res/frag_block_color.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			"./res/vert_block_texture.glsl", "./res/frag_block_texture.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_FRONT,
 			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
 			};
@@ -221,6 +221,8 @@ namespace nomic {
 					if(count > CHUNK_ADJOIN_MIN) {
 						chunk_ref->update(right, left, back, front);
 						chunk_ref->enable(true);
+					} else {
+						chunk_ref->enable(false);
 					}
 				}
 			}
@@ -341,6 +343,8 @@ namespace nomic {
 					if(count > CHUNK_ADJOIN_MIN) {
 						chunk_ref->update(right, left, back, front);
 						chunk_ref->enable(true);
+					} else {
+						chunk_ref->enable(false);
 					}
 				}
 			}
@@ -621,13 +625,19 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
 
+			if(!m_atlas) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
+					"Atlas is not allocated, Address=%p", m_atlas);
+			}
+
 			if(!m_camera) {
 				THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
 					"Camera is not allocated, Address=%p", m_camera);
 			}
 
 			m_manager_display.clear();
-			m_manager_render.render(m_camera->position(), m_camera->projection(), m_camera->view(), m_camera->dimensions(), delta);
+			m_manager_render.render(m_camera->position(), m_camera->projection(), m_camera->view(), m_camera->dimensions(), *m_atlas,
+				delta);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);

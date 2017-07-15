@@ -156,10 +156,11 @@ namespace nomic {
 		void 
 		entity::on_render(
 			__in nomic::core::renderer &renderer,
+			__in void *textures,
 			__in float delta
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Delta=%f", &renderer, delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 

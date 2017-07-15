@@ -301,12 +301,13 @@ namespace nomic {
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view,
 			__in const glm::uvec2 &view_dimensions,
+			__in nomic::graphic::atlas &textures,
 			__in float delta
 			)
 		{
 			std::map<nomic::core::renderer *, std::set<nomic::core::entity *>> deferred;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p, Delta=%f", &projection, &view, delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p, Textures=%p, Delta=%f", &projection, &view, &textures, delta);
 
 			std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -347,7 +348,7 @@ namespace nomic {
 							iter_deferred->second.insert(*iter_entity);
 						} else {
 							iter_handle->first->set_model((*iter_entity)->model());
-							(*iter_entity)->on_render(*iter_handle->first, delta);
+							(*iter_entity)->on_render(*iter_handle->first, &textures, delta);
 						}
 					}
 				}
@@ -378,7 +379,7 @@ namespace nomic {
 					}
 
 					iter_handle->first->set_model((*iter_entity)->model());
-					(*iter_entity)->on_render(*iter_handle->first, delta);
+					(*iter_entity)->on_render(*iter_handle->first, &textures, delta);
 				}
 			}
 

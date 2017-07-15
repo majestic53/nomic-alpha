@@ -51,6 +51,7 @@ namespace nomic {
 
 				void on_render(
 					__in nomic::core::renderer &renderer,
+					__in void *textures,
 					__in float delta
 					);
 

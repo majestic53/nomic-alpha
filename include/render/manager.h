@@ -24,6 +24,7 @@
 #include "../core/entity.h"
 #include "../core/renderer.h"
 #include "../core/singleton.h"
+#include "../graphic/atlas.h"
 
 namespace nomic {
 
@@ -63,6 +64,7 @@ namespace nomic {
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view,
 					__in const glm::uvec2 &view_dimensions,
+					__in nomic::graphic::atlas &textures,
 					__in float delta
 					);
 

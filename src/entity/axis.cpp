@@ -98,10 +98,11 @@ namespace nomic {
 		void 
 		axis::on_render(
 			__in nomic::core::renderer &renderer,
+			__in void *textures,
 			__in float delta
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Delta=%f", &renderer, delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
 			vertex_array().bind();
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, AXIS_SEGMENT_COUNT);

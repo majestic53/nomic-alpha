@@ -19,6 +19,8 @@
 #ifndef NOMIC_ENTITY_CHUNK_H_
 #define NOMIC_ENTITY_CHUNK_H_
 
+#include <map>
+#include <tuple>
 #include "../terrain/chunk.h"
 #include "../terrain/generator.h"
 #include "./object.h"
@@ -26,6 +28,8 @@
 namespace nomic {
 
 	namespace entity {
+
+		typedef std::tuple<std::vector<glm::vec4>, std::vector<glm::vec2>, std::vector<glm::vec3>, uint32_t, uint32_t> chunk_data;
 
 		class chunk :
 				public nomic::entity::object,
@@ -64,6 +68,7 @@ namespace nomic {
 
 				virtual void on_render(
 					__in nomic::core::renderer &renderer,
+					__in void *textures,
 					__in float delta
 					);
 
@@ -102,10 +107,12 @@ namespace nomic {
 
 				void add_face(
 					__in const glm::vec3 &position,
-					__in uint32_t face
+					__in uint32_t face,
+					__in std::map<uint8_t, chunk_data>::iterator entry
 					);
 
-				void add_face_type(
+				std::map<uint8_t, chunk_data>::iterator 
+				add_face_type(
 					__in uint8_t type,
 					__in uint32_t face
 					);
@@ -120,13 +127,7 @@ namespace nomic {
 
 				nomic::entity::chunk *m_chunk_right;
 
-				std::vector<uint8_t> m_face;
-
-				std::vector<glm::vec4> m_vao_color;
-
-				std::vector<glm::vec2> m_vao_coordinate;
-
-				std::vector<glm::vec3> m_vao_vertex;
+				std::map<uint8_t, chunk_data> m_face;
 		};
 	}
 }

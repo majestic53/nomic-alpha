@@ -112,12 +112,13 @@ namespace nomic {
 		void 
 		string::on_render(
 			__in nomic::core::renderer &renderer,
+			__in void *textures,
 			__in float delta
 			)
 		{
 			float x, y;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Delta=%f", &renderer, delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
 			x = m_position.x;
 			y = (m_view_dimensions.y - m_position.y);

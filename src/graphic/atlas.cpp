@@ -128,7 +128,10 @@ namespace nomic {
 				THROW_NOMIC_GRAPHIC_ATLAS_EXCEPTION_FORMAT(NOMIC_GRAPHIC_ATLAS_EXCEPTION_TYPE_INVALID, "Type=%x", type);
 			}
 
-			m_texture.at(type)->enable();
+			nomic::graphic::texture *texture_ref = m_texture.at(type);
+			if(texture_ref) {
+				texture_ref->bind();
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
