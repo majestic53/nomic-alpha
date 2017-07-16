@@ -49,7 +49,7 @@ namespace nomic {
 		typedef std::tuple<std::string, std::string, uint32_t, bool, uint32_t, uint32_t, bool, uint32_t, bool, uint32_t> renderer_config;
 
 		static const renderer_config CHUNK_RENDERER_CONFIGURATION = {
-			"./res/vert_block_texture.glsl", "./res/frag_block_texture.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			"./res/vert_block.glsl", "./res/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_FRONT,
 			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
 			};
@@ -66,7 +66,7 @@ namespace nomic {
 			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT, RENDERER_BLEND_DFACTOR_DEFAULT,
 				RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_DEPTH_DEFAULT,
 				RENDERER_DEPTH_MODE_DEFAULT }, // axis
-			{ "./res/vert_string_static.glsl", "./res/frag_string_static.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
+			{ "./res/vert_string.glsl", "./res/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
 			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
@@ -94,10 +94,6 @@ namespace nomic {
 			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "./res/skybox_side.bmp" },
 			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "./res/skybox_side.bmp" },
 			};
-
-		static const renderer_config MESSAGE_RENDERER_CONFIGURATION = { "./res/vert_string_static.glsl", "./res/frag_string_static.glsl",
-				RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT, RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT,
-				RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT };
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
 			{ SDL_GL_ACCELERATED_VISUAL, GL_ATTRIBUTE_ACCELERATE_VISUAL },
@@ -252,16 +248,12 @@ namespace nomic {
 			diagnostic.register_renderer(diagnostic_renderer.get_id());
 
 			nomic::entity::message message;
-			message_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_SHADER_FRAGMENT>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_mode(std::get<RENDERER_MODE>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_BLEND_SFACTOR>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_BLEND_DFACTOR>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_CULL_MODE>(MESSAGE_RENDERER_CONFIGURATION));
-			message_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(MESSAGE_RENDERER_CONFIGURATION),
-				std::get<RENDERER_DEPTH_MODE>(MESSAGE_RENDERER_CONFIGURATION));
+			message_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
+			message_renderer.set_mode(std::get<RENDERER_MODE>(config));
+			message_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
+				std::get<RENDERER_BLEND_DFACTOR>(config));
+			message_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
+			message_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
 
 			message.enable(true);
 			message.show(true);
@@ -551,7 +543,7 @@ namespace nomic {
 			m_camera->show(false);
 			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
 			initialize_entities();
-			m_camera->position().y = BLOCK_HEIGHT_WATER;
+			m_camera->position().y = BLOCK_LEVEL_GRASS;
 			nomic::core::thread::start(true);
 			nomic::core::thread::notify();
 

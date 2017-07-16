@@ -255,6 +255,24 @@ namespace nomic {
 								"Face=%x", face);
 					}
 					break;
+				case BLOCK_SANDSTONE:
+
+					switch(face) {
+						case BLOCK_FACE_BACK:
+						case BLOCK_FACE_FRONT:
+						case BLOCK_FACE_LEFT:
+						case BLOCK_FACE_RIGHT:
+							type = BLOCK_SANDSTONE_SIDE;
+							break;
+						case BLOCK_FACE_BOTTOM:
+						case BLOCK_FACE_TOP:
+							type = BLOCK_SANDSTONE;
+							break;
+						default:
+							THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_FACE_INVALID,
+								"Face=%x", face);
+					}
+					break;
 				case BLOCK_SNOW:
 
 					switch(face) {

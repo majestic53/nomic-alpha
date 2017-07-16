@@ -79,6 +79,22 @@ namespace nomic {
 					__in uint32_t b
 					);
 
+				uint32_t chunk_block_pick(
+					__in uint32_t a,
+					__in uint32_t b
+					);
+
+				uint32_t chunk_block_pick(
+					__in uint32_t a,
+					__in uint32_t b,
+					__in uint32_t c
+					);
+
+				uint32_t chunk_block_pick_uniform(
+					__in uint32_t a,
+					__in uint32_t b
+					);
+
 				void chunk_column(
 					__in const glm::uvec3 &position,
 					__in nomic::terrain::chunk &chunk
