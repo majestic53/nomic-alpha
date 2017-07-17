@@ -55,6 +55,7 @@ namespace nomic {
 				m_fov(other.m_fov),
 				m_key(other.m_key),
 				m_motion(other.m_motion),
+				m_position_block(other.m_position_block),
 				m_position_chunk(other.m_position_chunk),
 				m_position_chunk_previous(other.m_position_chunk_previous),
 				m_rotation_previous(other.m_rotation_previous),
@@ -89,6 +90,7 @@ namespace nomic {
 				m_fov = other.m_fov;
 				m_key = other.m_key;
 				m_motion = other.m_motion;
+				m_position_block = other.m_position_block;
 				m_position_chunk = other.m_position_chunk;
 				m_position_chunk_previous = other.m_position_chunk_previous;
 				m_rotation_previous = other.m_rotation_previous;
@@ -97,6 +99,14 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
 			return *this;
+		}
+
+		glm::uvec3 
+		camera::block(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%u, %u}", m_position_block.x, m_position_block.y, m_position_block.z);
+			return m_position_block;
 		}
 
 		void 
@@ -111,6 +121,14 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Button=%x, State=%x(%s), Clicks=%u, Position={%i, %i}", button, state,
 				(state == SDL_PRESSED) ? "Press" : "Release", (uint16_t) clicks, x, y);
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		glm::ivec2 
+		camera::chunk(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%i, %i}", m_position_chunk.x, m_position_chunk.y);
+			return m_position_chunk;
 		}
 
 		glm::uvec2 
@@ -342,8 +360,21 @@ namespace nomic {
 				}
 			}
 
-			m_position_chunk.x = (m_position.x / (CHUNK_WIDTH - 1));
-			m_position_chunk.y = (m_position.z / (CHUNK_WIDTH - 1));
+			if(m_position.y < 0) {
+				m_position.y = 0;
+			} else if(m_position.y > CHUNK_HEIGHT) {
+				m_position.y = CHUNK_HEIGHT;
+			}
+
+			m_position_block.x = m_position.x;
+			m_position_block.x %= CHUNK_WIDTH;
+			m_position_block.y = m_position.y;
+			m_position_block.z = m_position.z;
+			m_position_block.z %= CHUNK_WIDTH;
+			m_position_chunk.x = m_position.x;
+			m_position_chunk.x /= CHUNK_WIDTH;
+			m_position_chunk.y = m_position.z;
+			m_position_chunk.y /= CHUNK_WIDTH;
 
 			if(m_motion != glm::vec2()) {
 

@@ -29,7 +29,7 @@ namespace nomic {
 
 	namespace entity {
 
-		typedef std::tuple<std::vector<glm::vec4>, std::vector<glm::vec2>, std::vector<glm::vec3>, uint32_t, uint32_t> chunk_data;
+		typedef std::tuple<std::vector<glm::vec2>, std::vector<glm::vec3>, uint32_t, uint32_t> chunk_data;
 
 		class chunk :
 				public nomic::entity::object,

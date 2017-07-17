@@ -121,7 +121,8 @@ namespace nomic {
 			m_manager_graphic(nomic::graphic::manager::acquire()),
 			m_manager_render(nomic::render::manager::acquire()),
 			m_manager_terrain(nomic::terrain::manager::acquire()),
-			m_runtime(nullptr)
+			m_runtime(nullptr),
+			m_underwater(false)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -544,6 +545,7 @@ namespace nomic {
 			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
 			initialize_entities();
 			m_camera->position().y = BLOCK_LEVEL_GRASS;
+			m_underwater = false;
 			nomic::core::thread::start(true);
 			nomic::core::thread::notify();
 
@@ -629,7 +631,7 @@ namespace nomic {
 
 			m_manager_display.clear();
 			m_manager_render.render(m_camera->position(), m_camera->projection(), m_camera->view(), m_camera->dimensions(), *m_atlas,
-				delta);
+				m_underwater, delta);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -894,6 +896,14 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		bool 
+		manager::underwater(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_underwater);
+			return m_underwater;
+		}
+
 		void 
 		manager::unpause(void)
 		{
@@ -911,10 +921,12 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			m_camera->update();
+			
 			if(m_camera->moved()) {
 				nomic::core::thread::notify();
 			}
 
+			m_underwater = (m_manager_terrain.at(m_camera->chunk())->block_type(m_camera->block()) == BLOCK_WATER);
 			m_manager_entity.update(m_runtime, m_camera);
 
 			TRACE_EXIT(LEVEL_VERBOSE);

@@ -51,6 +51,8 @@ namespace nomic {
 					__in const camera &other
 					);
 
+				glm::uvec3 block(void);
+
 				void button(
 					__in uint8_t button,
 					__in uint8_t state,
@@ -58,6 +60,8 @@ namespace nomic {
 					__in int32_t x,
 					__in int32_t y
 					);
+
+				glm::ivec2 chunk(void);
 
 				glm::uvec2 dimensions(void) const;
 
@@ -140,6 +144,8 @@ namespace nomic {
 				std::map<std::pair<uint16_t, uint16_t>, bool> m_key;
 
 				glm::vec2 m_motion;
+
+				glm::uvec3 m_position_block;
 
 				glm::ivec2 m_position_chunk;
 

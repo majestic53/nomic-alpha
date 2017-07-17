@@ -50,19 +50,20 @@ namespace nomic {
 				THROW_NOMIC_TERRAIN_MANAGER_EXCEPTION(NOMIC_TERRAIN_MANAGER_EXCEPTION_UNINITIALIZED);
 			}
 
-			if(generate) {
+			if(generate && !contains(position)) {
 				std::map<std::pair<int32_t, int32_t>, nomic::entity::chunk *>::iterator iter;
-
-				nomic::entity::chunk *entry = new nomic::entity::chunk(position, m_generator);
-				if(!entry) {
-					THROW_NOMIC_TERRAIN_MANAGER_EXCEPTION_FORMAT(NOMIC_TERRAIN_MANAGER_EXCEPTION_ALLOCATE, "Position={%i, %i}",
-						position.x, position.y);
-				}
 
 				iter = m_chunk.find(std::make_pair(position.x, position.y));
 				if(iter == m_chunk.end()) {
+
+					nomic::entity::chunk *entry = new nomic::entity::chunk(position, m_generator);
+					if(!entry) {
+						THROW_NOMIC_TERRAIN_MANAGER_EXCEPTION_FORMAT(NOMIC_TERRAIN_MANAGER_EXCEPTION_ALLOCATE, "Position={%i, %i}",
+							position.x, position.y);
+					}
+
 					m_chunk.insert(std::make_pair(std::make_pair(position.x, position.y), entry));
-				} 
+				}
 			}
 
 			result = find(position)->second;

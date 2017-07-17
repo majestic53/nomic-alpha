@@ -334,17 +334,7 @@ namespace nomic {
 
 			chunk.set_block(glm::uvec3(position.x, y, position.z), type, attribute);
 
-			// TODO: add real water effect
-			if((y < BLOCK_HEIGHT_WATER)
-					&& (chunk.type(glm::uvec3(position.x, BLOCK_HEIGHT_WATER + 1, position.z)) == BLOCK_AIR)) {
-				chunk.set_block(glm::uvec3(position.x, BLOCK_HEIGHT_WATER, position.z), BLOCK_WATER,
-					BLOCK_ATTRIBUTES_DEFAULT | ~BLOCK_ATTRIBUTE_BREAKABLE);
-			}
-			// ---
-
-			--y;
-
-			for(; y >= BLOCK_HEIGHT_MIN; --y) { // block columns for y >= min
+			for(y = (position.y - 1); y >= BLOCK_HEIGHT_MIN; --y) { // block columns for y >= min
 				attribute = BLOCK_ATTRIBUTES_DEFAULT;
 
 				switch(zone) {
@@ -426,6 +416,16 @@ namespace nomic {
 
 			for(; y >= BLOCK_HEIGHT_BOUNDARY; --y) { // block column < min and > boundary
 				chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_STONE, BLOCK_ATTRIBUTES_DEFAULT);
+			}
+
+			if((position.y < BLOCK_HEIGHT_WATER)
+					&& (chunk.type(glm::uvec3(position.x, BLOCK_HEIGHT_WATER + 1, position.z)) == BLOCK_AIR)) { // water
+				uint32_t attributes = (BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+
+				for(y = BLOCK_HEIGHT_WATER; y > position.y; --y) {
+					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_WATER,
+						(y == BLOCK_HEIGHT_WATER) ? attributes : (attributes | BLOCK_ATTRIBUTE_HIDDEN));
+				}
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

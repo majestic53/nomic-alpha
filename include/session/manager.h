@@ -96,6 +96,8 @@ namespace nomic {
 
 				void toggle_debug(void);
 
+				bool underwater(void);
+
 				void unpause(void);
 
 				void update(void);
@@ -157,6 +159,8 @@ namespace nomic {
 				nomic::terrain::manager &m_manager_terrain;
 
 				void *m_runtime;
+
+				bool m_underwater;
 		};
 	}
 }

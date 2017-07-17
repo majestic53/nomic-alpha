@@ -65,6 +65,7 @@ namespace nomic {
 					__in const glm::mat4 &view,
 					__in const glm::uvec2 &view_dimensions,
 					__in nomic::graphic::atlas &textures,
+					__in bool underwater,
 					__in float delta
 					);
 

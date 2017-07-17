@@ -18,29 +18,49 @@
 
 #version 330 core
 
-const vec4 fog_color = vec4(0.52f, 0.64f, 0.99f, 1.f);
-const float fog_falloff = 0.01f;
-
-in vec4 out_color;
 in vec2 out_coordinate;
-in vec3 out_position;
 in vec3 out_vertex;
+
+uniform vec3 position;
+uniform bool underwater;
 
 uniform sampler2D out_texture;
 
+const vec4 FOG_COLOR = vec4(0.52f, 0.64f, 0.99f, 1.f);
+const float FOG_FALLOFF = 0.003f;
+
 vec4 
-add_fog(
+add_effect_air(
 	in vec4 color,
-	in float dist
+	in float distance
 	)
 {
-	float fog_density = (1.f - exp(-dist * fog_falloff));
+	float density = (1.f - exp(-distance * FOG_FALLOFF));
 
-	return mix(color, fog_color, fog_density);
+	return mix(color, FOG_COLOR, density);
+}
+
+const vec4 WATER_COLOR = vec4(0.02f, 0.26f, 0.45f, 1.f);
+const float WATER_FALLOFF = 0.1f;
+
+vec4 
+add_effect_water(
+	in vec4 color,
+	in float distance
+	)
+{
+	float density = (1.f - exp(-distance * WATER_FALLOFF));
+
+	return mix(color, WATER_COLOR, density);
 }
 
 void
 main(void)
 {
-	gl_FragColor = /*add_fog(*/texture(out_texture, out_coordinate)/*, distance(out_vertex, out_position))*/;
+
+	if(underwater) {
+		gl_FragColor = add_effect_water(texture(out_texture, out_coordinate), distance(position, out_vertex));
+	} else {
+		gl_FragColor = add_effect_air(texture(out_texture, out_coordinate), distance(position, out_vertex));
+	}
 }

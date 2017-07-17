@@ -52,7 +52,7 @@ namespace nomic {
 #endif // __inout_opt
 
 	#define ATLAS_DIMENSIONS_DEFAULT glm::uvec2(16, 16)
-	#define ATLAS_PATH_DEFAULT "./res/block.bmp"
+	#define ATLAS_PATH_DEFAULT "./res/block2.bmp"
 	#define ATLAS_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
@@ -84,12 +84,12 @@ namespace nomic {
 
 	#define CAMERA_CLIP_MAX 1000.f
 	#define CAMERA_CLIP_MIN 0.1f
-	#define CAMERA_FOV_DEFAULT 45.f
+	#define CAMERA_FOV_DEFAULT 55.f
 	#define CAMERA_FOV_MAX 90.f
 	#define CAMERA_FOV_MIN 10.f
 	#define CAMERA_PITCH_MAX 89.f
 	#define CAMERA_PITCH_MIN -CAMERA_PITCH_MAX
-	#define CAMERA_POSITION_DEFAULT glm::vec3(0.f, -200.f, 0.f)
+	#define CAMERA_POSITION_DEFAULT glm::vec3(0.f, BLOCK_LEVEL_GRASS, 0.f)
 	#define CAMERA_ROTATION_DEFAULT glm::vec3(0.f, 0.f, 0.f)
 	#define CAMERA_SENSITIVITY 0.55f
 	#define CAMERA_SPEED 0.35f
@@ -192,15 +192,15 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 356.0
 
-	#define NOISE_SEED_DEFAULT 0 //612443400
+	#define NOISE_SEED_DEFAULT 612443400 //0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 6
-	#define NOMIC_VERSION_WEEK 1728
+	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_WEEK 1729
 
 	#define OBJECT_COUNT 1
 
@@ -320,6 +320,7 @@ namespace nomic {
 	#define UNIFORM_MODEL "model"
 	#define UNIFORM_POSITION "position"
 	#define UNIFORM_PROJECTION "projection"
+	#define UNIFORM_UNDERWATER "underwater"
 	#define UNIFORM_VIEW "view"
 
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
@@ -354,6 +355,7 @@ namespace nomic {
 	enum {
 		BLOCK_ATTRIBUTE_STATIC = 1,
 		BLOCK_ATTRIBUTE_BREAKABLE = 2,
+		BLOCK_ATTRIBUTE_HIDDEN = 4,
 	};
 
 	enum {

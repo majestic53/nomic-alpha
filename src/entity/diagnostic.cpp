@@ -79,12 +79,10 @@ namespace nomic {
 			)
 		{
 			std::stringstream result;
-			glm::vec3 position, rotation;
-			nomic::runtime *runtime_ref = (nomic::runtime *) runtime;
-			nomic::entity::camera *camera_ref = (nomic::entity::camera *) camera;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
+			nomic::runtime *runtime_ref = (nomic::runtime *) runtime;
 			if(runtime_ref) {
 				result << NOMIC << " " << runtime_ref->version(true) << std::endl << "Seed=" << runtime_ref->seed();
 			}
@@ -92,21 +90,15 @@ namespace nomic {
 			if(m_verbose) {
 				result << std::endl << std::endl;
 
+				nomic::entity::camera *camera_ref = (nomic::entity::camera *) camera;
 				if(camera_ref) {
-					glm::uvec2 position_block;
-					glm::ivec2 position_chunk;
-					position = camera_ref->position();
-					position_block.x = position.x;
-					position_block.x %= CHUNK_WIDTH;
-					position_block.y = position.z;
-					position_block.y %= CHUNK_WIDTH;
-					position_chunk.x = position.x;
-					position_chunk.x /= CHUNK_WIDTH;
-					position_chunk.y = position.z;
-					position_chunk.y /= CHUNK_WIDTH;
-					rotation = camera_ref->rotation();
+					glm::vec3 position = camera_ref->position();
+					glm::vec3 rotation = camera_ref->rotation();
+					glm::uvec3 position_block = camera_ref->block();
+					glm::ivec2 position_chunk = camera_ref->chunk();
 					result << "Chunk=" << position_chunk.x << "," << position_chunk.y
-						<< ", Block=" << position_block.x << "," << position_block.y
+						<< ", Block=" << position_block.x << "," << position_block.y << "," << position_block.z
+						<< ", Mode=" << (runtime_ref->session().underwater() ? "Water" : "Air") << std::endl
 						<< std::endl << "Pos=" << position.x << "," << position.y << "," << position.z
 						<< std::endl << "Rot=" << rotation.x << "," << rotation.y << "," << rotation.z
 						<< std::endl << "Fov=" << camera_ref->fov();

@@ -24,6 +24,12 @@ make release
 Changelog
 =========
 
+Version 0.1.1729
+----------------
+*Updated: 7/17/2017*
+
+* Added underwater detection to shader
+
 Version 0.1.1728
 ----------------
 *Updated: 7/15/2017*

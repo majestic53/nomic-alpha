@@ -45,6 +45,7 @@ namespace nomic {
 				m_uniform_model(0),
 				m_uniform_position(0),
 				m_uniform_projection(0),
+				m_uniform_underwater(0),
 				m_uniform_view(0)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Blend=%x, Blend Factor={%x, %x}, Cull=%x, Cull Mode=%x, Depth=%x, Depth Mode=%x",
@@ -70,6 +71,7 @@ namespace nomic {
 				m_uniform_model(other.m_uniform_model),
 				m_uniform_position(other.m_uniform_position),
 				m_uniform_projection(other.m_uniform_projection),
+				m_uniform_underwater(other.m_uniform_underwater),
 				m_uniform_view(other.m_uniform_view)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Blend=%x, Blend Factor={%x, %x}, Cull=%x, Cull Mode=%x, Depth=%x, Depth Mode=%x",
@@ -113,6 +115,7 @@ namespace nomic {
 				m_uniform_model = other.m_uniform_model;
 				m_uniform_position = other.m_uniform_position;
 				m_uniform_projection = other.m_uniform_projection;
+				m_uniform_underwater = other.m_uniform_underwater;
 				m_uniform_view = other.m_uniform_view;
 				add();
 			}
@@ -318,6 +321,18 @@ namespace nomic {
 		}
 
 		void 
+		renderer::set_underwater(
+			__in const GLboolean underwater
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Underwater=%x", underwater);
+
+			nomic::graphic::program::set_uniform(m_uniform_underwater, underwater);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		renderer::set_view(
 			__in const glm::mat4 &view
 			)
@@ -344,6 +359,7 @@ namespace nomic {
 			m_uniform_model = nomic::graphic::program::uniform_location(UNIFORM_MODEL);
 			m_uniform_position = nomic::graphic::program::uniform_location(UNIFORM_POSITION);
 			m_uniform_projection = nomic::graphic::program::uniform_location(UNIFORM_PROJECTION);
+			m_uniform_underwater = nomic::graphic::program::uniform_location(UNIFORM_UNDERWATER);
 			m_uniform_view = nomic::graphic::program::uniform_location(UNIFORM_VIEW);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -369,7 +385,8 @@ namespace nomic {
 					<< ", Mode=" << SCALAR_AS_HEX(uint32_t, m_mode)
 						<< "(" << ((m_mode == RENDER_PERSPECTIVE) ? "Perspective" : "Orthogonal") << ")"
 					<< ", Model=" << m_uniform_model << ", Position=" << m_uniform_position
-					<< ", Projection=" << m_uniform_projection << ", View=" << m_uniform_view;
+					<< ", Projection=" << m_uniform_projection << ", Underwater=" << m_uniform_underwater
+					<< ", View=" << m_uniform_view;
 			}
 
 			return result.str();
@@ -389,14 +406,17 @@ namespace nomic {
 		void 
 		renderer::use(
 			__in const glm::vec3 &position,
+			__in GLboolean underwater,
 			__in const glm::mat4 &projection
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Projection=%p", position.x, position.y, position.z, &projection);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Underwater=%x, Projection=%p", position.x, position.y, position.z,
+				underwater, &projection);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
+			nomic::graphic::program::set_uniform(m_uniform_underwater, underwater);
 			set_attributes();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -405,16 +425,18 @@ namespace nomic {
 		void 
 		renderer::use(
 			__in const glm::vec3 &position,
+			__in GLboolean underwater,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Projection=%p, View=%p", position.x, position.y, position.z,
-				&projection, &view);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Underwater=%x, Projection=%p, View=%p", position.x, position.y,
+				position.z, underwater, &projection, &view);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
+			nomic::graphic::program::set_uniform(m_uniform_underwater, underwater);
 			nomic::graphic::program::set_uniform(m_uniform_view, view);
 			set_attributes();
 
@@ -424,18 +446,20 @@ namespace nomic {
 		void 
 		renderer::use(
 			__in const glm::vec3 &position,
+			__in GLboolean underwater,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view,
 			__in const glm::mat4 &model
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Projection=%p, View=%p, Model=%p", position.x, position.y, position.z,
-				&projection, &view, &model);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Underwater=%x, Projection=%p, View=%p, Model=%p", position.x,
+				position.y, position.z, underwater, &projection, &view, &model);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_model, model);
 			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
+			nomic::graphic::program::set_uniform(m_uniform_underwater, underwater);
 			nomic::graphic::program::set_uniform(m_uniform_view, view);
 			set_attributes();
 
