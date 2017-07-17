@@ -52,7 +52,7 @@ namespace nomic {
 #endif // __inout_opt
 
 	#define ATLAS_DIMENSIONS_DEFAULT glm::uvec2(16, 16)
-	#define ATLAS_PATH_DEFAULT "./res/block2.bmp"
+	#define ATLAS_PATH_DEFAULT "./res/block.bmp"
 	#define ATLAS_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
@@ -192,7 +192,7 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 356.0
 
-	#define NOISE_SEED_DEFAULT 612443400 //0
+	#define NOISE_SEED_DEFAULT 0 //612443400
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
