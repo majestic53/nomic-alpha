@@ -113,6 +113,7 @@ namespace nomic {
 	#define CHUNK_BLOCK_SURFACE_COUNT (CHUNK_WIDTH * CHUNK_WIDTH)
 	#define CHUNK_MAX_DEFAULT 64
 	#define CHUNK_HEIGHT 128
+	#define CHUNK_RADIUS (CHUNK_WIDTH / 2.f)
 	#define CHUNK_WIDTH 16
 
 	#define CUBEMAP_FILTER_MAG_DEFAULT GL_LINEAR
@@ -192,14 +193,14 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 356.0
 
-	#define NOISE_SEED_DEFAULT 0 //612443400
+	#define NOISE_SEED_DEFAULT 612443400 //0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1729
 
 	#define OBJECT_COUNT 1
@@ -325,6 +326,7 @@ namespace nomic {
 
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
+	#define VIEW_SELECTIVE_SHOW
 	#define VIEW_WIDTH 30
 
 	enum {
@@ -351,6 +353,14 @@ namespace nomic {
 	};
 
 	#define BLOCK_MAX BLOCK_WATER
+
+	static const std::string BLOCK_STR[] = {
+		"Air", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone", "Stone/Snow", "Snow",
+		"Gravel", "Sand", "Sandstone", "Sandstone/Side", "Water",
+		};
+
+	#define BLOCK_STRING(_TYPE_) \
+		(((_TYPE_) > BLOCK_MAX) ? STRING_UNKNOWN : STRING_CHECK(BLOCK_STR[_TYPE_]))
 
 	enum {
 		BLOCK_ATTRIBUTE_STATIC = 1,

@@ -376,6 +376,22 @@ namespace nomic {
 			m_position_chunk.y = m_position.z;
 			m_position_chunk.y /= CHUNK_WIDTH;
 
+			if(m_position.x < 0) {
+				--m_position_chunk.x;
+
+				if(m_position.x > -BLOCK_WIDTH) {
+					m_position_block.x = (CHUNK_WIDTH - 1);
+				}
+			}
+
+			if(m_position.z < 0) {
+				--m_position_chunk.y;
+
+				if(m_position.z > -BLOCK_WIDTH) {
+					m_position_block.z = (CHUNK_WIDTH - 1);
+				}
+			}
+
 			if(m_motion != glm::vec2()) {
 
 				m_rotation_previous.x -= (m_motion.y * sensitivity);

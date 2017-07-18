@@ -26,9 +26,11 @@ Changelog
 
 Version 0.1.1729
 ----------------
-*Updated: 7/17/2017*
+
+*Updated: 7/17-18/2017*
 
 * Added underwater detection to shader
+* Fixed coordinate system
 
 Version 0.1.1728
 ----------------

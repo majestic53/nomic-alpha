@@ -96,17 +96,18 @@ namespace nomic {
 					glm::vec3 rotation = camera_ref->rotation();
 					glm::uvec3 position_block = camera_ref->block();
 					glm::ivec2 position_chunk = camera_ref->chunk();
-					result << "Chunk=" << position_chunk.x << "," << position_chunk.y
-						<< ", Block=" << position_block.x << "," << position_block.y << "," << position_block.z
-						<< ", Mode=" << (runtime_ref->session().underwater() ? "Water" : "Air") << std::endl
-						<< std::endl << "Pos=" << position.x << "," << position.y << "," << position.z
-						<< std::endl << "Rot=" << rotation.x << "," << rotation.y << "," << rotation.z
+					uint8_t type = runtime_ref->session().terrain().at(position_chunk)->block_type(position_block);
+					result << "Chunk=(" << position_chunk.x << "," << position_chunk.y << ")"
+						<< ", Block=(" << position_block.x << "," << position_block.y << "," << position_block.z << ")"
+						<< ", Type=" << BLOCK_STRING(type) << (runtime_ref->session().underwater() ? " (Underwater)" : "")
+						<< std::endl << std::endl << "Pos=(" << position.x << "," << position.y << "," << position.z << ")"
+						<< std::endl << "Rot=(" << rotation.x << "," << rotation.y << "," << rotation.z << ")"
 						<< std::endl << "Fov=" << camera_ref->fov();
 				}
 
 				if(runtime_ref) {
 					result << ", Fps=" << runtime_ref->frame_rate() << ", Tick=" << runtime_ref->tick()
-						<< "(@" << RUNTIME_TICKS_PER_SECOND << "/sec)";
+						<< " (@" << RUNTIME_TICKS_PER_SECOND << "/sec)";
 				}
 			}
 

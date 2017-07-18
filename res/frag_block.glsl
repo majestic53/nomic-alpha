@@ -40,8 +40,8 @@ add_effect_air(
 	return mix(color, FOG_COLOR, density);
 }
 
-const vec4 WATER_COLOR = vec4(0.02f, 0.26f, 0.45f, 1.f);
-const float WATER_FALLOFF = 0.1f;
+const vec4 WATER_COLOR = vec4(0.06f, 0.25f, 1.f, 1.f);
+const float WATER_FALLOFF = 0.05f;
 
 vec4 
 add_effect_water(
