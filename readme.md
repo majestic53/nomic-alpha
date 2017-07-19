@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1729
 ----------------
+*Updated: 7/19/2017*
+
+* Fixed bug in underwater detection
+* Fixed bug in fog/water effect shader routines
 
 *Updated: 7/17-18/2017*
 

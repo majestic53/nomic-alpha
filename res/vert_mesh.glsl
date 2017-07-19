@@ -18,13 +18,25 @@
 
 #version 330 core
 
-in vec2 out_coordinate;
-in vec3 out_vertex;
+layout(location = 0) in vec2 in_coordinate;
+layout(location = 1) in vec3 in_vertex;
 
-uniform sampler2D out_texture;
+uniform mat4 model;
+uniform mat4 projection;
+uniform bool underwater;
+uniform mat4 view;
+
+out vec2 out_coordinate;
+out float out_distance;
+out vec3 out_vertex;
 
 void
 main(void)
 {
-	gl_FragColor = texture(out_texture, out_coordinate);
+	vec4 position_relative = (view * model * vec4(in_vertex, 1.f));
+
+	out_coordinate = in_coordinate;
+	out_distance = length(position_relative.xyz);
+	out_vertex = in_vertex;
+	gl_Position = (projection * position_relative);
 }

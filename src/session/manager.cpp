@@ -21,6 +21,7 @@
 #include "../../include/session/manager.h"
 #include "../../include/core/renderer.h"
 #include "../../include/entity/axis.h"
+#include "../../include/entity/block.h"
 #include "../../include/entity/diagnostic.h"
 #include "../../include/entity/message.h"
 #include "../../include/entity/reticle.h"
@@ -49,13 +50,14 @@ namespace nomic {
 		typedef std::tuple<std::string, std::string, uint32_t, bool, uint32_t, uint32_t, bool, uint32_t, bool, uint32_t> renderer_config;
 
 		static const renderer_config CHUNK_RENDERER_CONFIGURATION = {
-			"./res/vert_block.glsl", "./res/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			"./res/vert_mesh.glsl", "./res/frag_mesh.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_FRONT,
 			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
 			};
 
 		enum {
 			DEBUG_OBJECT_AXIS = 0,
+			DEBUG_OBJECT_BLOCK,
 			DEBUG_OBJECT_DIAGNOSTIC,
 			DEBUG_OBJECT_RETICLE,
 		};
@@ -66,6 +68,9 @@ namespace nomic {
 			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT, RENDERER_BLEND_DFACTOR_DEFAULT,
 				RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_DEPTH_DEFAULT,
 				RENDERER_DEPTH_MODE_DEFAULT }, // axis
+			{ "./res/vert_block.glsl", "./res/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, false, RENDERER_CULL_MODE_DEFAULT,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // block
 			{ "./res/vert_string.glsl", "./res/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
@@ -73,6 +78,17 @@ namespace nomic {
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
 			};
+
+		static const std::map<uint32_t, std::string> DEBUG_BLOCK_FACE = {
+			{ BLOCK_FACE_RIGHT, "./res/debug.bmp" },
+			{ BLOCK_FACE_LEFT, "./res/debug.bmp" },
+			{ BLOCK_FACE_TOP, "./res/debug.bmp" },
+			{ BLOCK_FACE_BOTTOM, "./res/debug.bmp" },
+			{ BLOCK_FACE_BACK, "./res/debug.bmp" },
+			{ BLOCK_FACE_FRONT, "./res/debug.bmp" },
+			};
+
+		#define DEBUG_BLOCK_SCALE 0.5f
 
 		enum {
 			ENTITY_OBJECT_SKYBOX = 0,
@@ -419,6 +435,9 @@ namespace nomic {
 				switch(iter) {
 					case DEBUG_OBJECT_AXIS:
 						m_debug_object.push_back(new nomic::entity::axis);
+						break;
+					case DEBUG_OBJECT_BLOCK:
+						m_debug_object.push_back(new nomic::entity::block(DEBUG_BLOCK_FACE, DEBUG_BLOCK_SCALE));
 						break;
 					case DEBUG_OBJECT_DIAGNOSTIC:
 						m_debug_object.push_back(new nomic::entity::diagnostic);
@@ -918,6 +937,10 @@ namespace nomic {
 		void 
 		manager::update(void)
 		{
+			glm::uvec3 block;
+			glm::ivec2 chunk;
+			bool underwater = false;
+
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			m_camera->update();
@@ -926,7 +949,22 @@ namespace nomic {
 				nomic::core::thread::notify();
 			}
 
-			m_underwater = (m_manager_terrain.at(m_camera->chunk())->block_type(m_camera->block()) == BLOCK_WATER);
+			block = m_camera->block();
+			chunk = m_camera->chunk();
+
+			if(block.y < (CHUNK_HEIGHT - 1)) {
+				++block.y;
+
+				if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
+					--block.y;
+
+					if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
+						underwater = true;
+					}
+				}
+			}
+
+			m_underwater = underwater;
 			m_manager_entity.update(m_runtime, m_camera);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
