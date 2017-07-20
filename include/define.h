@@ -200,7 +200,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1729
 
 	#define OBJECT_COUNT 1
@@ -237,6 +237,9 @@ namespace nomic {
 	#define SCALE_DEFAULT 1.f
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
+
+	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 0.f, 1.f)
+	#define SELECTOR_SCALE_DEFAULT 1.f
 
 	#define SEND_EVENT(_EVENT_) { \
 		nomic::event::manager &instance = nomic::event::manager::acquire(); \
@@ -393,6 +396,7 @@ namespace nomic {
 	enum {
 		ENTITY_CAMERA = 0,
 		ENTITY_SKYBOX,
+		ENTITY_SELECTOR,
 		ENTITY_STRING,
 		ENTITY_PLAIN,
 		ENTITY_BLOCK,

@@ -26,8 +26,9 @@ uniform bool underwater;
 
 uniform sampler2D out_texture;
 
-const vec4 FOG_COLOR = vec4(0.61f, 0.70f, 0.96f, 1.f);
-const float FOG_FALLOFF = 0.003f;
+const vec4 FOG_COLOR = vec4(0.52f, 0.6f, 0.9f, 1.f);
+const float FOG_DENSITY = 0.004f;
+const float FOG_GRADIENT = 1.6f;
 
 vec4 
 add_effect_air(
@@ -35,7 +36,7 @@ add_effect_air(
 	in float distance
 	)
 {
-	float density = (1.f - exp(-distance * FOG_FALLOFF));
+	float density = (1.f - exp(-pow(distance * FOG_DENSITY, FOG_GRADIENT)));
 
 	return mix(color, FOG_COLOR, density);
 }

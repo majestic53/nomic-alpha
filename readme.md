@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1729
 ----------------
+*Updated: 7/20/2017*
+
+* Added block selector (incomplete)
+
 *Updated: 7/19/2017*
 
 * Fixed bug in underwater detection
@@ -50,25 +54,6 @@ Version 0.1.1728
 
 * Added fog to chunk shader
 * Fixed chunk generation threading issue
-
-Version 0.1.1727
-----------------
-*Updated: 7/9/2017*
-
-* Added infinite terrain generation
-
-*Updated: 7/6/2017*
-
-* Added chunk manager class
-* Tied camera to update tick
-
-*Updated: 7/5/2017*
-
-* Implemented chunk joining
-
-*Updated: 7/3/2017*
-
-* Added loading screen
 
 *Changelog truncated (see file history for full log)*
 

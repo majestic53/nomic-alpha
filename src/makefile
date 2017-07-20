@@ -52,7 +52,8 @@ archive:
 			$(DIR_BUILD)core_thread.o $(DIR_BUILD)core_transform.o $(DIR_BUILD)core_uniform.o \
 		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_block.o $(DIR_BUILD)entity_camera.o $(DIR_BUILD)entity_chunk.o \
 			$(DIR_BUILD)entity_diagnostic.o $(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_message.o $(DIR_BUILD)entity_object.o \
-			$(DIR_BUILD)entity_plain.o $(DIR_BUILD)entity_reticle.o $(DIR_BUILD)entity_skybox.o $(DIR_BUILD)entity_string.o \
+			$(DIR_BUILD)entity_plain.o $(DIR_BUILD)entity_reticle.o $(DIR_BUILD)entity_selector.o $(DIR_BUILD)entity_skybox.o \
+			$(DIR_BUILD)entity_string.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)font_manager.o \
 		$(DIR_BUILD)graphic_atlas.o $(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_character.o $(DIR_BUILD)graphic_cubemap.o \
@@ -127,7 +128,7 @@ core_uniform.o: $(DIR_SRC_CORE)uniform.cpp $(DIR_INC_CORE)uniform.h
 ### ENTITY ###
 
 build_entity: entity_axis.o entity_block.o entity_camera.o entity_chunk.o entity_diagnostic.o entity_manager.o entity_message.o entity_object.o \
-	entity_plain.o entity_reticle.o entity_skybox.o entity_string.o
+	entity_plain.o entity_reticle.o entity_selector.o entity_skybox.o entity_string.o
 
 entity_axis.o: $(DIR_SRC_ENTITY)axis.cpp $(DIR_INC_ENTITY)axis.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)axis.cpp -o $(DIR_BUILD)entity_axis.o
@@ -158,6 +159,9 @@ entity_plain.o: $(DIR_SRC_ENTITY)plain.cpp $(DIR_INC_ENTITY)plain.h
 
 entity_reticle.o: $(DIR_SRC_ENTITY)reticle.cpp $(DIR_INC_ENTITY)reticle.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)reticle.cpp -o $(DIR_BUILD)entity_reticle.o
+
+entity_selector.o: $(DIR_SRC_ENTITY)selector.cpp $(DIR_INC_ENTITY)selector.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)selector.cpp -o $(DIR_BUILD)entity_selector.o
 
 entity_skybox.o: $(DIR_SRC_ENTITY)skybox.cpp $(DIR_INC_ENTITY)skybox.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)skybox.cpp -o $(DIR_BUILD)entity_skybox.o
