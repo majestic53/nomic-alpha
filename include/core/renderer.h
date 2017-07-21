@@ -92,6 +92,10 @@ namespace nomic {
 					__in const glm::mat4 &projection
 					);
 
+				void set_rotation(
+					__in const glm::vec3 &rotation
+					);
+
 				void set_underwater(
 					__in const GLboolean underwater
 					);
@@ -113,12 +117,14 @@ namespace nomic {
 
 				void use(
 					__in const glm::vec3 &position,
+					__in const glm::vec3 &rotation,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection
 					);
 
 				void use(
 					__in const glm::vec3 &position,
+					__in const glm::vec3 &rotation,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view
@@ -126,6 +132,7 @@ namespace nomic {
 
 				void use(
 					__in const glm::vec3 &position,
+					__in const glm::vec3 &rotation,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view,
@@ -161,6 +168,8 @@ namespace nomic {
 				GLint m_uniform_position;
 
 				GLint m_uniform_projection;
+
+				GLint m_uniform_rotation;
 
 				GLint m_uniform_underwater;
 

@@ -22,46 +22,54 @@ in vec2 out_coordinate;
 in float out_distance;
 in vec3 out_vertex;
 
+uniform vec3 position;
+uniform vec3 rotation;
 uniform bool underwater;
 
 uniform sampler2D out_texture;
 
 const vec4 FOG_COLOR = vec4(0.52f, 0.6f, 0.9f, 1.f);
-const float FOG_DENSITY = 0.004f;
-const float FOG_GRADIENT = 1.6f;
-
-vec4 
-add_effect_air(
-	in vec4 color,
-	in float distance
-	)
-{
-	float density = (1.f - exp(-pow(distance * FOG_DENSITY, FOG_GRADIENT)));
-
-	return mix(color, FOG_COLOR, density);
-}
+const float FOG_FALLOFF = 0.004f;
 
 const vec4 WATER_COLOR = vec4(0.06f, 0.25f, 1.f, 1.f);
 const float WATER_FALLOFF = 0.05f;
 
 vec4 
-add_effect_water(
+add_fog_constant(
 	in vec4 color,
+	in vec4 color_final,
+	in float falloff,
 	in float distance
 	)
 {
-	float density = (1.f - exp(-distance * WATER_FALLOFF));
+	float density = (1.f - exp(-distance * falloff));
 
-	return mix(color, WATER_COLOR, density);
+	return mix(color, color_final, density);
+}
+
+vec4 
+add_fog_non_constant(
+	in vec4 color,
+	in vec4 color_final,
+	in float falloff,
+	in float distance,
+	in vec3 position,
+	in vec3 rotation
+	)
+{
+	float density = (exp(-position.y * falloff) * ((1.f - exp(-distance * falloff * rotation.y)) / rotation.y));
+
+	return mix(color, color_final, density);
 }
 
 void
 main(void)
 {
 
-	if(underwater) {
-		gl_FragColor = add_effect_water(texture(out_texture, out_coordinate), out_distance);
-	} else {
-		gl_FragColor = add_effect_air(texture(out_texture, out_coordinate), out_distance);
+	if(underwater) { // underwater
+		gl_FragColor = add_fog_constant(texture(out_texture, out_coordinate), WATER_COLOR, WATER_FALLOFF, out_distance);
+	} else { // above water
+		gl_FragColor = add_fog_non_constant(texture(out_texture, out_coordinate), FOG_COLOR, FOG_FALLOFF, out_distance,
+			position, rotation);
 	}
 }

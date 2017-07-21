@@ -334,97 +334,103 @@ namespace nomic {
 
 			chunk.set_block(glm::uvec3(position.x, y, position.z), type, attribute);
 
-			for(y = (position.y - 1); y >= BLOCK_HEIGHT_MIN; --y) { // block columns for y >= min
-				attribute = BLOCK_ATTRIBUTES_DEFAULT;
+			if(y) {
 
-				switch(zone) {
-					case BLOCK_ZONE_ALPINE:
-					case BLOCK_ZONE_GRASS:
-					case BLOCK_ZONE_PEAK:
-						switch(type) {
-							case BLOCK_DIRT: // dirt/gravel/stone
-							case BLOCK_GRASS:
+				for(y = (position.y - 1); y >= BLOCK_HEIGHT_MIN; --y) { // block columns for y >= min
+					attribute = BLOCK_ATTRIBUTES_DEFAULT;
 
-								type = chunk_block_pick(BLOCK_DIRT, BLOCK_GRAVEL, BLOCK_STONE);
-								if((type == BLOCK_DIRT) && (depth >= BLOCK_DEPTH_DIRT_MAX)) {
+					switch(zone) {
+						case BLOCK_ZONE_ALPINE:
+						case BLOCK_ZONE_GRASS:
+						case BLOCK_ZONE_PEAK:
+							switch(type) {
+								case BLOCK_DIRT: // dirt/gravel/stone
+								case BLOCK_GRASS:
+
+									type = chunk_block_pick(BLOCK_DIRT, BLOCK_GRAVEL, BLOCK_STONE);
+									if((type == BLOCK_DIRT) && (depth >= BLOCK_DEPTH_DIRT_MAX)) {
+										type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
+										depth = 0;
+									} else {
+										++depth;
+									}
+									break;
+								case BLOCK_GRAVEL: // gravel/stone
+
 									type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
-									depth = 0;
-								} else {
-									++depth;
-								}
-								break;
-							case BLOCK_GRAVEL: // gravel/stone
-
-								type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
-								if((type == BLOCK_GRAVEL) && (depth >= BLOCK_DEPTH_GRAVEL_MAX)) {
+									if((type == BLOCK_GRAVEL) && (depth >= BLOCK_DEPTH_GRAVEL_MAX)) {
+										type = BLOCK_STONE;
+										depth = 0;
+									} else {
+										++depth;
+									}
+									break;
+								default: // stone
 									type = BLOCK_STONE;
-									depth = 0;
-								} else {
-									++depth;
-								}
-								break;
-							default: // stone
-								type = BLOCK_STONE;
-								break;
-						}
-						break;
-					case BLOCK_ZONE_BEACH:
-					case BLOCK_ZONE_SEA:
-						switch(type) {
-							case BLOCK_SAND: // sand/sandstone/gravel
+									break;
+							}
+							break;
+						case BLOCK_ZONE_BEACH:
+						case BLOCK_ZONE_SEA:
+							switch(type) {
+								case BLOCK_SAND: // sand/sandstone/gravel
 
-								type = chunk_block_pick(BLOCK_SAND, BLOCK_SANDSTONE, BLOCK_GRAVEL);
-								if((type == BLOCK_SAND) && (depth >= BLOCK_DEPTH_SAND_MAX)) {
-									type = chunk_block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL);
-									depth = 0;
-								} else {
-									++depth;
-								}
-								break;
-							case BLOCK_SANDSTONE: // sandstone/gravel/stone
+									type = chunk_block_pick(BLOCK_SAND, BLOCK_SANDSTONE, BLOCK_GRAVEL);
+									if((type == BLOCK_SAND) && (depth >= BLOCK_DEPTH_SAND_MAX)) {
+										type = chunk_block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL);
+										depth = 0;
+									} else {
+										++depth;
+									}
+									break;
+								case BLOCK_SANDSTONE: // sandstone/gravel/stone
 
-								type = chunk_block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL, BLOCK_STONE);
-								if((type == BLOCK_SANDSTONE) && (depth >= BLOCK_DEPTH_SANDSTONE_MAX)) {
+									type = chunk_block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL, BLOCK_STONE);
+									if((type == BLOCK_SANDSTONE) && (depth >= BLOCK_DEPTH_SANDSTONE_MAX)) {
+										type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
+										depth = 0;
+									} else {
+										++depth;
+									}
+									break;
+								case BLOCK_GRAVEL: // gravel/stone
+
 									type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
-									depth = 0;
-								} else {
-									++depth;
-								}
-								break;
-							case BLOCK_GRAVEL: // gravel/stone
-
-								type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
-								if((type == BLOCK_GRAVEL) && (depth >= BLOCK_DEPTH_GRAVEL_MAX)) {
+									if((type == BLOCK_GRAVEL) && (depth >= BLOCK_DEPTH_GRAVEL_MAX)) {
+										type = BLOCK_STONE;
+										depth = 0;
+									} else {
+										++depth;
+									}
+									break;
+								default: // stone
 									type = BLOCK_STONE;
-									depth = 0;
-								} else {
-									++depth;
-								}
-								break;
-							default: // stone
-								type = BLOCK_STONE;
-								break;
-						}
-						break;
-					default:
-						type = BLOCK_BOUNDARY;
-						break;
+									break;
+							}
+							break;
+						default:
+							type = BLOCK_BOUNDARY;
+							break;
+					}
+
+					chunk.set_block(glm::uvec3(position.x, y, position.z), type, attribute);
 				}
 
-				chunk.set_block(glm::uvec3(position.x, y, position.z), type, attribute);
-			}
+				for(; y >= BLOCK_HEIGHT_BOUNDARY; --y) { // block column < min and > boundary
+					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_STONE, BLOCK_ATTRIBUTES_DEFAULT);
+				}
 
-			for(; y >= BLOCK_HEIGHT_BOUNDARY; --y) { // block column < min and > boundary
-				chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_STONE, BLOCK_ATTRIBUTES_DEFAULT);
-			}
+				chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_BOUNDARY, // boundary
+					BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
 
-			if((position.y < BLOCK_HEIGHT_WATER)
-					&& (chunk.type(glm::uvec3(position.x, BLOCK_HEIGHT_WATER + 1, position.z)) == BLOCK_AIR)) { // water
-				uint32_t attributes = (BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+				if((position.y < BLOCK_HEIGHT_WATER)
+						&& (chunk.type(glm::uvec3(position.x, BLOCK_HEIGHT_WATER + 1, position.z)) == BLOCK_AIR)) { // water
+					uint32_t attributes = (BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
 
-				for(y = BLOCK_HEIGHT_WATER; y > position.y; --y) {
-					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_WATER,
-						(y == BLOCK_HEIGHT_WATER) ? attributes : (attributes | BLOCK_ATTRIBUTE_HIDDEN));
+					for(y = BLOCK_HEIGHT_WATER; y > position.y; --y) {
+						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_WATER,
+							(y == BLOCK_HEIGHT_WATER) ? attributes : (attributes | BLOCK_ATTRIBUTE_HIDDEN));
+					}
 				}
 			}
 

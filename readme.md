@@ -29,6 +29,7 @@ Version 0.1.1729
 *Updated: 7/20/2017*
 
 * Added block selector (incomplete)
+* Added non-constant density fog
 
 *Updated: 7/19/2017*
 

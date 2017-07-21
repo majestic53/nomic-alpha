@@ -24,6 +24,42 @@ namespace nomic {
 
 	namespace entity {
 
+		#define SELECTOR_SEGMENT_COUNT 24
+		#define SELECTOR_SEGMENT_WIDTH_COLOR 4
+		#define SELECTOR_SEGMENT_WIDTH_VERTEX 3
+
+		enum {
+			SELECTOR_INDEX_COLOR = 0,
+			SELECTOR_INDEX_VERTEX,
+		};
+
+		static const glm::vec3 SELECTOR_VERTEX[] = {
+			{ BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // right
+			{ BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, -BLOCK_RADIUS,-BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // left
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS, }, // top
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, }, // bottom
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, }, // back
+			{ BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, },
+			{ BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, }, // front
+			{ BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, },
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS, },
+			};
+
 		selector::selector(
 			__in_opt const glm::vec4 &color,
 			__in_opt float scale,
@@ -89,9 +125,10 @@ namespace nomic {
 			__in float delta
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", renderer, textures, delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
-			// TODO
+			vertex_array().bind();
+			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, SELECTOR_SEGMENT_COUNT);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -99,9 +136,29 @@ namespace nomic {
 		void 
 		selector::reconfigure(void)
 		{
+			std::vector<glm::vec4> color;
+			std::vector<glm::vec3> vertex;
+			glm::vec3 scale(m_scale, m_scale, m_scale);
+
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			// TODO
+			for(uint32_t iter = 0; iter < SELECTOR_SEGMENT_COUNT; ++iter) {
+				color.push_back(m_color);
+				vertex.push_back(SELECTOR_VERTEX[iter] * scale);
+			}
+
+			nomic::graphic::vao &arr = vertex_array();
+			arr.disable_all();
+			arr.remove_all();
+			arr.clear();
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
+				((uint8_t *) &color[0]) + ((SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				SELECTOR_INDEX_COLOR, SELECTOR_SEGMENT_WIDTH_COLOR, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
+				((uint8_t *) &vertex[0]) + ((SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))),
+				GL_STATIC_DRAW), SELECTOR_INDEX_VERTEX, SELECTOR_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
+			arr.enable(SELECTOR_INDEX_COLOR);
+			arr.enable(SELECTOR_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

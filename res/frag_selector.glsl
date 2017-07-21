@@ -18,27 +18,10 @@
 
 #version 330 core
 
-layout(location = 0) in vec2 in_coordinate;
-layout(location = 1) in vec3 in_vertex;
-
-uniform mat4 model;
-uniform vec3 position;
-uniform mat4 projection;
-uniform vec3 rotation;
-uniform bool underwater;
-uniform mat4 view;
-
-out vec2 out_coordinate;
-out float out_distance;
-out vec3 out_vertex;
+in vec3 out_color;
 
 void
 main(void)
 {
-	vec4 position_relative = (view * model * vec4(in_vertex, 1.f));
-
-	out_coordinate = in_coordinate;
-	out_distance = length(position_relative.xyz);
-	out_vertex = in_vertex;
-	gl_Position = (projection * position_relative);
+	gl_FragColor = vec4(out_color, 1.f);
 }

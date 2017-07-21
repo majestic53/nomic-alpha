@@ -25,6 +25,7 @@
 #include "../../include/entity/diagnostic.h"
 #include "../../include/entity/message.h"
 #include "../../include/entity/reticle.h"
+#include "../../include/entity/selector.h"
 #include "../../include/entity/skybox.h"
 #include "../../include/graphic/vao.h"
 #include "../../include/trace.h"
@@ -59,6 +60,7 @@ namespace nomic {
 			DEBUG_OBJECT_AXIS = 0,
 			DEBUG_OBJECT_BLOCK,
 			DEBUG_OBJECT_DIAGNOSTIC,
+			DEBUG_OBJECT_SELECTOR,
 			DEBUG_OBJECT_RETICLE,
 		};
 
@@ -74,6 +76,9 @@ namespace nomic {
 			{ "./res/vert_string.glsl", "./res/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
+			{ "./res/vert_selector.glsl", "./res/frag_selector.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT,
+				RENDERER_CULL_MODE_DEFAULT, false, RENDERER_DEPTH_MODE_DEFAULT }, // selector
 			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
@@ -366,6 +371,57 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Building debug objects...");
+
+			for(uint32_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
+
+				m_debug_renderer.push_back(new nomic::core::renderer);
+				if(!m_debug_renderer.at(iter)) {
+					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Renderer=%u", iter);
+				}
+
+				const renderer_config &config = DEBUG_RENDERER_CONFIGURATION.at(iter);
+
+				nomic::core::renderer *rend = m_debug_renderer.at(iter);
+				if(rend) {
+					rend->set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
+					rend->set_mode(std::get<RENDERER_MODE>(config));
+					rend->set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
+						std::get<RENDERER_BLEND_DFACTOR>(config));
+					rend->set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
+					rend->set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
+				}
+
+				switch(iter) {
+					case DEBUG_OBJECT_AXIS:
+						m_debug_object.push_back(new nomic::entity::axis);
+						break;
+					case DEBUG_OBJECT_BLOCK:
+						m_debug_object.push_back(new nomic::entity::block(DEBUG_BLOCK_FACE, DEBUG_BLOCK_SCALE));
+						break;
+					case DEBUG_OBJECT_DIAGNOSTIC:
+						m_debug_object.push_back(new nomic::entity::diagnostic);
+						break;
+					case DEBUG_OBJECT_SELECTOR:
+						m_debug_object.push_back(new nomic::entity::selector);
+						break;
+					case DEBUG_OBJECT_RETICLE:
+						m_debug_object.push_back(new nomic::entity::reticle);
+						break;
+					default:
+						break;
+				}
+
+				if(!m_debug_object.at(iter)) {
+					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
+				}
+
+				m_debug_object.at(iter)->defer(true);
+				m_debug_object.at(iter)->enable(false);
+				m_debug_object.at(iter)->show(false);
+				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->get_id());
+			}
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building entity objects...");
 
 			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_MAX; ++iter) {
@@ -406,57 +462,9 @@ namespace nomic {
 					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
 				}
 
-				m_entity_object.at(iter)->enable(true);
-				m_entity_object.at(iter)->show(true);
+				m_entity_object.at(iter)->enable(false);
+				m_entity_object.at(iter)->show(false);
 				m_entity_object.at(iter)->register_renderer(m_entity_renderer.at(iter)->get_id());
-			}
-
-			TRACE_MESSAGE(LEVEL_INFORMATION, "Building debug objects...");
-
-			for(uint32_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
-
-				m_debug_renderer.push_back(new nomic::core::renderer);
-				if(!m_debug_renderer.at(iter)) {
-					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Renderer=%u", iter);
-				}
-
-				const renderer_config &config = DEBUG_RENDERER_CONFIGURATION.at(iter);
-
-				nomic::core::renderer *rend = m_debug_renderer.at(iter);
-				if(rend) {
-					rend->set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
-					rend->set_mode(std::get<RENDERER_MODE>(config));
-					rend->set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
-						std::get<RENDERER_BLEND_DFACTOR>(config));
-					rend->set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
-					rend->set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
-				}
-
-				switch(iter) {
-					case DEBUG_OBJECT_AXIS:
-						m_debug_object.push_back(new nomic::entity::axis);
-						break;
-					case DEBUG_OBJECT_BLOCK:
-						m_debug_object.push_back(new nomic::entity::block(DEBUG_BLOCK_FACE, DEBUG_BLOCK_SCALE));
-						break;
-					case DEBUG_OBJECT_DIAGNOSTIC:
-						m_debug_object.push_back(new nomic::entity::diagnostic);
-						break;
-					case DEBUG_OBJECT_RETICLE:
-						m_debug_object.push_back(new nomic::entity::reticle);
-						break;
-					default:
-						break;
-				}
-
-				if(!m_debug_object.at(iter)) {
-					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
-				}
-
-				m_debug_object.at(iter)->defer(true);
-				m_debug_object.at(iter)->enable(false);
-				m_debug_object.at(iter)->show(false);
-				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->get_id());
 			}
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building chunk objects...");
@@ -478,6 +486,11 @@ namespace nomic {
 				std::get<RENDERER_DEPTH_MODE>(CHUNK_RENDERER_CONFIGURATION));
 
 			generate_chunks_spawn();
+
+			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_MAX; ++iter) {
+				m_entity_object.at(iter)->enable(true);
+				m_entity_object.at(iter)->show(true);
+			}
 
 			for(uint32_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
 				m_debug_object.at(iter)->enable(m_debug);
@@ -649,8 +662,8 @@ namespace nomic {
 			}
 
 			m_manager_display.clear();
-			m_manager_render.render(m_camera->position(), m_camera->projection(), m_camera->view(), m_camera->dimensions(), *m_atlas,
-				m_underwater, delta);
+			m_manager_render.render(m_camera->position(), m_camera->rotation(), m_camera->projection(), m_camera->view(),
+				m_camera->dimensions(), *m_atlas, m_underwater, delta);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -939,7 +952,6 @@ namespace nomic {
 		{
 			glm::uvec3 block;
 			glm::ivec2 chunk;
-			bool underwater = false;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
@@ -952,20 +964,60 @@ namespace nomic {
 			block = m_camera->block();
 			chunk = m_camera->chunk();
 
-			if(block.y < (CHUNK_HEIGHT - 1)) {
-				++block.y;
+			update_selector(chunk, block);
+			update_underwater(chunk, block);
+			m_manager_entity.update(m_runtime, m_camera);
 
-				if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
-					--block.y;
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
 
-					if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
+		void 
+		manager::update_selector(
+			__in const glm::ivec2 &chunk,
+			__in const glm::uvec3 &block
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+
+			// TODO: m_debug_object.at(DEBUG_OBJECT_SELECTOR)
+			/*glm::vec3 pos;
+
+			pos.x = ((chunk.x * CHUNK_WIDTH) + block.x) + BLOCK_WIDTH;
+			pos.y = (block.y - 2);
+			pos.z = ((chunk.y * CHUNK_WIDTH) + block.z) + BLOCK_WIDTH;
+
+			//std::cout << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+
+			m_debug_object.at(DEBUG_OBJECT_SELECTOR)->position() = pos;*/
+			// ---
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::update_underwater(
+			__in const glm::ivec2 &chunk,
+			__in const glm::uvec3 &block
+			)
+		{
+			bool underwater = false;
+			glm::uvec3 block_offset = block;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+
+			if(block_offset.y < (CHUNK_HEIGHT - 1)) {
+				++block_offset.y;
+
+				if(m_manager_terrain.at(chunk)->block_type(block_offset) == BLOCK_WATER) {
+					--block_offset.y;
+
+					if(m_manager_terrain.at(chunk)->block_type(block_offset) == BLOCK_WATER) {
 						underwater = true;
 					}
 				}
 			}
 
 			m_underwater = underwater;
-			m_manager_entity.update(m_runtime, m_camera);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

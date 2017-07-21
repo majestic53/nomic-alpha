@@ -84,7 +84,7 @@ namespace nomic {
 
 	#define CAMERA_CLIP_MAX 1000.f
 	#define CAMERA_CLIP_MIN 0.1f
-	#define CAMERA_FOV_DEFAULT 55.f
+	#define CAMERA_FOV_DEFAULT 75.f
 	#define CAMERA_FOV_MAX 90.f
 	#define CAMERA_FOV_MIN 10.f
 	#define CAMERA_PITCH_MAX 89.f
@@ -200,7 +200,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 4
+	#define NOMIC_VERSION_REVISION 5
 	#define NOMIC_VERSION_WEEK 1729
 
 	#define OBJECT_COUNT 1
@@ -238,7 +238,7 @@ namespace nomic {
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
-	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 0.f, 1.f)
+	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
 	#define SELECTOR_SCALE_DEFAULT 1.f
 
 	#define SEND_EVENT(_EVENT_) { \
@@ -313,7 +313,7 @@ namespace nomic {
 	#define TRACE_PREFIX_EXIT "-"
 
 	#define TRANSFORM_POSITION_DEFAULT glm::vec3(0.f, 0.f, 0.f)
-	#define TRANSFORM_ROTATION_DEFAULT glm::vec3(0.f, 0.f, -1.f)
+	#define TRANSFORM_ROTATION_DEFAULT glm::vec3(0.f, 0.f, glm::pi<GLfloat>())
 	#define TRANSFORM_UP_DEFAULT glm::vec3(0.f, 1.f, 0.f)
 
 	#define UID_INVALID 0
@@ -324,13 +324,14 @@ namespace nomic {
 	#define UNIFORM_MODEL "model"
 	#define UNIFORM_POSITION "position"
 	#define UNIFORM_PROJECTION "projection"
+	#define UNIFORM_ROTATION "rotation"
 	#define UNIFORM_UNDERWATER "underwater"
 	#define UNIFORM_VIEW "view"
 
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 30
+	#define VIEW_WIDTH 30 // 40
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -396,13 +397,13 @@ namespace nomic {
 	enum {
 		ENTITY_CAMERA = 0,
 		ENTITY_SKYBOX,
-		ENTITY_SELECTOR,
 		ENTITY_STRING,
 		ENTITY_PLAIN,
 		ENTITY_BLOCK,
 		ENTITY_CHUNK,
 		ENTITY_AXIS,
 		ENTITY_RETICLE,
+		ENTITY_SELECTOR,
 	};
 
 	enum {

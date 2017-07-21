@@ -102,6 +102,16 @@ namespace nomic {
 
 				void update(void);
 
+				void update_selector(
+					__in const glm::ivec2 &chunk,
+					__in const glm::uvec3 &block
+					);
+
+				void update_underwater(
+					__in const glm::ivec2 &chunk,
+					__in const glm::uvec3 &block
+					);
+
 			protected:
 
 				SINGLETON_CLASS_BASE(nomic::session::manager);

@@ -54,12 +54,12 @@ namespace nomic {
 			};
 
 		static const float PLAIN_VERTEX[] = {
-			-1.f, -1.f, 0.f, // bottom left corner
-			-1.f, 1.f, 0.f, // top left corner
-			1.f, 1.f, 0.f, // top right corner
-			-1.f, -1.f, 0.f, // bottom left corner
-			1.f, 1.f, 0.f, // top right corner
-			1.f, -1.f, 0.f, // bottom right corner
+			-BLOCK_RADIUS, -BLOCK_RADIUS, 0.f, // bottom left corner
+			-BLOCK_RADIUS, BLOCK_RADIUS, 0.f, // top left corner
+			BLOCK_RADIUS, BLOCK_RADIUS, 0.f, // top right corner
+			-BLOCK_RADIUS, -BLOCK_RADIUS, 0.f, // bottom left corner
+			BLOCK_RADIUS, BLOCK_RADIUS, 0.f, // top right corner
+			BLOCK_RADIUS, -BLOCK_RADIUS, 0.f, // bottom right corner
 			};
 
 		plain::plain(

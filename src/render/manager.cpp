@@ -298,6 +298,7 @@ namespace nomic {
 		void 
 		manager::render(
 			__in const glm::vec3 &position,
+			__in const glm::vec3 &rotation,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view,
 			__in const glm::uvec2 &view_dimensions,
@@ -308,8 +309,8 @@ namespace nomic {
 		{
 			std::map<nomic::core::renderer *, std::set<nomic::core::entity *>> deferred;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, View=%p, Textures=%p, Underwater=%x, Delta=%f", &projection, &view, &textures,
-				underwater, delta);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Projection=%p, Rotation=%p, View=%p, Textures=%p, Underwater=%x, Delta=%f",
+				&projection, &rotation, &view, &textures, underwater, delta);
 
 			std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -325,11 +326,11 @@ namespace nomic {
 
 					switch(iter_handle->first->mode()) {
 						case RENDER_PERSPECTIVE:
-							iter_handle->first->use(position, underwater, projection, view);
+							iter_handle->first->use(position, rotation, underwater, projection, view);
 							break;
 						default:
-							iter_handle->first->use(position, underwater, glm::ortho(0.f, (float) view_dimensions.x, 0.f,
-								(float) view_dimensions.y, -1.f, 1.f));
+							iter_handle->first->use(position, rotation, underwater,
+								glm::ortho(0.f, (float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f, 1.f));
 							break;
 					}
 
@@ -365,10 +366,10 @@ namespace nomic {
 
 				switch(iter_handle->first->mode()) {
 					case RENDER_PERSPECTIVE:
-						iter_handle->first->use(position, underwater, projection, view);
+						iter_handle->first->use(position, rotation, underwater, projection, view);
 						break;
 					default:
-						iter_handle->first->use(position, underwater, glm::ortho(0.f, (float) view_dimensions.x, 0.f,
+						iter_handle->first->use(position, rotation, underwater, glm::ortho(0.f, (float) view_dimensions.x, 0.f,
 							(float) view_dimensions.y, -1.f, 1.f));
 						break;
 				}
