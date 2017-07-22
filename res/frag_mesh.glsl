@@ -37,20 +37,20 @@ const float WATER_FALLOFF = 0.05f;
 vec4 
 add_fog_constant(
 	in vec4 color,
-	in vec4 color_final,
+	in vec4 color_fog,
 	in float falloff,
 	in float distance
 	)
 {
 	float density = (1.f - exp(-distance * falloff));
 
-	return mix(color, color_final, density);
+	return mix(color, color_fog, density);
 }
 
 vec4 
 add_fog_non_constant(
 	in vec4 color,
-	in vec4 color_final,
+	in vec4 color_fog,
 	in float falloff,
 	in float distance,
 	in vec3 position,
@@ -59,7 +59,7 @@ add_fog_non_constant(
 {
 	float density = (exp(-position.y * falloff) * ((1.f - exp(-distance * falloff * rotation.y)) / rotation.y));
 
-	return mix(color, color_final, density);
+	return mix(color, color_fog, density);
 }
 
 void

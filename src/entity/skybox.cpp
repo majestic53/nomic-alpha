@@ -33,42 +33,42 @@ namespace nomic {
 		};
 
 		static const float SKYBOX_VERTEX[] = {
-			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, //right
-			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, // left
-			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // top
-			BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS, // bottom
-			-BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
-			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
-			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // back
-			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			-BLOCK_RADIUS, BLOCK_RADIUS, BLOCK_RADIUS,
-			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // front
-			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS,
-			-BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
-			BLOCK_RADIUS, -BLOCK_RADIUS, BLOCK_RADIUS,
+			-1.f, 1.f, -1.f, //right
+			-1.f, -1.f, -1.f,
+			1.f, -1.f, -1.f,
+			1.f, -1.f, -1.f,
+			1.f, 1.f, -1.f,
+			-1.f, 1.f, -1.f,
+			-1.f, -1.f, 1.f, // left
+			-1.f, -1.f, -1.f,
+			-1.f, 1.f, -1.f,
+			-1.f, 1.f, -1.f,
+			-1.f, 1.f, 1.f,
+			-1.f, -1.f, 1.f,
+			1.f, -1.f, -1.f, // top
+			1.f, -1.f, 1.f,
+			1.f, 1.f, 1.f,
+			1.f, 1.f, 1.f,
+			1.f, 1.f, -1.f,
+			1.f, -1.f, -1.f,
+			-1.f, -1.f, 1.f, // bottom
+			-1.f, 1.f, 1.f,
+			1.f, 1.f, 1.f,
+			1.f, 1.f, 1.f,
+			1.f, -1.f, 1.f,
+			-1.f, -1.f, 1.f,
+			-1.f, 1.f, -1.f, // back
+			1.f, 1.f, -1.f,
+			1.f, 1.f, 1.f,
+			1.f, 1.f, 1.f,
+			-1.f, 1.f, 1.f,
+			-1.f, 1.f, -1.f,
+			-1.f, -1.f, -1.f, // front
+			-1.f, -1.f, 1.f,
+			1.f, -1.f, -1.f,
+			1.f, -1.f, -1.f,
+			-1.f, -1.f, 1.f,
+			1.f, -1.f, 1.f,
 			};
 
 		skybox::skybox(

@@ -48,7 +48,7 @@ namespace nomic {
 				void pause(void);
 
 				void render(
-					__in_opt float delta = 1.f
+					__in_opt float delta = DELTA_FULL
 					);
 
 				uint32_t seed(void);
@@ -80,6 +80,10 @@ namespace nomic {
 					__in_opt uint32_t max = CHUNK_MAX_DEFAULT
 					);
 
+				void set_spawn(
+					__in const glm::vec3 &position
+					);
+
 				void set_title(
 					__in const std::string &title
 					);
@@ -87,6 +91,8 @@ namespace nomic {
 				void set_vsync(
 					__in bool vsync
 					);
+
+				glm::vec3 spawn(void);
 
 				nomic::terrain::manager &terrain(void);
 
@@ -130,6 +136,8 @@ namespace nomic {
 
 				void generate_chunks_spawn(void);
 
+				void generate_spawn_location(void);
+
 				void initialize_entities(void);
 
 				bool on_initialize(void);
@@ -152,9 +160,13 @@ namespace nomic {
 
 				std::vector<nomic::core::renderer *> m_debug_renderer;
 
-				std::vector<nomic::entity::object *> m_entity_object;
+				std::vector<nomic::entity::object *> m_entity_object_background;
 
-				std::vector<nomic::core::renderer *> m_entity_renderer;
+				std::vector<nomic::entity::object *> m_entity_object_foreground;
+
+				std::vector<nomic::core::renderer *> m_entity_renderer_background;
+
+				std::vector<nomic::core::renderer *> m_entity_renderer_foreground;
 
 				nomic::graphic::display &m_manager_display;
 
@@ -169,6 +181,8 @@ namespace nomic {
 				nomic::terrain::manager &m_manager_terrain;
 
 				void *m_runtime;
+
+				glm::vec3 m_spawn;
 
 				bool m_underwater;
 		};

@@ -325,10 +325,10 @@ namespace nomic {
 				}
 
 				switch(iter->first.first) {
-					case KEY_BACKWARD:
+					case KEY_BACKWARD: // backward
 						m_position -= (m_rotation * speed);
 						break;
-					case KEY_DEBUG: {
+					case KEY_DEBUG: { // enable/disable debug mode
 
 							nomic::session::manager &instance = nomic::session::manager::acquire();
 							if(instance.initialized()) {
@@ -338,20 +338,30 @@ namespace nomic {
 							instance.release();
 							iter->second = false;
 						} break;
-					case KEY_DESCEND:
+					case KEY_DESCEND: // up
 						m_position.y -= speed;
 						break;
-					case KEY_ELEVATE:
+					case KEY_ELEVATE: // down
 						m_position.y += speed;
 						break;
-					case KEY_FORWARD:
+					case KEY_FORWARD: // forward
 						m_position += (m_rotation * speed);
 						break;
-					case KEY_LEFT:
+					case KEY_LEFT: // left
 					case KEY_LEFT_STRAFE:
 						m_position -= (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
 						break;
-					case KEY_RIGHT:
+					case KEY_RESET: { // reset camera to spawn
+
+							nomic::session::manager &instance = nomic::session::manager::acquire();
+							if(instance.initialized()) {
+								position() = instance.spawn();
+							}
+
+							instance.release();
+							iter->second = false;
+						} break;
+					case KEY_RIGHT: // right
 					case KEY_RIGHT_STRAFE:
 						m_position += (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
 						break;
@@ -366,30 +376,24 @@ namespace nomic {
 				m_position.y = CHUNK_HEIGHT;
 			}
 
-			m_position_block.x = m_position.x;
+			m_position_block.x = std::floor(m_position.x);
 			m_position_block.x %= CHUNK_WIDTH;
-			m_position_block.y = m_position.y;
-			m_position_block.z = m_position.z;
+			m_position_block.y = std::floor(m_position.y);
+			m_position_block.z = std::floor(m_position.z);
 			m_position_block.z %= CHUNK_WIDTH;
-			m_position_chunk.x = m_position.x;
+			m_position_chunk.x = std::floor(std::fabs(m_position.x));
 			m_position_chunk.x /= CHUNK_WIDTH;
-			m_position_chunk.y = m_position.z;
+			m_position_chunk.y = std::floor(std::fabs(m_position.z));
 			m_position_chunk.y /= CHUNK_WIDTH;
 
 			if(m_position.x < 0) {
+				m_position_chunk.x *= -1;
 				--m_position_chunk.x;
-
-				if(m_position.x > -BLOCK_WIDTH) {
-					m_position_block.x = (CHUNK_WIDTH - 1);
-				}
 			}
 
 			if(m_position.z < 0) {
+				m_position_chunk.y *= -1;
 				--m_position_chunk.y;
-
-				if(m_position.z > -BLOCK_WIDTH) {
-					m_position_block.z = (CHUNK_WIDTH - 1);
-				}
 			}
 
 			if(m_motion != glm::vec2()) {
@@ -442,6 +446,7 @@ namespace nomic {
 				std::cos(glm::radians(m_rotation_previous.x)) * std::sin(glm::radians(m_rotation_previous.y)),
 				std::sin(glm::radians(m_rotation_previous.x)),
 				std::cos(glm::radians(m_rotation_previous.x)) * std::cos(glm::radians(m_rotation_previous.y))));
+			m_view = glm::lookAt(m_position, m_position + m_rotation, m_up);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
