@@ -34,6 +34,7 @@ namespace nomic {
 
 		enum {
 			NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE = 0,
+			NOMIC_SESSION_MANAGER_EXCEPTION_BLOCK_NOT_SELECTED,
 			NOMIC_SESSION_MANAGER_EXCEPTION_EXTERNAL,
 			NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED,
 		};
@@ -42,6 +43,7 @@ namespace nomic {
 
 		static const std::string NOMIC_SESSION_MANAGER_EXCEPTION_STR[] = {
 			NOMIC_SESSION_MANAGER_EXCEPTION_HEADER "Failed to allocate session manager object",
+			NOMIC_SESSION_MANAGER_EXCEPTION_HEADER "No block is not selected",
 			NOMIC_SESSION_MANAGER_EXCEPTION_HEADER "Session manager external exception",
 			NOMIC_SESSION_MANAGER_EXCEPTION_HEADER "Session manager is uninitialized",
 			};

@@ -90,24 +90,39 @@ namespace nomic {
 			if(m_verbose) {
 				result << std::endl << std::endl;
 
+				if(runtime_ref) {
+					result << "Fps=" << runtime_ref->frame_rate() << ", Tick=" << runtime_ref->tick()
+						<< " (@" << RUNTIME_TICKS_PER_SECOND << "/sec)";
+				}
+
 				nomic::entity::camera *camera_ref = (nomic::entity::camera *) camera;
 				if(camera_ref) {
 					glm::vec3 position = camera_ref->position();
 					glm::vec3 rotation = camera_ref->rotation();
 					glm::uvec3 position_block = camera_ref->block();
 					glm::ivec2 position_chunk = camera_ref->chunk();
-					uint8_t type = runtime_ref->session().terrain().at(position_chunk)->block_type(position_block);
-					result << "Chunk=(" << position_chunk.x << "," << position_chunk.y << ")"
-						<< ", Block=(" << position_block.x << "," << position_block.y << "," << position_block.z << ")"
-						<< ", Type=" << BLOCK_STRING(type) << (runtime_ref->session().underwater() ? " (Underwater)" : "")
-						<< std::endl << std::endl << "Pos=(" << position.x << "," << position.y << "," << position.z << ")"
-						<< std::endl << "Rot=(" << rotation.x << "," << rotation.y << "," << rotation.z << ")"
-						<< std::endl << "Fov=" << camera_ref->fov();
-				}
 
-				if(runtime_ref) {
-					result << ", Fps=" << runtime_ref->frame_rate() << ", Tick=" << runtime_ref->tick()
-						<< " (@" << RUNTIME_TICKS_PER_SECOND << "/sec)";
+					result << std::endl << std::endl << "Pos=(" << position.x << "," << position.y << "," << position.z << ")"
+						<< std::endl << "Rot=(" << rotation.x << "," << rotation.y << "," << rotation.z << ")"
+						<< std::endl << "Fov=" << camera_ref->fov()
+						<< std::endl << std::endl << "Chunk=(" << position_chunk.x << "," << position_chunk.y << ")"
+						<< ", Block=(" << position_block.x << "," << position_block.y << "," << position_block.z << ")";
+
+					if(runtime_ref) {
+						nomic::session::manager &session_ref = runtime_ref->session();
+						uint8_t type = session_ref.terrain().at(position_chunk)->block_type(position_block);
+						result << ", Type=" << BLOCK_STRING(type) << (session_ref.underwater() ? " (Underwater)" : "");
+
+						if(session_ref.block_selected()) {
+							session_ref.selected_block(position_chunk, position_block);
+							type = session_ref.terrain().at(position_chunk)->block_type(position_block);
+							result << std::endl << std::endl << "Selected Chunk=(" << position_chunk.x
+									<< "," << position_chunk.y << ")"
+								<< ", Block=(" << position_block.x << "," << position_block.y
+									<< "," << position_block.z << ")"
+								<< ", Type=" << BLOCK_STRING(type);
+						}
+					}
 				}
 			}
 

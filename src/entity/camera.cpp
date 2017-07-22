@@ -56,6 +56,7 @@ namespace nomic {
 				m_key(other.m_key),
 				m_motion(other.m_motion),
 				m_position_block(other.m_position_block),
+				m_position_block_previous(other.m_position_block_previous),
 				m_position_chunk(other.m_position_chunk),
 				m_position_chunk_previous(other.m_position_chunk_previous),
 				m_rotation_previous(other.m_rotation_previous),
@@ -91,6 +92,7 @@ namespace nomic {
 				m_key = other.m_key;
 				m_motion = other.m_motion;
 				m_position_block = other.m_position_block;
+				m_position_block_previous = other.m_position_block_previous;
 				m_position_chunk = other.m_position_chunk;
 				m_position_chunk_previous = other.m_position_chunk_previous;
 				m_rotation_previous = other.m_rotation_previous;
@@ -105,8 +107,50 @@ namespace nomic {
 		camera::block(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%u, %u}", m_position_block.x, m_position_block.y, m_position_block.z);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%u, %u, %u}", m_position_block.x, m_position_block.y, m_position_block.z);
 			return m_position_block;
+		}
+
+		bool 
+		camera::block_changed(void)
+		{
+			bool result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = (m_position_block != m_position_block_previous);
+			if(result) {
+				m_position_block_previous = m_position_block;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		glm::uvec3 
+		camera::block_previous(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%u, %u, %u}", m_position_block_previous.x, m_position_block_previous.y,
+				m_position_block_previous.z);
+			return m_position_block_previous;
+		}
+
+		glm::vec3 
+		camera::block_position(void)
+		{
+			glm::vec3 result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result.x = (m_position_chunk.x * CHUNK_WIDTH);
+			result.x += m_position_block.x;
+			result.y = m_position_block.y;
+			result.z = (m_position_chunk.y * CHUNK_WIDTH);
+			result.z += m_position_block.z;
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%f, %f, %f}", result.x, result.y, result.z);
+			return result;
 		}
 
 		void 
@@ -129,6 +173,30 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%i, %i}", m_position_chunk.x, m_position_chunk.y);
 			return m_position_chunk;
+		}
+
+		bool 
+		camera::chunk_changed(void)
+		{
+			bool result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = (m_position_chunk != m_position_chunk_previous);
+			if(result) {
+				m_position_chunk_previous = m_position_chunk;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		glm::ivec2 
+		camera::chunk_previous(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%i, %i}", m_position_chunk_previous.x, m_position_chunk_previous.y);
+			return m_position_chunk_previous;
 		}
 
 		glm::uvec2 
@@ -178,20 +246,17 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
-		bool 
-		camera::moved(void)
+		void 
+		camera::move(
+			__in const glm::ivec2 &chunk,
+			__in const glm::uvec3 &block
+			)
 		{
-			bool result;
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
 
-			TRACE_ENTRY(LEVEL_VERBOSE);
+			position() = nomic::utility::block_as_position(chunk, block);
 
-			result = (m_position_chunk != m_position_chunk_previous);
-			if(result) {
-				m_position_chunk_previous = m_position_chunk;
-			}
-
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
-			return result;
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -376,25 +441,7 @@ namespace nomic {
 				m_position.y = CHUNK_HEIGHT;
 			}
 
-			m_position_block.x = std::floor(m_position.x);
-			m_position_block.x %= CHUNK_WIDTH;
-			m_position_block.y = std::floor(m_position.y);
-			m_position_block.z = std::floor(m_position.z);
-			m_position_block.z %= CHUNK_WIDTH;
-			m_position_chunk.x = std::floor(std::fabs(m_position.x));
-			m_position_chunk.x /= CHUNK_WIDTH;
-			m_position_chunk.y = std::floor(std::fabs(m_position.z));
-			m_position_chunk.y /= CHUNK_WIDTH;
-
-			if(m_position.x < 0) {
-				m_position_chunk.x *= -1;
-				--m_position_chunk.x;
-			}
-
-			if(m_position.z < 0) {
-				m_position_chunk.y *= -1;
-				--m_position_chunk.y;
-			}
+			nomic::utility::position_as_block(m_position, m_position_chunk, m_position_block);
 
 			if(m_motion != glm::vec2()) {
 

@@ -53,6 +53,12 @@ namespace nomic {
 
 				glm::uvec3 block(void);
 
+				bool block_changed(void);
+
+				glm::vec3 block_position(void);
+
+				glm::uvec3 block_previous(void);
+
 				void button(
 					__in uint8_t button,
 					__in uint8_t state,
@@ -62,6 +68,10 @@ namespace nomic {
 					);
 
 				glm::ivec2 chunk(void);
+
+				bool chunk_changed(void);
+
+				glm::ivec2 chunk_previous(void);
 
 				glm::uvec2 dimensions(void) const;
 
@@ -81,7 +91,10 @@ namespace nomic {
 					__in int32_t y_relative
 					);
 
-				bool moved(void);
+				void move(
+					__in const glm::ivec2 &chunk,
+					__in const glm::uvec3 &block
+					);
 
 				void set_dimensions(
 					__in const glm::uvec2 &dimensions
@@ -146,6 +159,8 @@ namespace nomic {
 				glm::vec2 m_motion;
 
 				glm::uvec3 m_position_block;
+
+				glm::uvec3 m_position_block_previous;
 
 				glm::ivec2 m_position_chunk;
 

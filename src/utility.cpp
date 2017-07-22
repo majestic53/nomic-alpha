@@ -26,6 +26,26 @@ namespace nomic {
 	#define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S"
 	#define TIMESTAMP_LENGTH 64
 
+	glm::vec3 
+	utility::block_as_position(
+		__in const glm::ivec2 &chunk,
+		__in const glm::uvec3 &block
+		)
+	{
+		glm::vec3 result;
+
+		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+
+		result.x = (chunk.x * CHUNK_WIDTH);
+		result.x += block.x;
+		result.y = block.y;
+		result.z = (chunk.y * CHUNK_WIDTH);
+		result.z += block.z;
+
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}", position.x, position.y, position.z);
+		return result;
+	}
+
 	std::string 
 	utility::format_as_string(
 		__in const char *format,
@@ -54,6 +74,38 @@ namespace nomic {
 		}
 
 		return result;
+	}
+
+	void 
+	utility::position_as_block(
+		__in const glm::vec3 &position,
+		__inout glm::ivec2 &chunk,
+		__inout glm::uvec3 &block
+		)
+	{
+		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}", position.x, position.y, position.z);
+
+		block.x = std::floor(position.x);
+		block.x %= CHUNK_WIDTH;
+		block.y = std::floor(position.y);
+		block.z = std::floor(position.z);
+		block.z %= CHUNK_WIDTH;
+		chunk.x = std::floor(std::fabs(position.x));
+		chunk.x /= CHUNK_WIDTH;
+		chunk.y = std::floor(std::fabs(position.z));
+		chunk.y /= CHUNK_WIDTH;
+
+		if(position.x < 0) {
+			chunk.x *= -1;
+			--chunk.x;
+		}
+
+		if(position.z < 0) {
+			chunk.y *= -1;
+			--chunk.y;
+		}
+
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
 	}
 
 	std::string 

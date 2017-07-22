@@ -43,6 +43,8 @@ namespace nomic {
 
 				~manager(void);
 
+				bool block_selected(void);
+
 				nomic::entity::camera *camera(void);
 
 				void pause(void);
@@ -52,6 +54,11 @@ namespace nomic {
 					);
 
 				uint32_t seed(void);
+
+				void selected_block(
+					__inout glm::ivec2 &chunk,
+					__inout glm::uvec3 &block
+					);
 
 				void set_debug(
 					__in bool debug
@@ -108,16 +115,6 @@ namespace nomic {
 
 				void update(void);
 
-				void update_selector(
-					__in const glm::ivec2 &chunk,
-					__in const glm::uvec3 &block
-					);
-
-				void update_underwater(
-					__in const glm::ivec2 &chunk,
-					__in const glm::uvec3 &block
-					);
-
 			protected:
 
 				SINGLETON_CLASS_BASE(nomic::session::manager);
@@ -148,7 +145,19 @@ namespace nomic {
 
 				void uninitialize_entities(void);
 
+				void update_position(void);
+
+				void update_selector(void);
+
+				void update_underwater(void);
+
 				nomic::graphic::atlas *m_atlas;
+
+				bool m_block_selected;
+
+				glm::uvec3 m_block_selected_block;
+
+				glm::ivec2 m_block_selected_chunk;
 
 				nomic::entity::camera *m_camera;
 

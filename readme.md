@@ -26,9 +26,9 @@ Changelog
 
 Version 0.1.1729
 ----------------
-*Updated: 7/20/2017*
+*Updated: 7/20-22/2017*
 
-* Added block selector (incomplete)
+* Added block selector <s>(incomplete)</s>
 * Added non-constant density fog
 
 *Updated: 7/19/2017*

@@ -144,6 +144,7 @@ namespace nomic {
 
 		manager::manager(void) :
 			m_atlas(nullptr),
+			m_block_selected(false),
 			m_camera(nullptr),
 			m_chunk_renderer(nullptr),
 			m_debug(SESSION_DEBUG_DEFAULT),
@@ -172,6 +173,19 @@ namespace nomic {
 			m_manager_terrain.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		bool 
+		manager::block_selected(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_block_selected);
+			return m_block_selected;
 		}
 
 		nomic::entity::camera *
@@ -749,6 +763,28 @@ namespace nomic {
 		}
 
 		void 
+		manager::selected_block(
+			__inout glm::ivec2 &chunk,
+			__inout glm::uvec3 &block
+			)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(!m_block_selected) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_BLOCK_NOT_SELECTED);
+			}
+
+			block = m_block_selected_block;
+			chunk = m_block_selected_chunk;
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+		}
+
+		void 
 		manager::set_debug(
 			__in bool debug
 			)
@@ -942,7 +978,14 @@ namespace nomic {
 			if(verbose) {
 				result << " Base=" << SINGLETON_CLASS(nomic::session::manager)::to_string(verbose)
 					<< ", Mode=" << (m_debug ? "Non-debug" : "Debug") << ", " << (m_underwater ? "Underwater" : "Above-water")
-					<< ", Spawn={" << m_spawn.x << ", " << m_spawn.y << ", " << m_spawn.z << "}";
+					<< ", Spawn={" << m_spawn.x << ", " << m_spawn.y << ", " << m_spawn.z << "}"
+					<< ", " << (m_block_selected ? "Selected" : "Not Selected");
+
+				if(m_block_selected) {
+					result << "(Chunk={" << m_block_selected_chunk.x << ", " << m_block_selected_chunk.y << "}"
+						<< ", Block={" << m_block_selected_block.x << ", " << m_block_selected_block.y
+							<< ", " << m_block_selected_block.z << "})";
+				}
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -964,7 +1007,10 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			m_spawn = glm::vec3(0.f);
+			m_block_selected = false;
+			m_block_selected_block = glm::uvec3();
+			m_block_selected_chunk = glm::ivec2();
+			m_spawn = glm::vec3();
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Destroying foreground entity objects...");
 
@@ -1061,72 +1107,101 @@ namespace nomic {
 		void 
 		manager::update(void)
 		{
-			glm::uvec3 block;
-			glm::ivec2 chunk;
-
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			m_camera->update();
 			
-			if(m_camera->moved()) {
+			if(m_camera->chunk_changed()) {
 				nomic::core::thread::notify();
 			}
 
-			block = m_camera->block();
-			chunk = m_camera->chunk();
-
-			update_selector(chunk, block);
-			update_underwater(chunk, block);
+			update_position();
+			update_underwater();
+			update_selector();
 			m_manager_entity.update(m_runtime, m_camera);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
-		manager::update_selector(
-			__in const glm::ivec2 &chunk,
-			__in const glm::uvec3 &block
-			)
+		manager::update_position(void)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+			uint8_t type;
+			glm::uvec3 block;
+			glm::ivec2 chunk;
 
-			// TODO
-			glm::vec3 pos;
+			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			pos.x = (chunk.x * CHUNK_WIDTH);
-			pos.x += block.x;
+			block = m_camera->block();
+			chunk = m_camera->chunk();
 
-			pos.y = (block.y - 1);
+			type = m_manager_terrain.at(chunk)->block_type(block);
+			if((type != BLOCK_AIR) && (type != BLOCK_WATER)) {
 
-			pos.z = (chunk.y * CHUNK_WIDTH);
-			pos.z += block.z;
-
-			//std::cout << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
-
-			m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_SELECTOR)->position() = pos;
-			// ---
+				// TODO
+				std::cout << "COLLISION" << std::endl;
+				// ---
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
-		manager::update_underwater(
-			__in const glm::ivec2 &chunk,
-			__in const glm::uvec3 &block
-			)
+		manager::update_selector(void)
 		{
+			uint32_t type;
+			glm::vec3 position, rotation;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			m_block_selected = false;
+			position = m_camera->position();
+			rotation = glm::normalize(m_camera->rotation());
+
+			for(uint32_t iter = 0; iter < SELECTOR_DISTANCE_MAX; ++iter) {
+				position += rotation;
+				nomic::utility::position_as_block(position, m_block_selected_chunk, m_block_selected_block);
+
+				type = m_manager_terrain.at(m_block_selected_chunk)->block_type(m_block_selected_block);
+				if((type != BLOCK_AIR) && (type != BLOCK_WATER)) {
+					m_block_selected = true;
+					break;
+				}
+			}
+
+			nomic::entity::object *selector_ref = m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_SELECTOR);
+			if(selector_ref) {
+
+				if(m_block_selected) {
+					selector_ref->position() = nomic::utility::block_as_position(m_block_selected_chunk,
+						m_block_selected_block);
+				}
+
+				selector_ref->show(m_block_selected);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::update_underwater(void)
+		{
+			glm::uvec3 block;
+			glm::ivec2 chunk;
 			bool underwater = false;
-			glm::uvec3 block_offset = block;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			if(block_offset.y < (CHUNK_HEIGHT - 1)) {
-				++block_offset.y;
+			block = m_camera->block();
+			chunk = m_camera->chunk();
 
-				if(m_manager_terrain.at(chunk)->block_type(block_offset) == BLOCK_WATER) {
-					--block_offset.y;
+			if(block.y < (CHUNK_HEIGHT - 1)) {
+				++block.y;
 
-					if(m_manager_terrain.at(chunk)->block_type(block_offset) == BLOCK_WATER) {
+				if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
+					--block.y;
+
+					if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
 						underwater = true;
 					}
 				}

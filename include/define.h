@@ -202,7 +202,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 6
+	#define NOMIC_VERSION_REVISION 8
 	#define NOMIC_VERSION_WEEK 1729
 
 	#define OBJECT_COUNT 1
@@ -240,6 +240,7 @@ namespace nomic {
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
+	#define SELECTOR_DISTANCE_MAX 6
 	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
 	#define SELECTOR_SCALE_DEFAULT 1.f
 
@@ -452,9 +453,20 @@ namespace nomic {
 
 		public:
 
+			static glm::vec3 block_as_position(
+				__in const glm::ivec2 &chunk,
+				__in const glm::uvec3 &block
+				);
+
 			static std::string format_as_string(
 				__in const char *format,
 				...
+				);
+
+			static void position_as_block(
+				__in const glm::vec3 &position,
+				__inout glm::ivec2 &chunk,
+				__inout glm::uvec3 &block
 				);
 
 			static std::string read_file(
