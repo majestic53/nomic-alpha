@@ -38,6 +38,8 @@ namespace nomic {
 
 				void poll_input(void);
 
+				void sync(void);
+
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;

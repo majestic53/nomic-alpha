@@ -162,6 +162,18 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		void 
+		input::sync(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::event::queue::flush_events();
+			nomic::event::queue::unregister_all_events();
+			nomic::event::queue::register_for_event(EVENT_INPUT);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		std::string 
 		input::to_string(
 			__in_opt bool verbose

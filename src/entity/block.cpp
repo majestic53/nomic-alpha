@@ -230,6 +230,9 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.disable_all();
+			arr.remove_all();
+			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
 				((uint8_t *) &color[0]) + ((BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))),
 				GL_STATIC_DRAW), BLOCK_INDEX_COLOR, BLOCK_SEGMENT_WIDTH_COLOR, GL_FLOAT);

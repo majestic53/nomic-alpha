@@ -37,6 +37,7 @@ namespace nomic {
 
 		class manager :
 				public SINGLETON_CLASS(nomic::session::manager),
+				protected nomic::event::input,
 				protected nomic::core::thread {
 
 			public:
@@ -137,11 +138,23 @@ namespace nomic {
 
 				void initialize_entities(void);
 
+				void on_button(
+					__in uint8_t button,
+					__in uint8_t state,
+					__in uint8_t clicks,
+					__in int32_t x,
+					__in int32_t y
+					);
+
 				bool on_initialize(void);
 
 				bool on_run(void);
 
 				void on_uninitialize(void);
+
+				void selected_block_add(void);
+
+				void selected_block_remove(void);
 
 				void uninitialize_entities(void);
 

@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1729
 ----------------
+*Updated: 7/23/2017*
+
+* Block removal (incomplete)
+
 *Updated: 7/20-22/2017*
 
 * Added block selector <s>(incomplete)</s>

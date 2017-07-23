@@ -36,6 +36,25 @@ namespace nomic {
 					__in_opt const std::string &path = std::string(),
 					__in_opt const glm::vec2 dimensions = PLAIN_DIMENSION_DEFAULT,
 					__in_opt float scale = PLAIN_SCALE_DEFAULT,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT,
+					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
+					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
+					__in_opt const glm::vec3 &up = TRANSFORM_UP_DEFAULT
+					);
+
+				explicit plain(
+					__in const std::vector<uint8_t> &data,
+					__in const glm::uvec2 &data_dimensions,
+					__in uint32_t data_depth,
+					__in_opt const glm::vec2 dimensions = PLAIN_DIMENSION_DEFAULT,
+					__in_opt float scale = PLAIN_SCALE_DEFAULT,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT,
 					__in_opt const glm::vec3 &position = TRANSFORM_POSITION_DEFAULT,
 					__in_opt const glm::vec3 &rotation = TRANSFORM_ROTATION_DEFAULT,
 					__in_opt const glm::vec3 &up = TRANSFORM_UP_DEFAULT
@@ -76,7 +95,7 @@ namespace nomic {
 
 				void set_dimensions(
 					__in const glm::vec2 dimensions,
-					__in float scale
+					__in_opt float scale = PLAIN_SCALE_DEFAULT
 					);
 
 				void set_position(
@@ -86,7 +105,21 @@ namespace nomic {
 					);
 
 				void set_texture(
-					__in const std::string &path
+					__in const std::string &path,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
+					);
+
+				void set_texture(
+					__in const std::vector<uint8_t> &data,
+					__in const glm::uvec2 &data_dimensions,
+					__in uint32_t data_depth,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
 					);
 
 				virtual std::string to_string(

@@ -84,6 +84,10 @@ namespace nomic {
 					__in_opt nomic::entity::chunk *front = nullptr
 					);
 
+				uint8_t remove_block(
+					__in const glm::uvec3 &position
+					);
+
 				uint8_t set_block(
 					__in const glm::uvec3 &position,
 					__in uint8_t type,

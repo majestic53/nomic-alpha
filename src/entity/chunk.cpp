@@ -600,6 +600,21 @@ namespace nomic {
 		}
 
 		uint8_t 
+		chunk::remove_block(
+			__in const glm::uvec3 &position
+			)
+		{
+			uint8_t result;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}", position.x, position.y, position.z);
+
+			result = set_block(position, BLOCK_AIR, BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE);
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x(%u)", (uint16_t) result, (uint16_t) result);
+			return result;
+		}
+
+		uint8_t 
 		chunk::set_block(
 			__in const glm::uvec3 &position,
 			__in uint8_t type,

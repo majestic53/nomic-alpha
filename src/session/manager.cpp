@@ -24,6 +24,7 @@
 #include "../../include/entity/block.h"
 #include "../../include/entity/diagnostic.h"
 #include "../../include/entity/message.h"
+#include "../../include/entity/plain.h"
 #include "../../include/entity/reticle.h"
 #include "../../include/entity/selector.h"
 #include "../../include/entity/skybox.h"
@@ -49,6 +50,12 @@ namespace nomic {
 		};
 
 		typedef std::tuple<std::string, std::string, uint32_t, bool, uint32_t, uint32_t, bool, uint32_t, bool, uint32_t> renderer_config;
+
+		static const renderer_config BACKDROP_RENDERER_CONFIGURATION = {
+			"./res/vert_plain.glsl", "./res/frag_plain.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
+			};
 
 		static const renderer_config CHUNK_RENDERER_CONFIGURATION = {
 			"./res/vert_mesh.glsl", "./res/frag_mesh.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
@@ -276,7 +283,8 @@ namespace nomic {
 		void 
 		manager::generate_chunks_spawn(void)
 		{
-			nomic::core::renderer diagnostic_renderer, message_renderer;
+			std::vector<nomic::entity::plain *> backdrop;
+			nomic::core::renderer backdrop_renderer, diagnostic_renderer, message_renderer;
 			uint32_t completed = 0, current, previous = 0, total = (VIEW_WIDTH * VIEW_WIDTH);
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -290,9 +298,6 @@ namespace nomic {
 			diagnostic_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
 
 			nomic::entity::diagnostic diagnostic(false);
-			diagnostic.enable(true);
-			diagnostic.show(true);
-			diagnostic.register_renderer(diagnostic_renderer.get_id());
 
 			nomic::entity::message message;
 			message_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
@@ -302,10 +307,58 @@ namespace nomic {
 			message_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
 			message_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
 
+			backdrop_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(BACKDROP_RENDERER_CONFIGURATION),
+				std::get<RENDERER_SHADER_FRAGMENT>(BACKDROP_RENDERER_CONFIGURATION));
+			backdrop_renderer.set_mode(std::get<RENDERER_MODE>(BACKDROP_RENDERER_CONFIGURATION));
+			backdrop_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
+				std::get<RENDERER_BLEND_SFACTOR>(BACKDROP_RENDERER_CONFIGURATION),
+				std::get<RENDERER_BLEND_DFACTOR>(BACKDROP_RENDERER_CONFIGURATION));
+			backdrop_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
+				std::get<RENDERER_CULL_MODE>(BACKDROP_RENDERER_CONFIGURATION));
+			backdrop_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
+				std::get<RENDERER_DEPTH_MODE>(BACKDROP_RENDERER_CONFIGURATION));
+
+			nomic::graphic::bitmap backdrop_texture(BACKDROP_PATH_DEFAULT);
+
+			const void *backdrop_texture_data_ref = backdrop_texture.pixels();
+			if(backdrop_texture_data_ref) {
+				uint8_t backdrop_texture_depth = (backdrop_texture.depth() / CHAR_WIDTH);
+				glm::uvec2 backdrop_texture_dimensions = glm::uvec2(backdrop_texture.width(), backdrop_texture.height());
+				std::vector<uint8_t> backdrop_texture_data((uint8_t *) backdrop_texture_data_ref,
+					((uint8_t *) backdrop_texture_data_ref) + (backdrop_texture_dimensions.x
+						* backdrop_texture_dimensions.y * backdrop_texture_depth));
+
+				for(int32_t y = -BACKDROP_HEIGHT_DEFAULT; y < BACKDROP_HEIGHT_DEFAULT; ++y) {
+
+					for(int32_t x = -BACKDROP_WIDTH_DEFAULT; x < BACKDROP_WIDTH_DEFAULT; ++x) {
+
+						backdrop.push_back(new nomic::entity::plain(backdrop_texture_data, backdrop_texture_dimensions,
+							backdrop_texture_depth));
+						if(!backdrop.back()) {
+							THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE,
+								"Position={%i, %i}", x, y);
+						}
+
+						glm::vec3 position = m_camera->position();
+						position.x += (x + BLOCK_RADIUS);
+						position.y += (y + BLOCK_RADIUS);
+						position.z += BACKDROP_OFFSET_DEFAULT;
+						backdrop.back()->position() = position;
+						backdrop.back()->show(true);
+						backdrop.back()->register_renderer(backdrop_renderer.get_id());
+					}
+				}
+			}
+
+			diagnostic.enable(true);
+			diagnostic.show(true);
+			diagnostic.register_renderer(diagnostic_renderer.get_id());
+
 			message.enable(true);
 			message.show(true);
 			message.register_renderer(message_renderer.get_id());
 			message.text() = "Generating chunk objects...";
+
 			update();
 			render();
 
@@ -387,6 +440,16 @@ namespace nomic {
 					}
 				}
 			}
+
+			for(std::vector<nomic::entity::plain *>::iterator iter = backdrop.begin(); iter != backdrop.end(); ++iter) {
+
+				if(*iter) {
+					delete *iter;
+					*iter = nullptr;
+				}
+			}
+
+			backdrop.clear();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -581,6 +644,38 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		void 
+		manager::on_button(
+			__in uint8_t button,
+			__in uint8_t state,
+			__in uint8_t clicks,
+			__in int32_t x,
+			__in int32_t y
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Button=%x, State=%x(%s), Clicks=%u, Position={%i, %i}", button, state,
+				(state == SDL_PRESSED) ? "Press" : "Release", (uint16_t) clicks, x, y);
+
+			switch(button) {
+				case SDL_BUTTON_LEFT:
+
+					if(block_selected() && (state == SDL_RELEASED)) {
+						selected_block_add();
+					}
+					break;
+				case SDL_BUTTON_RIGHT:
+
+					if(block_selected() && (state == SDL_RELEASED)) {
+						selected_block_remove();
+					}
+					break;
+				default:
+					break;
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		bool 
 		manager::on_initialize(void)
 		{
@@ -658,6 +753,7 @@ namespace nomic {
 			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
 			initialize_entities();
 			m_underwater = false;
+			nomic::event::input::sync();
 			nomic::core::thread::start(true);
 			nomic::core::thread::notify();
 
@@ -782,6 +878,29 @@ namespace nomic {
 			chunk = m_block_selected_chunk;
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+		}
+
+		void 
+		manager::selected_block_add(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			// TODO: add block at selected block face
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::selected_block_remove(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
+			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
+				chunk->remove_block(m_block_selected_block);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -1118,6 +1237,7 @@ namespace nomic {
 			update_position();
 			update_underwater();
 			update_selector();
+			nomic::event::input::poll_input();
 			m_manager_entity.update(m_runtime, m_camera);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -1138,9 +1258,8 @@ namespace nomic {
 			type = m_manager_terrain.at(chunk)->block_type(block);
 			if((type != BLOCK_AIR) && (type != BLOCK_WATER)) {
 
-				// TODO
-				std::cout << "COLLISION" << std::endl;
-				// ---
+				// TODO: move camera out of block
+
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -1164,7 +1283,100 @@ namespace nomic {
 
 				type = m_manager_terrain.at(m_block_selected_chunk)->block_type(m_block_selected_block);
 				if((type != BLOCK_AIR) && (type != BLOCK_WATER)) {
-					m_block_selected = true;
+					int32_t x = m_block_selected_block.x, y = m_block_selected_block.y, z = m_block_selected_block.z;
+
+					if((y - 1) > 0) { // bottom
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y - 1, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					}
+
+					if((y + 1) < CHUNK_HEIGHT) { // top
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y + 1, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					}
+
+					if((x + 1) < CHUNK_WIDTH) { // right
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x + 1, y, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					} else if(((x + 1) == CHUNK_WIDTH) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x + 1,
+							m_block_selected_chunk.y))) { // right (boundary)
+
+						type = m_manager_terrain.at(glm::ivec2(
+							m_block_selected_chunk.x + 1, m_block_selected_chunk.y))->block_type(glm::uvec3(0, y, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					}
+
+					if((x - 1) >= 0) { // left
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x - 1, y, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					} else if(((x - 1) < 0) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x - 1,
+							m_block_selected_chunk.y))) { // left (boundary)
+
+						type = m_manager_terrain.at(glm::ivec2(
+							m_block_selected_chunk.x - 1, m_block_selected_chunk.y))->block_type(glm::uvec3(
+							CHUNK_WIDTH - 1, y, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					}
+
+					if((z + 1) < CHUNK_WIDTH) { // back
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y, z + 1));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					} else if(((z + 1) == CHUNK_WIDTH) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x,
+							m_block_selected_chunk.y + 1))) { // back (boundary)
+
+						type = m_manager_terrain.at(glm::ivec2(
+							m_block_selected_chunk.x, m_block_selected_chunk.y + 1))->block_type(glm::uvec3(x, y, 0));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					}
+
+					if((z - 1) >= 0) { // front
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y, z - 1));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					} else if(((z - 1) < 0) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x,
+							m_block_selected_chunk.y - 1))) { // front (boundary)
+
+						type = m_manager_terrain.at(glm::ivec2(
+							m_block_selected_chunk.x, m_block_selected_chunk.y - 1))->block_type(glm::uvec3(
+							x, y, CHUNK_WIDTH - 1));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							break;
+						}
+					}
+
 					break;
 				}
 			}

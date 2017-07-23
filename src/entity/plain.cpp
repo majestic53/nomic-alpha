@@ -54,18 +54,22 @@ namespace nomic {
 			};
 
 		static const float PLAIN_VERTEX[] = {
-			0.f, 0.f, 0.f, // bottom left corner
-			0.f, 1.f, 0.f, // top left corner
-			1.f, 1.f, 0.f, // top right corner
-			0.f, 0.f, 0.f, // bottom left corner
-			1.f, 1.f, 0.f, // top right corner
-			1.f, 0.f, 0.f, // bottom right corner
+			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // bottom left corner
+			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // top left corner
+			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // top right corner
+			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // bottom left corner
+			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // top right corner
+			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // bottom right corner
 			};
 
 		plain::plain(
 			__in_opt const std::string &path,
 			__in_opt const glm::vec2 dimensions,
 			__in_opt float scale,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag,
 			__in_opt const glm::vec3 &position,
 			__in_opt const glm::vec3 &rotation,
 			__in_opt const glm::vec3 &up
@@ -83,10 +87,40 @@ namespace nomic {
 			set_dimensions(dimensions, scale);
 
 			if(!path.empty()) {
-				set_texture(path);
+				set_texture(path, wrap_s, wrap_t, filter_min, filter_mag);
 			} else {
 				clear_texture();
 			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		plain::plain(
+			__in const std::vector<uint8_t> &data,
+			__in const glm::uvec2 &data_dimensions,
+			__in uint32_t data_depth,
+			__in_opt const glm::vec2 dimensions,
+			__in_opt float scale,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag,
+			__in_opt const glm::vec3 &position,
+			__in_opt const glm::vec3 &rotation,
+			__in_opt const glm::vec3 &up
+			) :
+				nomic::entity::object(ENTITY_PLAIN, SUBTYPE_UNDEFINED, position, rotation, up),
+				m_color(PLAIN_COLOR_DEFAULT),
+				m_dimensions(PLAIN_DIMENSION_DEFAULT),
+				m_texture_set(false)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
+				"Data[%u]=%p, {%u, %u}, %u, Dimension={%f, %f}, Scale=%f, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}",
+				data.size(), &data[0], data_dimensions.x, data_dimensions.y, (int) data_depth, dimensions.x, dimensions.y, scale,
+				position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, up.x, up.y, up.z);
+
+			set_dimensions(dimensions, scale);
+			set_texture(data, data_dimensions, data_depth, wrap_s, wrap_t, filter_min, filter_mag);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -221,6 +255,9 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.disable_all();
+			arr.remove_all();
+			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
 				((uint8_t *) &color[0]) + ((PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PLAIN_INDEX_COLOR, PLAIN_SEGMENT_WIDTH_COLOR, GL_FLOAT);
@@ -252,7 +289,7 @@ namespace nomic {
 		void 
 		plain::set_dimensions(
 			__in const glm::vec2 dimensions,
-			__in float scale
+			__in_opt float scale
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%f, %f}, Scale=%f", dimensions.x, dimensions.y, scale);
@@ -282,13 +319,37 @@ namespace nomic {
 
 		void 
 		plain::set_texture(
-			__in const std::string &path
+			__in const std::string &path,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
 
 			m_texture_set = true;
-			nomic::graphic::texture::set(path);
+			nomic::graphic::texture::set(path, wrap_s, wrap_t, filter_min, filter_mag);
+			reconfigure();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		plain::set_texture(
+			__in const std::vector<uint8_t> &data,
+			__in const glm::uvec2 &data_dimensions,
+			__in uint32_t data_depth,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
+
+			m_texture_set = true;
+			nomic::graphic::texture::set(data, data_dimensions, data_depth, wrap_s, wrap_t, filter_min, filter_mag);
 			reconfigure();
 
 			TRACE_EXIT(LEVEL_VERBOSE);

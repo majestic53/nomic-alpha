@@ -184,6 +184,9 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.disable_all();
+			arr.remove_all();
+			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &SKYBOX_VERTEX[0],
 				((uint8_t *) &SKYBOX_VERTEX[0]) + ((SKYBOX_SEGMENT_COUNT * SKYBOX_SEGMENT_WIDTH) * sizeof(GLfloat))), GL_STATIC_DRAW),
 				SKYBOX_INDEX_VERTEX, SKYBOX_SEGMENT_WIDTH, GL_FLOAT);

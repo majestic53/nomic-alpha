@@ -55,6 +55,11 @@ namespace nomic {
 	#define ATLAS_PATH_DEFAULT "./res/atlas.bmp"
 	#define ATLAS_WIDTH_DEFAULT 16
 
+	#define BACKDROP_HEIGHT_DEFAULT 10
+	#define BACKDROP_OFFSET_DEFAULT 12.f
+	#define BACKDROP_PATH_DEFAULT "./res/load.bmp"
+	#define BACKDROP_WIDTH_DEFAULT 16
+
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
 	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
 	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
@@ -202,7 +207,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 8
+	#define NOMIC_VERSION_REVISION 9
 	#define NOMIC_VERSION_WEEK 1729
 
 	#define OBJECT_COUNT 1
@@ -241,7 +246,7 @@ namespace nomic {
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
 	#define SELECTOR_DISTANCE_MAX 6
-	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
+	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.8f)
 	#define SELECTOR_SCALE_DEFAULT 1.f
 
 	#define SEND_EVENT(_EVENT_) { \
@@ -334,7 +339,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 30 // 40
+	#define VIEW_WIDTH 36 //40
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
