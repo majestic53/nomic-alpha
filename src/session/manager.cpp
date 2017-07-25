@@ -97,7 +97,7 @@ namespace nomic {
 			{ BLOCK_FACE_FRONT, "./res/debug.bmp" },
 			};
 
-		#define DEBUG_BLOCK_SCALE 0.5f
+		#define DEBUG_BLOCK_SCALE 0.2f
 
 		// entity background objects
 		enum {
@@ -152,6 +152,7 @@ namespace nomic {
 		manager::manager(void) :
 			m_atlas(nullptr),
 			m_block_selected(false),
+			m_block_selected_face(BLOCK_FACE_TOP),
 			m_camera(nullptr),
 			m_chunk_renderer(nullptr),
 			m_debug(SESSION_DEBUG_DEFAULT),
@@ -521,6 +522,45 @@ namespace nomic {
 				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->get_id());
 			}
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Building foreground entity objects...");
+
+			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_FOREGROUND_MAX; ++iter) {
+
+				m_entity_renderer_foreground.push_back(new nomic::core::renderer);
+				if(!m_entity_renderer_foreground.at(iter)) {
+					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Renderer=%u", iter);
+				}
+
+				const renderer_config &config = ENTITY_RENDERER_FOREGROUND_CONFIGURATION.at(iter);
+
+				nomic::core::renderer *rend = m_entity_renderer_foreground.at(iter);
+				if(rend) {
+					rend->set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
+					rend->set_mode(std::get<RENDERER_MODE>(config));
+					rend->set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
+						std::get<RENDERER_BLEND_DFACTOR>(config));
+					rend->set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
+					rend->set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
+				}
+
+				switch(iter) {
+					case ENTITY_OBJECT_FOREGROUND_SELECTOR:
+						m_entity_object_foreground.push_back(new nomic::entity::selector);
+						break;
+					default:
+						break;
+				}
+
+				if(!m_entity_object_foreground.at(iter)) {
+					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
+				}
+
+				m_entity_object_foreground.at(iter)->defer(true);
+				m_entity_object_foreground.at(iter)->enable(false);
+				m_entity_object_foreground.at(iter)->show(false);
+				m_entity_object_foreground.at(iter)->register_renderer(m_entity_renderer_foreground.at(iter)->get_id());
+			}
+
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building background entity objects...");
 
 			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_BACKGROUND_MAX; ++iter) {
@@ -584,49 +624,12 @@ namespace nomic {
 			m_chunk_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
 				std::get<RENDERER_DEPTH_MODE>(CHUNK_RENDERER_CONFIGURATION));
 
-			TRACE_MESSAGE(LEVEL_INFORMATION, "Building foreground entity objects...");
-
-			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_FOREGROUND_MAX; ++iter) {
-
-				m_entity_renderer_foreground.push_back(new nomic::core::renderer);
-				if(!m_entity_renderer_foreground.at(iter)) {
-					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Renderer=%u", iter);
-				}
-
-				const renderer_config &config = ENTITY_RENDERER_FOREGROUND_CONFIGURATION.at(iter);
-
-				nomic::core::renderer *rend = m_entity_renderer_foreground.at(iter);
-				if(rend) {
-					rend->set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
-					rend->set_mode(std::get<RENDERER_MODE>(config));
-					rend->set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
-						std::get<RENDERER_BLEND_DFACTOR>(config));
-					rend->set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
-					rend->set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
-				}
-
-				switch(iter) {
-					case ENTITY_OBJECT_FOREGROUND_SELECTOR:
-						m_entity_object_foreground.push_back(new nomic::entity::selector);
-						break;
-					default:
-						break;
-				}
-
-				if(!m_entity_object_foreground.at(iter)) {
-					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
-				}
-
-				m_entity_object_foreground.at(iter)->enable(false);
-				m_entity_object_foreground.at(iter)->show(false);
-				m_entity_object_foreground.at(iter)->register_renderer(m_entity_renderer_foreground.at(iter)->get_id());
-			}
-
 			generate_chunks_spawn();
+			generate_spawn_location();
 
-			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_FOREGROUND_MAX; ++iter) {
-				m_entity_object_foreground.at(iter)->enable(true);
-				m_entity_object_foreground.at(iter)->show(true);
+			for(uint32_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
+				m_debug_object.at(iter)->enable(m_debug);
+				m_debug_object.at(iter)->show(m_debug);
 			}
 
 			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_BACKGROUND_MAX; ++iter) {
@@ -634,12 +637,10 @@ namespace nomic {
 				m_entity_object_background.at(iter)->show(true);
 			}
 
-			for(uint32_t iter = 0; iter <= DEBUG_OBJECT_MAX; ++iter) {
-				m_debug_object.at(iter)->enable(m_debug);
-				m_debug_object.at(iter)->show(m_debug);
+			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_FOREGROUND_MAX; ++iter) {
+				m_entity_object_foreground.at(iter)->enable(true);
+				m_entity_object_foreground.at(iter)->show(true);
 			}
-
-			generate_spawn_location();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -861,7 +862,8 @@ namespace nomic {
 		void 
 		manager::selected_block(
 			__inout glm::ivec2 &chunk,
-			__inout glm::uvec3 &block
+			__inout glm::uvec3 &block,
+			__inout uint8_t &face
 			)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -876,8 +878,10 @@ namespace nomic {
 
 			block = m_block_selected_block;
 			chunk = m_block_selected_chunk;
+			face = m_block_selected_face;
 
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}, Face=%x(%s)", chunk.x, chunk.y,
+				block.x, block.y, block.z, face, BLOCK_FACE_STRING(face));
 		}
 
 		void 
@@ -898,6 +902,8 @@ namespace nomic {
 			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
 			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
 				chunk->remove_block(m_block_selected_block);
+
+				// TODO: update adjacent blocks to avoid holes when removing blocks from position 0 or 15
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -1103,7 +1109,9 @@ namespace nomic {
 				if(m_block_selected) {
 					result << "(Chunk={" << m_block_selected_chunk.x << ", " << m_block_selected_chunk.y << "}"
 						<< ", Block={" << m_block_selected_block.x << ", " << m_block_selected_block.y
-							<< ", " << m_block_selected_block.z << "})";
+							<< ", " << m_block_selected_block.z << "}"
+						<< ", Face=" << SCALAR_AS_HEX(uint8_t, m_block_selected_face)
+							<< "(" << BLOCK_FACE_STRING(m_block_selected_face) << "))";
 				}
 			}
 
@@ -1129,6 +1137,7 @@ namespace nomic {
 			m_block_selected = false;
 			m_block_selected_block = glm::uvec3();
 			m_block_selected_chunk = glm::ivec2();
+			m_block_selected_face = BLOCK_FACE_TOP;
 			m_spawn = glm::vec3();
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Destroying foreground entity objects...");
@@ -1268,16 +1277,18 @@ namespace nomic {
 		void 
 		manager::update_selector(void)
 		{
-			uint32_t type;
+			uint8_t type;
+			float distance = 0.f;
 			glm::vec3 position, rotation;
+			bool back = false, bottom = false, front = false, left = false, right = false, top = false;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			m_block_selected = false;
 			position = m_camera->position();
-			rotation = glm::normalize(m_camera->rotation());
+			rotation = glm::normalize(m_camera->rotation()) * SELECTOR_DISTANCE_SCALE;
 
-			for(uint32_t iter = 0; iter < SELECTOR_DISTANCE_MAX; ++iter) {
+			for(; distance < SELECTOR_DISTANCE_MAX; ++distance) {
 				position += rotation;
 				nomic::utility::position_as_block(position, m_block_selected_chunk, m_block_selected_block);
 
@@ -1285,30 +1296,12 @@ namespace nomic {
 				if((type != BLOCK_AIR) && (type != BLOCK_WATER)) {
 					int32_t x = m_block_selected_block.x, y = m_block_selected_block.y, z = m_block_selected_block.z;
 
-					if((y - 1) > 0) { // bottom
-
-						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y - 1, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
-							m_block_selected = true;
-							break;
-						}
-					}
-
-					if((y + 1) < CHUNK_HEIGHT) { // top
-
-						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y + 1, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
-							m_block_selected = true;
-							break;
-						}
-					}
-
 					if((x + 1) < CHUNK_WIDTH) { // right
 
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x + 1, y, z));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							right = true;
 						}
 					} else if(((x + 1) == CHUNK_WIDTH) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x + 1,
 							m_block_selected_chunk.y))) { // right (boundary)
@@ -1317,7 +1310,7 @@ namespace nomic {
 							m_block_selected_chunk.x + 1, m_block_selected_chunk.y))->block_type(glm::uvec3(0, y, z));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							right = true;
 						}
 					}
 
@@ -1326,7 +1319,7 @@ namespace nomic {
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x - 1, y, z));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							left = true;
 						}
 					} else if(((x - 1) < 0) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x - 1,
 							m_block_selected_chunk.y))) { // left (boundary)
@@ -1336,7 +1329,25 @@ namespace nomic {
 							CHUNK_WIDTH - 1, y, z));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							left = true;
+						}
+					}
+
+					if((y - 1) > 0) { // bottom
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y - 1, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							bottom = true;
+						}
+					}
+
+					if((y + 1) < CHUNK_HEIGHT) { // top
+
+						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y + 1, z));
+						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+							m_block_selected = true;
+							top = true;
 						}
 					}
 
@@ -1345,7 +1356,7 @@ namespace nomic {
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y, z + 1));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							back = true;
 						}
 					} else if(((z + 1) == CHUNK_WIDTH) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x,
 							m_block_selected_chunk.y + 1))) { // back (boundary)
@@ -1354,7 +1365,7 @@ namespace nomic {
 							m_block_selected_chunk.x, m_block_selected_chunk.y + 1))->block_type(glm::uvec3(x, y, 0));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							back = true;
 						}
 					}
 
@@ -1363,7 +1374,7 @@ namespace nomic {
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y, z - 1));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							front = true;
 						}
 					} else if(((z - 1) < 0) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x,
 							m_block_selected_chunk.y - 1))) { // front (boundary)
@@ -1373,7 +1384,7 @@ namespace nomic {
 							x, y, CHUNK_WIDTH - 1));
 						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
 							m_block_selected = true;
-							break;
+							front = true;
 						}
 					}
 
@@ -1381,12 +1392,48 @@ namespace nomic {
 				}
 			}
 
-			nomic::entity::object *selector_ref = m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_SELECTOR);
+			nomic::entity::selector *selector_ref
+				= (nomic::entity::selector *) m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_SELECTOR);
 			if(selector_ref) {
 
 				if(m_block_selected) {
-					selector_ref->position() = nomic::utility::block_as_position(m_block_selected_chunk,
-						m_block_selected_block);
+					uint8_t face = BLOCK_FACE_TOP;
+					glm::vec3 position_block = nomic::utility::block_as_position(m_block_selected_chunk, m_block_selected_block),
+						position_block_offset = position;
+
+					selector_ref->position() = position_block;
+					position_block_offset.x = glm::fract(position_block_offset.x);
+					position_block_offset.y = glm::fract(position_block_offset.y);
+					position_block_offset.z = glm::fract(position_block_offset.z);
+
+					if(right && (position_block_offset.x >= (1.f - SELECTOR_DISTANCE_STEP))) {
+						face = BLOCK_FACE_RIGHT;
+					}
+
+					if(left && (position_block_offset.x <= SELECTOR_DISTANCE_STEP)) {
+						face = BLOCK_FACE_LEFT;
+					}
+
+					if(top && (position_block_offset.y >= (1.f - SELECTOR_DISTANCE_STEP))) {
+						face = BLOCK_FACE_TOP;
+					}
+
+					if(bottom && (position_block_offset.y <= SELECTOR_DISTANCE_STEP)) {
+						face = BLOCK_FACE_BOTTOM;
+					}
+
+					if(back && (position_block_offset.z >= (1.f - SELECTOR_DISTANCE_STEP))) {
+						face = BLOCK_FACE_BACK;
+					}
+
+					if(front && (position_block_offset.z <= SELECTOR_DISTANCE_STEP)) {
+						face = BLOCK_FACE_FRONT;
+					}
+
+					if(m_block_selected_face != face) {
+						m_block_selected_face = face;
+						selector_ref->set_face(m_block_selected_face);
+					}
 				}
 
 				selector_ref->show(m_block_selected);

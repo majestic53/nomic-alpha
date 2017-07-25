@@ -24,7 +24,7 @@ namespace nomic {
 
 	namespace entity {
 
-		#define SELECTOR_SEGMENT_COUNT 24
+		#define SELECTOR_SEGMENT_COUNT 8
 		#define SELECTOR_SEGMENT_WIDTH_COLOR 4
 		#define SELECTOR_SEGMENT_WIDTH_VERTEX 3
 
@@ -34,30 +34,54 @@ namespace nomic {
 		};
 
 		static const glm::vec3 SELECTOR_VERTEX[] = {
-			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, }, // right
-			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
-			{ BLOCK_WIDTH, 0.f,0.f, },
-			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, },
-			{ 0.f, BLOCK_WIDTH, 0.f, }, // left
-			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
-			{ 0.f, 0.f, 0.f, },
-			{ 0.f, 0.f, BLOCK_WIDTH, },
-			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, }, // top
-			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
-			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
-			{ 0.f, BLOCK_WIDTH, 0.f, },
-			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, }, // bottom
-			{ 0.f, 0.f, BLOCK_WIDTH, },
-			{ BLOCK_WIDTH, 0.f, 0.f, },
-			{ 0.f, 0.f, 0.f, },
-			{ BLOCK_WIDTH, 0.f, 0.f, }, // back
-			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
-			{ 0.f, 0.f, 0.f, },
-			{ 0.f, BLOCK_WIDTH, 0.f, },
-			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, }, // front
-			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
-			{ 0.f, 0.f, BLOCK_WIDTH, },
-			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f }, // right
+			{ BLOCK_WIDTH, 0.f, 0.f },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, 0.f, 0.f },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH },
+			{ 0.f, BLOCK_WIDTH, 0.f }, // left
+			{ 0.f, 0.f, 0.f },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ 0.f, 0.f, BLOCK_WIDTH },
+			{ 0.f, BLOCK_WIDTH, 0.f },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ 0.f, 0.f, 0.f },
+			{ 0.f, 0.f, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f }, // top
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ 0.f, BLOCK_WIDTH, 0.f },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f },
+			{ 0.f, BLOCK_WIDTH, 0.f },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, 0.f, 0.f }, // bottom
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH },
+			{ 0.f, 0.f, 0.f },
+			{ 0.f, 0.f, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, 0.f, 0.f },
+			{ 0.f, 0.f, 0.f },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH },
+			{ 0.f, 0.f, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH }, // back
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ 0.f, 0.f, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH },
+			{ 0.f, 0.f, BLOCK_WIDTH },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f }, // front
+			{ BLOCK_WIDTH, 0.f, 0.f },
+			{ 0.f, BLOCK_WIDTH, 0.f },
+			{ 0.f, 0.f, 0.f },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f },
+			{ 0.f, BLOCK_WIDTH, 0.f },
+			{ BLOCK_WIDTH, 0.f, 0.f },
+			{ 0.f, 0.f, 0.f },
 			};
 
 		selector::selector(
@@ -69,6 +93,7 @@ namespace nomic {
 			) :
 				nomic::entity::object(ENTITY_SELECTOR, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_color(color),
+				m_face(BLOCK_FACE_TOP),
 				m_scale(scale)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
@@ -86,6 +111,7 @@ namespace nomic {
 			) :
 				nomic::entity::object(other),
 				m_color(other.m_color),
+				m_face(other.m_face),
 				m_scale(other.m_scale)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -111,6 +137,7 @@ namespace nomic {
 			if(this != &other) {
 				nomic::entity::object::operator=(other);
 				m_color = other.m_color;
+				m_face = other.m_face;
 				m_scale = other.m_scale;
 			}
 
@@ -144,7 +171,7 @@ namespace nomic {
 
 			for(uint32_t iter = 0; iter < SELECTOR_SEGMENT_COUNT; ++iter) {
 				color.push_back(m_color);
-				vertex.push_back(SELECTOR_VERTEX[iter] * scale);
+				vertex.push_back(SELECTOR_VERTEX[(m_face * SELECTOR_SEGMENT_COUNT) + iter] * scale);
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
@@ -177,6 +204,24 @@ namespace nomic {
 		}
 
 		void 
+		selector::set_face(
+			__in uint8_t face
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Face=%x(%s)", face, BLOCK_FACE_STRING(face));
+
+			if((face < BLOCK_FACE_MIN) || (face > BLOCK_FACE_MAX)) {
+				THROW_NOMIC_ENTITY_SELECTOR_EXCEPTION_FORMAT(NOMIC_ENTITY_SELECTOR_EXCEPTION_FACE_INVALID,
+					"Face=%x", face);
+			}
+
+			m_face = face;
+			reconfigure();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		selector::set_scale(
 			__in float scale
 			)
@@ -203,6 +248,7 @@ namespace nomic {
 			if(verbose) {
 				result << " Base=" << nomic::entity::object::to_string(verbose)
 					<< ", Color={" << m_color.x << ", " << m_color.y << ", " << m_color.z << ", " << m_color.w << "}"
+					<< ", Face=" << SCALAR_AS_HEX(uint8_t, m_face) << "(" << BLOCK_FACE_STRING(m_face) << ")"
 					<< ", Scale=" << m_scale;
 			}
 

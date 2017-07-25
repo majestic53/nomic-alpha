@@ -100,11 +100,13 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
+				void update(void);
+
 				void update(
-					__in_opt nomic::entity::chunk *right,
-					__in_opt nomic::entity::chunk *left,
-					__in_opt nomic::entity::chunk *back,
-					__in_opt nomic::entity::chunk *front
+					__in nomic::entity::chunk *right,
+					__in nomic::entity::chunk *left,
+					__in nomic::entity::chunk *back,
+					__in nomic::entity::chunk *front
 					);
 
 			protected:

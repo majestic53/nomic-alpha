@@ -35,6 +35,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 namespace nomic {
 
@@ -207,8 +208,8 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 9
-	#define NOMIC_VERSION_WEEK 1729
+	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_WEEK 1730
 
 	#define OBJECT_COUNT 1
 
@@ -245,8 +246,10 @@ namespace nomic {
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
-	#define SELECTOR_DISTANCE_MAX 6
-	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.8f)
+	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
+	#define SELECTOR_DISTANCE_MAX 60.f
+	#define SELECTOR_DISTANCE_STEP 0.1f
+	#define SELECTOR_DISTANCE_SCALE glm::vec3(SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP)
 	#define SELECTOR_SCALE_DEFAULT 1.f
 
 	#define SEND_EVENT(_EVENT_) { \
@@ -339,7 +342,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 36 //40
+	#define VIEW_WIDTH 30 //36
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -392,6 +395,25 @@ namespace nomic {
 	#define BLOCK_FACE_COUNT (BLOCK_FACE_MAX + 1)
 	#define BLOCK_FACE_MIN BLOCK_FACE_RIGHT
 	#define BLOCK_FACE_MAX BLOCK_FACE_FRONT
+
+	static const std::string BLOCK_FACE_STR[] = {
+		"Right", "Left", "Top", "Bottom", "Back", "Front",
+		};
+
+	#define BLOCK_FACE_STRING(_TYPE_) \
+		(((_TYPE_) > BLOCK_FACE_MAX) ? STRING_UNKNOWN : STRING_CHECK(BLOCK_FACE_STR[_TYPE_]))
+
+	static const glm::vec3 BLOCK_FACE_NORMAL[] = {
+		glm::vec3(1.f, 0.f, 0.f),
+		glm::vec3(-1.f, 0.f, 0.f),
+		glm::vec3(0.f, 1.f, 0.f),
+		glm::vec3(0.f, -1.f, 0.f),
+		glm::vec3(0.f, 0.f, 1.f),
+		glm::vec3(0.f, 0.f, -1.f),
+		};
+
+	#define BLOCK_FACE_NORMAL(_TYPE_) \
+		(((_TYPE_) > BLOCK_FACE_MAX) ? glm::vec3(0.f) : BLOCK_FACE_NORMAL[_TYPE_])
 
 	enum {
 		BLOCK_ZONE_ALPINE = 0,

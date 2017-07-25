@@ -58,7 +58,8 @@ namespace nomic {
 
 				void selected_block(
 					__inout glm::ivec2 &chunk,
-					__inout glm::uvec3 &block
+					__inout glm::uvec3 &block,
+					__inout uint8_t &face
 					);
 
 				void set_debug(
@@ -171,6 +172,8 @@ namespace nomic {
 				glm::uvec3 m_block_selected_block;
 
 				glm::ivec2 m_block_selected_chunk;
+
+				uint8_t m_block_selected_face;
 
 				nomic::entity::camera *m_camera;
 

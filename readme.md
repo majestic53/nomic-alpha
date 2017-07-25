@@ -24,6 +24,12 @@ make release
 Changelog
 =========
 
+Version 0.1.1730
+----------------
+*Updated: 7/25/2017*
+
+* Added block face selection
+
 Version 0.1.1729
 ----------------
 *Updated: 7/23/2017*
@@ -44,21 +50,6 @@ Version 0.1.1729
 
 * Added underwater detection to shader
 * Fixed coordinate system
-
-Version 0.1.1728
-----------------
-*Updated: 7/15/2017*
-
-* Integrated textured into renderer
-
-*Updated: 7/12-13/2017*
-
-* Added texture atlas class <s>(incomplete)</s>
-
-*Updated: 7/11/2017*
-
-* Added fog to chunk shader
-* Fixed chunk generation threading issue
 
 *Changelog truncated (see file history for full log)*
 

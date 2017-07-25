@@ -346,7 +346,8 @@ namespace nomic {
 			__in_opt GLenum filter_mag
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Path[%u]=%s", path.size(), STRING_CHECK(path));
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Data[%u]=%p, {%u, %u}, %u", data.size(), &data[0], data_dimensions.x, data_dimensions.y,
+				data_depth);
 
 			m_texture_set = true;
 			nomic::graphic::texture::set(data, data_dimensions, data_depth, wrap_s, wrap_t, filter_min, filter_mag);

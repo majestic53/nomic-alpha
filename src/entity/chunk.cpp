@@ -470,7 +470,7 @@ namespace nomic {
 				for(int32_t x = 0; x < CHUNK_WIDTH; ++x) {
 					position.y = nomic::terrain::chunk::height(glm::uvec2(x, z));
 
-					for(int32_t y = position.y; y >= 0; --y) {
+					for(int32_t y = (CHUNK_HEIGHT - 1); y >= 0; --y) {
 						uint32_t attributes, count = 0, type;
 						glm::vec3 position_relative = glm::vec3(x, y, z);
 
@@ -589,7 +589,7 @@ namespace nomic {
 							}
 
 							if(!count) {
-								break;
+								continue;
 							}
 						}
 					}
@@ -670,11 +670,21 @@ namespace nomic {
 		}
 
 		void 
+		chunk::update(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			m_changed = true;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		chunk::update(
-			__in_opt nomic::entity::chunk *right,
-			__in_opt nomic::entity::chunk *left,
-			__in_opt nomic::entity::chunk *back,
-			__in_opt nomic::entity::chunk *front
+			__in nomic::entity::chunk *right,
+			__in nomic::entity::chunk *left,
+			__in nomic::entity::chunk *back,
+			__in nomic::entity::chunk *front
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Edge={%p, %p, %p, %p}", right, left, back, front);

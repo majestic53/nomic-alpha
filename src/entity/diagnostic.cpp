@@ -114,13 +114,15 @@ namespace nomic {
 						result << ", Type=" << BLOCK_STRING(type) << (session_ref.underwater() ? " (Underwater)" : "");
 
 						if(session_ref.block_selected()) {
-							session_ref.selected_block(position_chunk, position_block);
+							uint8_t face;
+							session_ref.selected_block(position_chunk, position_block, face);
 							type = session_ref.terrain().at(position_chunk)->block_type(position_block);
 							result << std::endl << std::endl << "Selected Chunk=(" << position_chunk.x
 									<< "," << position_chunk.y << ")"
 								<< ", Block=(" << position_block.x << "," << position_block.y
 									<< "," << position_block.z << ")"
-								<< ", Type=" << BLOCK_STRING(type);
+								<< ", Type=" << BLOCK_STRING(type)
+								<< ", Face=" << BLOCK_FACE_STRING(face);
 						}
 					}
 				}

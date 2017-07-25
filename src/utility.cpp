@@ -34,15 +34,12 @@ namespace nomic {
 	{
 		glm::vec3 result;
 
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
-
 		result.x = (chunk.x * CHUNK_WIDTH);
 		result.x += block.x;
 		result.y = block.y;
 		result.z = (chunk.y * CHUNK_WIDTH);
 		result.z += block.z;
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}", position.x, position.y, position.z);
 		return result;
 	}
 
@@ -83,8 +80,6 @@ namespace nomic {
 		__inout glm::uvec3 &block
 		)
 	{
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}", position.x, position.y, position.z);
-
 		block.x = std::floor(position.x);
 		block.x %= CHUNK_WIDTH;
 		block.y = std::floor(position.y);
@@ -104,8 +99,6 @@ namespace nomic {
 			chunk.y *= -1;
 			--chunk.y;
 		}
-
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Chunk={%i, %i}, Block={%u, %u, %u}", chunk.x, chunk.y, block.x, block.y, block.z);
 	}
 
 	std::string 

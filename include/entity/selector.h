@@ -58,6 +58,10 @@ namespace nomic {
 					__in const glm::vec4 &color
 					);
 
+				void set_face(
+					__in uint8_t face
+					);
+
 				void set_scale(
 					__in float scale
 					);
@@ -71,6 +75,8 @@ namespace nomic {
 				void reconfigure(void);
 
 				glm::vec4 m_color;
+
+				uint8_t m_face;
 
 				float m_scale;
 		};

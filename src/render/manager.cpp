@@ -324,16 +324,6 @@ namespace nomic {
 						continue;
 					}
 
-					switch(iter_handle->first->mode()) {
-						case RENDER_PERSPECTIVE:
-							iter_handle->first->use(position, rotation, underwater, projection, view);
-							break;
-						default:
-							iter_handle->first->use(position, rotation, underwater,
-								glm::ortho(0.f, (float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f, 1.f));
-							break;
-					}
-
 					for(std::set<nomic::core::entity *>::iterator iter_entity = iter_handle->second.begin();
 							iter_entity != iter_handle->second.end(); ++iter_entity) {
 
@@ -350,6 +340,18 @@ namespace nomic {
 
 							iter_deferred->second.insert(*iter_entity);
 						} else {
+
+							switch(iter_handle->first->mode()) {
+								case RENDER_PERSPECTIVE:
+									iter_handle->first->use(position, rotation, underwater, projection, view);
+									break;
+								default:
+									iter_handle->first->use(position, rotation, underwater, glm::ortho(
+										0.f, (float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f,
+										1.f));
+									break;
+							}
+
 							iter_handle->first->set_model((*iter_entity)->model());
 							(*iter_entity)->on_render(*iter_handle->first, &textures, delta);
 						}
@@ -364,21 +366,21 @@ namespace nomic {
 					continue;
 				}
 
-				switch(iter_handle->first->mode()) {
-					case RENDER_PERSPECTIVE:
-						iter_handle->first->use(position, rotation, underwater, projection, view);
-						break;
-					default:
-						iter_handle->first->use(position, rotation, underwater, glm::ortho(0.f, (float) view_dimensions.x, 0.f,
-							(float) view_dimensions.y, -1.f, 1.f));
-						break;
-				}
-
 				for(std::set<nomic::core::entity *>::iterator iter_entity = iter_handle->second.begin();
 						iter_entity != iter_handle->second.end(); ++iter_entity) {
 
 					if(!*iter_entity || !(*iter_entity)->shown()) {
 						continue;
+					}
+
+					switch(iter_handle->first->mode()) {
+						case RENDER_PERSPECTIVE:
+							iter_handle->first->use(position, rotation, underwater, projection, view);
+							break;
+						default:
+							iter_handle->first->use(position, rotation, underwater, glm::ortho(0.f,
+								(float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f, 1.f));
+							break;
 					}
 
 					iter_handle->first->set_model((*iter_entity)->model());
