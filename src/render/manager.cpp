@@ -77,7 +77,8 @@ namespace nomic {
 
 			iter_id->second.insert(std::make_pair(handle, std::set<nomic::core::entity *>()));
 
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer added. Handle=%p", handle);
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer added. Handle=%p, Id=%x, Type=%x(%s)", handle, handle->get_id(),
+				handle->type(), RENDERER_STRING(handle->type()));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -259,9 +260,9 @@ namespace nomic {
 				}
 
 				iter_handle->second.insert(handle);
+				TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity registered. Handle=%p, Id=%x, Type=%x(%s)", handle, id,
+					iter_handle->first->type(), RENDERER_STRING(iter_handle->first->type()));
 			}
-
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity registered. Handle=%p", handle);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -290,7 +291,8 @@ namespace nomic {
 				m_id.erase(iter_id);
 			}
 
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer removed. Handle=%p", handle);
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer removed. Handle=%p, Id=%x, Type=%x(%s)", handle, handle->get_id(),
+				handle->type(), RENDERER_STRING(handle->type()));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -324,6 +326,16 @@ namespace nomic {
 						continue;
 					}
 
+					switch(iter_handle->first->mode()) {
+						case RENDER_PERSPECTIVE:
+							iter_handle->first->use(position, rotation, underwater, projection, view);
+							break;
+						default:
+							iter_handle->first->use(position, rotation, underwater, glm::ortho(0.f,
+								(float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f, 1.f));
+							break;
+					}
+
 					for(std::set<nomic::core::entity *>::iterator iter_entity = iter_handle->second.begin();
 							iter_entity != iter_handle->second.end(); ++iter_entity) {
 
@@ -340,18 +352,6 @@ namespace nomic {
 
 							iter_deferred->second.insert(*iter_entity);
 						} else {
-
-							switch(iter_handle->first->mode()) {
-								case RENDER_PERSPECTIVE:
-									iter_handle->first->use(position, rotation, underwater, projection, view);
-									break;
-								default:
-									iter_handle->first->use(position, rotation, underwater, glm::ortho(
-										0.f, (float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f,
-										1.f));
-									break;
-							}
-
 							iter_handle->first->set_model((*iter_entity)->model());
 							(*iter_entity)->on_render(*iter_handle->first, &textures, delta);
 						}
@@ -366,21 +366,21 @@ namespace nomic {
 					continue;
 				}
 
+				switch(iter_handle->first->mode()) {
+					case RENDER_PERSPECTIVE:
+						iter_handle->first->use(position, rotation, underwater, projection, view);
+						break;
+					default:
+						iter_handle->first->use(position, rotation, underwater, glm::ortho(0.f,
+							(float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f, 1.f));
+						break;
+				}
+
 				for(std::set<nomic::core::entity *>::iterator iter_entity = iter_handle->second.begin();
 						iter_entity != iter_handle->second.end(); ++iter_entity) {
 
 					if(!*iter_entity || !(*iter_entity)->shown()) {
 						continue;
-					}
-
-					switch(iter_handle->first->mode()) {
-						case RENDER_PERSPECTIVE:
-							iter_handle->first->use(position, rotation, underwater, projection, view);
-							break;
-						default:
-							iter_handle->first->use(position, rotation, underwater, glm::ortho(0.f,
-								(float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f, 1.f));
-							break;
 					}
 
 					iter_handle->first->set_model((*iter_entity)->model());
@@ -475,7 +475,7 @@ namespace nomic {
 			}
 
 			m_id.erase(find_id(id));
-			TRACE_MESSAGE(LEVEL_INFORMATION, "Unregistered all entities.");
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Unregistered all entities. Id=%x", id);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -509,10 +509,10 @@ namespace nomic {
 				iter_entity = iter_handle->second.find(handle);
 				if(iter_entity != iter_handle->second.end()) {
 					iter_handle->second.erase(iter_entity);
+					TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Unregisted entity. Handle=%p, Id=%x, Type=%x(%s)", handle, id,
+						iter_handle->first->type(), RENDERER_STRING(iter_handle->first->type()));
 				}
 			}
-
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Unregisted entity. Handle=%p", handle);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

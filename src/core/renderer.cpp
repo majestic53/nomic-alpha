@@ -26,6 +26,7 @@ namespace nomic {
 	namespace core {
 
 		renderer::renderer(
+			__in uint32_t type,
 			__in_opt bool blend,
 			__in_opt GLenum blend_sfactor,
 			__in_opt GLenum blend_dfactor,
@@ -42,6 +43,7 @@ namespace nomic {
 				m_depth(depth),
 				m_depth_mode(depth_mode),
 				m_mode(RENDER_PERSPECTIVE),
+				m_type(type),
 				m_uniform_model(0),
 				m_uniform_position(0),
 				m_uniform_projection(0),
@@ -69,6 +71,7 @@ namespace nomic {
 				m_depth(other.m_depth),
 				m_depth_mode(other.m_depth_mode),
 				m_mode(other.m_mode),
+				m_type(other.m_type),
 				m_uniform_model(other.m_uniform_model),
 				m_uniform_position(other.m_uniform_position),
 				m_uniform_projection(other.m_uniform_projection),
@@ -114,6 +117,7 @@ namespace nomic {
 				m_depth = other.m_depth;
 				m_depth_mode = other.m_depth_mode;
 				m_mode = other.m_mode;
+				m_type = other.m_type;
 				m_uniform_model = other.m_uniform_model;
 				m_uniform_position = other.m_uniform_position;
 				m_uniform_projection = other.m_uniform_projection;
@@ -394,6 +398,7 @@ namespace nomic {
 
 			if(verbose) {
 				result << " Base=" << nomic::graphic::program::to_string(verbose)
+					<< ", Type=" << SCALAR_AS_HEX(uint32_t, m_type) << "(" << RENDERER_STRING(m_type) << ")"
 					<< ", Blend=" << m_blend << ", Blend Factor={" << SCALAR_AS_HEX(GLenum, m_blend_sfactor)
 					<< ", " << SCALAR_AS_HEX(GLenum, m_blend_dfactor) << "}, Cull=" << m_cull
 					<< ", Cull Mode=" << SCALAR_AS_HEX(GLenum, m_cull_mode)
@@ -406,6 +411,14 @@ namespace nomic {
 			}
 
 			return result.str();
+		}
+
+		uint32_t 
+		renderer::type(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_type);
+			return m_type;
 		}
 
 		void 

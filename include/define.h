@@ -208,7 +208,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1730
 
 	#define OBJECT_COUNT 1
@@ -395,6 +395,7 @@ namespace nomic {
 	#define BLOCK_FACE_COUNT (BLOCK_FACE_MAX + 1)
 	#define BLOCK_FACE_MIN BLOCK_FACE_RIGHT
 	#define BLOCK_FACE_MAX BLOCK_FACE_FRONT
+	#define BLOCK_FACE_UNDEFINED SCALAR_INVALID(uint8_t)
 
 	static const std::string BLOCK_FACE_STR[] = {
 		"Right", "Left", "Top", "Bottom", "Back", "Front",
@@ -470,6 +471,29 @@ namespace nomic {
 		PRIMITIVE_VAO,
 		PRIMITIVE_VBO,
 	};
+
+	enum {
+		RENDERER_BACKGROUND_SKYBOX = 0,
+		RENDERER_CHUNK,
+		RENDERER_DEBUG_AXIS,
+		RENDERER_DEBUG_BLOCK,
+		RENDERER_DEBUG_DIAGNOSTIC,
+		RENDERER_FOREGROUND_RETICLE,
+		RENDERER_FOREGROUND_SELECTOR,
+		RENDERER_SPAWN_BACKDROP,
+		RENDERER_SPAWN_DIAGNOSTIC,
+		RENDERER_SPAWN_MESSAGE,
+	};
+
+	#define RENDERER_MAX RENDERER_SPAWN_MESSAGE
+
+	static const std::string RENDERER_STR[] = {
+		"Background-Skybox", "Chunk", "Debug-Axis", "Debug-Block", "Debug-Diagnostic", "Foreground-Reticle",
+		"Foreground-Selector", "Spawn-Backdrop", "Spawn-Diagnostic", "Spawn-Message",
+	};
+
+	#define RENDERER_STRING(_TYPE_) \
+		(((_TYPE_) > RENDERER_MAX) ? STRING_UNKNOWN : STRING_CHECK(RENDERER_STR[_TYPE_]))
 
 	enum {
 		RENDER_PERSPECTIVE = 0,

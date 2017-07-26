@@ -31,6 +31,7 @@ namespace nomic {
 			public:
 
 				explicit renderer(
+					__in uint32_t type,
 					__in_opt bool blend = RENDERER_BLEND_DEFAULT,
 					__in_opt GLenum blend_sfactor = RENDERER_BLEND_SFACTOR_DEFAULT,
 					__in_opt GLenum blend_dfactor = RENDERER_BLEND_DFACTOR_DEFAULT,
@@ -113,6 +114,8 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
+				uint32_t type(void);
+
 				void use(void);
 
 				void use(
@@ -162,6 +165,8 @@ namespace nomic {
 				GLenum m_depth_mode;
 
 				uint32_t m_mode;
+
+				uint32_t m_type;
 
 				GLint m_uniform_model;
 
