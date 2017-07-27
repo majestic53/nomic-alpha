@@ -25,23 +25,54 @@ namespace nomic {
 	namespace entity {
 
 		#define AXIS_SEGMENT_COUNT 18
-		#define AXIS_SEGMENT_WIDTH 3
+		#define AXIS_SEGMENT_WIDTH_COLOR 4
+		#define AXIS_SEGMENT_WIDTH_VERTEX 3
 
 		enum {
 			AXIS_INDEX_COLOR = 0,
 			AXIS_INDEX_VERTEX,
 		};
 
-		static const float AXIS_COLOR[] = {
-			1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, // red x
-			0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, // green y
-			0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, // blue z
+		static const glm::vec4 AXIS_COLOR[] = {
+			{ 1.f, 0.f, 0.f, 1.f }, // red x
+			{ 1.f, 0.f, 0.f, 1.f },
+			{ 1.f, 0.f, 0.f, 1.f },
+			{ 1.f, 0.f, 0.f, 1.f },
+			{ 1.f, 0.f, 0.f, 1.f },
+			{ 1.f, 0.f, 0.f, 1.f },
+			{ 0.f, 1.f, 0.f, 1.f }, // green y
+			{ 0.f, 1.f, 0.f, 1.f },
+			{ 0.f, 1.f, 0.f, 1.f },
+			{ 0.f, 1.f, 0.f, 1.f },
+			{ 0.f, 1.f, 0.f, 1.f },
+			{ 0.f, 1.f, 0.f, 1.f },
+			{ 0.f, 0.f, 1.f, 1.f }, // blue z
+			{ 0.f, 0.f, 1.f, 1.f },
+			{ 0.f, 0.f, 1.f, 1.f },
+			{ 0.f, 0.f, 1.f, 1.f },
+			{ 0.f, 0.f, 1.f, 1.f },
+			{ 0.f, 0.f, 1.f, 1.f },
 			};
 
-		static const float AXIS_VERTEX[] = {
-			0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.75f, 0.25f, 0.f, 1.f, 0.f, 0.f, 0.75f, -0.25f, 0.f, // x
-			0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, 0.f, // y
-			0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.25f, 0.75f, 0.f, 0.f, 1.f, 0.f, -0.25f, 0.75f, // z
+		static const glm::vec3 AXIS_VERTEX[] = {
+			{ 0.f, 0.f, 0.f, }, // x
+			{ 1.f, 0.f, 0.f, },
+			{ 1.f, 0.f, 0.f, },
+			{ 0.75f, 0.25f, 0.f, },
+			{ 1.f, 0.f, 0.f, },
+			{ 0.75f, -0.25f, 0.f, },
+			{ 0.f, 0.f, 0.f, }, // y
+			{ 0.f, 1.f, 0.f, },
+			{ 0.f, 1.f, 0.f, },
+			{ 0.25f, 0.75f, 0.f, },
+			{ 0.f, 1.f, 0.f, },
+			{ -0.25f, 0.75f, 0.f, },
+			{ 0.f, 0.f, 0.f, }, // z
+			{ 0.f, 0.f, 1.f, },
+			{ 0.f, 0.f, 1.f, },
+			{ 0.f, 0.25f, 0.75f, },
+			{ 0.f, 0.f, 1.f, },
+			{ 0.f, -0.25f, 0.75f, }, // z
 			};
 
 		axis::axis(void) :
@@ -51,11 +82,11 @@ namespace nomic {
 
 			nomic::graphic::vao &arr = vertex_array();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_COLOR[0],
-				((uint8_t *) &AXIS_COLOR[0]) + ((AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				AXIS_INDEX_COLOR, AXIS_SEGMENT_WIDTH, GL_FLOAT);
+				((uint8_t *) &AXIS_COLOR[0]) + ((AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				AXIS_INDEX_COLOR, AXIS_SEGMENT_WIDTH_COLOR, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_VERTEX[0],
-				((uint8_t *) &AXIS_VERTEX[0]) + ((AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				AXIS_INDEX_VERTEX, AXIS_SEGMENT_WIDTH, GL_FLOAT);
+				((uint8_t *) &AXIS_VERTEX[0]) + ((AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				AXIS_INDEX_VERTEX, AXIS_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 			arr.enable(AXIS_INDEX_COLOR);
 			arr.enable(AXIS_INDEX_VERTEX);
 

@@ -208,7 +208,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_REVISION 3
 	#define NOMIC_VERSION_WEEK 1730
 
 	#define OBJECT_COUNT 1
@@ -231,6 +231,11 @@ namespace nomic {
 	#define RENDERER_CULL_MODE_DEFAULT GL_BACK
 	#define RENDERER_DEPTH_DEFAULT true
 	#define RENDERER_DEPTH_MODE_DEFAULT GL_LESS
+
+	#define RETICLE_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
+	#define RETICLE_HORIZONTAL_LEFT 2
+	#define RETICLE_HORIZONTAL_RIGHT 3
+	#define RETICLE_WIDTH 0.04f
 
 	#define RUNTIME_PAUSE_DELAY 200
 	#define RUNTIME_TICKS_PER_SECOND 60
@@ -261,6 +266,8 @@ namespace nomic {
 		}
 
 	#define SESSION_DEBUG_DEFAULT true
+
+	#define SKYBOX_RADIUS 1.f
 
 	#define STRING_EMPTY "<EMPTY>"
 	#define STRING_INVALID "<INVALID>"

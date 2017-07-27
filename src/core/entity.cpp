@@ -35,7 +35,6 @@ namespace nomic {
 			) :
 				nomic::core::object(type, subtype),
 				nomic::core::transform(position, rotation, up),
-				m_deferred(false),
 				m_enabled(true),
 				m_shown(true)
 		{
@@ -52,7 +51,6 @@ namespace nomic {
 				nomic::core::id(other),
 				nomic::core::object(other),
 				nomic::core::transform(other),
-				m_deferred(other.m_deferred),
 				m_enabled(other.m_enabled),
 				m_shown(other.m_shown)
 		{
@@ -87,7 +85,6 @@ namespace nomic {
 				nomic::core::id::operator=(other);
 				nomic::core::object::operator=(other);
 				nomic::core::transform::operator=(other);
-				m_deferred = other.m_deferred;
 				m_enabled = other.m_enabled;
 				m_shown = other.m_shown;
 				add();
@@ -111,26 +108,6 @@ namespace nomic {
 			instance.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		void 
-		entity::defer(
-			__in bool state
-			)
-		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "State=%x", state);
-
-			m_deferred = state;
-
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		bool 
-		entity::deferred(void) const
-		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_deferred);
-			return m_deferred;
 		}
 
 		void 
@@ -176,14 +153,14 @@ namespace nomic {
 
 		bool 
 		entity::registered(
-			__in GLuint id
+			__in uint32_t type
 			) const
 		{
 			bool result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x(%s)", type, RENDERER_STRING(type));
 
-			result = (m_renderer.find(id) != m_renderer.end());
+			result = (m_renderer.find(type) != m_renderer.end());
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -191,38 +168,40 @@ namespace nomic {
 
 		void 
 		entity::register_renderer(
-			__in GLuint id
+			__in uint32_t type
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x(%s)", type, RENDERER_STRING(type));
 
-			if(id == HANDLE_INVALID) {
-				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_INVALID, "Id=%x", id);
+			if(type > RENDERER_MAX) {
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_INVALID,
+					"Type=%x(%s)", type, RENDERER_STRING(type));
 			}
 
-			if(m_renderer.find(id) != m_renderer.end()) {
-				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_DUPLICATE, "Id=%x", id);
+			if(m_renderer.find(type) != m_renderer.end()) {
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_DUPLICATE,
+					"Type=%x(%s)", type, RENDERER_STRING(type));
 			}
 
 			nomic::render::manager &instance = nomic::render::manager::acquire();
 			if(instance.initialized()) {
-				instance.register_entity(this, id);
+				instance.register_entity(this, type);
 			}
 
 			instance.release();
-			m_renderer.insert(id);
+			m_renderer.insert(type);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
 		entity::register_renderers(
-			__in const std::set<GLuint> &renderer
+			__in const std::set<uint32_t> &renderer
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer[%u]=%p", renderer.size(), &renderer);
 
-			for(std::set<GLuint>::const_iterator iter = renderer.begin(); iter != renderer.end(); ++iter) {
+			for(std::set<uint32_t>::const_iterator iter = renderer.begin(); iter != renderer.end(); ++iter) {
 				register_renderer(*iter);
 			}
 
@@ -289,19 +268,18 @@ namespace nomic {
 					<< ", Transform=" << nomic::core::transform::to_string(verbose)
 					<< ", Id=" << nomic::core::id::to_string(verbose)
 					<< ", State=" << (m_enabled ? "Enabled" : "Disabled") << "/" << (m_shown ? "Shown" : "Hidden")
-						<< "/" << (m_deferred ? "Deferred" : "Immediate")
 					<< ", Renderer[" << m_renderer.size() << "]";
 
 				if(!m_renderer.empty()) {
 					result << "={";
 
-					for(std::set<GLuint>::iterator iter = m_renderer.begin(); iter != m_renderer.end(); ++iter) {
+					for(std::set<uint32_t>::iterator iter = m_renderer.begin(); iter != m_renderer.end(); ++iter) {
 
 						if(iter != m_renderer.begin()) {
 							result << ", ";
 						}
 
-						result << SCALAR_AS_HEX(GLuint, *iter);
+						result << SCALAR_AS_HEX(uint32_t, *iter);
 					}
 
 					result << "}";
@@ -319,9 +297,9 @@ namespace nomic {
 
 			nomic::render::manager &instance = nomic::render::manager::acquire();
 
-			for(std::set<GLuint>::iterator iter = m_renderer.begin(); iter != m_renderer.end(); ++iter) {
+			for(std::set<uint32_t>::iterator iter = m_renderer.begin(); iter != m_renderer.end(); ++iter) {
 
-				if(instance.initialized() && instance.contains_registration(this, *iter)) {
+				if(instance.initialized() && instance.contains_entity(this, *iter)) {
 					instance.unregister_entity(this, *iter);
 				}
 			}
@@ -334,25 +312,27 @@ namespace nomic {
 
 		void 
 		entity::unregister_renderer(
-			__in GLuint id
+			__in uint32_t type
 			)
 		{
-			std::set<GLuint>::iterator result;
+			std::set<uint32_t>::iterator result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Id=%x", id);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x(%s)", type, RENDERER_STRING(type));
 
-			if(id == HANDLE_INVALID) {
-				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_INVALID, "Id=%x", id);
+			if(type > RENDERER_MAX) {
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_INVALID,
+					"Type=%x(%s)", type, RENDERER_STRING(type));
 			}
 
-			result = m_renderer.find(id);
+			result = m_renderer.find(type);
 			if(result == m_renderer.end()) {
-				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_UNREGISTERED, "Id=%x", id);
+				THROW_NOMIC_CORE_ENTITY_EXCEPTION_FORMAT(NOMIC_CORE_ENTITY_EXCEPTION_RENDERER_UNREGISTERED,
+					"Type=%x(%s)", type, RENDERER_STRING(type));
 			}
 
 			nomic::render::manager &instance = nomic::render::manager::acquire();
-			if(instance.initialized() && instance.contains_registration(this, id)) {
-				instance.unregister_entity(this, id);
+			if(instance.initialized() && instance.contains_entity(this, type)) {
+				instance.unregister_entity(this, type);
 			}
 
 			instance.release();

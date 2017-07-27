@@ -32,43 +32,43 @@ namespace nomic {
 			SKYBOX_INDEX_VERTEX = 0,
 		};
 
-		static const float SKYBOX_VERTEX[] = {
-			-1.f, 1.f, -1.f, //right
-			-1.f, -1.f, -1.f,
-			1.f, -1.f, -1.f,
-			1.f, -1.f, -1.f,
-			1.f, 1.f, -1.f,
-			-1.f, 1.f, -1.f,
-			-1.f, -1.f, 1.f, // left
-			-1.f, -1.f, -1.f,
-			-1.f, 1.f, -1.f,
-			-1.f, 1.f, -1.f,
-			-1.f, 1.f, 1.f,
-			-1.f, -1.f, 1.f,
-			1.f, -1.f, -1.f, // top
-			1.f, -1.f, 1.f,
-			1.f, 1.f, 1.f,
-			1.f, 1.f, 1.f,
-			1.f, 1.f, -1.f,
-			1.f, -1.f, -1.f,
-			-1.f, -1.f, 1.f, // bottom
-			-1.f, 1.f, 1.f,
-			1.f, 1.f, 1.f,
-			1.f, 1.f, 1.f,
-			1.f, -1.f, 1.f,
-			-1.f, -1.f, 1.f,
-			-1.f, 1.f, -1.f, // back
-			1.f, 1.f, -1.f,
-			1.f, 1.f, 1.f,
-			1.f, 1.f, 1.f,
-			-1.f, 1.f, 1.f,
-			-1.f, 1.f, -1.f,
-			-1.f, -1.f, -1.f, // front
-			-1.f, -1.f, 1.f,
-			1.f, -1.f, -1.f,
-			1.f, -1.f, -1.f,
-			-1.f, -1.f, 1.f,
-			1.f, -1.f, 1.f,
+		static const glm::vec3 SKYBOX_VERTEX[] = {
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, }, //right
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, }, // left
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, }, // top
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, }, // bottom
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, }, // back
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, }, // front
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, -SKYBOX_RADIUS, },
+			{ -SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, },
+			{ SKYBOX_RADIUS, -SKYBOX_RADIUS, SKYBOX_RADIUS, },
 			};
 
 		skybox::skybox(

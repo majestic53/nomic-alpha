@@ -170,19 +170,6 @@ namespace nomic {
 			return m_depth;
 		}
 
-		GLuint 
-		renderer::get_id(void) const
-		{
-			GLuint result;
-
-			TRACE_ENTRY(LEVEL_VERBOSE);
-
-			result = nomic::graphic::program::handle();
-
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
-			return result;
-		}
-
 		uint32_t 
 		renderer::mode(void) const
 		{
@@ -197,7 +184,7 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::render::manager &instance = nomic::render::manager::acquire();
-			if(instance.initialized() && instance.contains(m_handle)) {
+			if(instance.initialized() && instance.contains(m_type)) {
 				instance.remove(this);
 			}
 

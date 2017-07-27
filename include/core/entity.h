@@ -54,12 +54,6 @@ namespace nomic {
 					__in const entity &other
 					);
 
-				void defer(
-					__in bool state
-					);
-
-				bool deferred(void) const;
-
 				void enable(
 					__in bool state
 					);
@@ -80,11 +74,11 @@ namespace nomic {
 				virtual glm::mat4 &model(void) = 0;
 
 				void register_renderer(
-					__in GLuint id
+					__in uint32_t type
 					);
 
 				bool registered(
-					__in GLuint id
+					__in uint32_t type
 					) const;
 
 				virtual void set_view_dimensions(
@@ -104,7 +98,7 @@ namespace nomic {
 				void unregsiter_all_renderers(void);
 
 				void unregister_renderer(
-					__in GLuint id
+					__in uint32_t type
 					);
 
 			protected:
@@ -112,16 +106,14 @@ namespace nomic {
 				void add(void);
 
 				void register_renderers(
-					__in const std::set<GLuint> &renderer
+					__in const std::set<uint32_t> &renderer
 					);
 
 				void remove(void);
 
-				bool m_deferred;
-
 				bool m_enabled;
 
-				std::set<GLuint> m_renderer;
+				std::set<uint32_t> m_renderer;
 
 				bool m_shown;
 		};

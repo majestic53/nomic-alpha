@@ -65,23 +65,23 @@ namespace nomic {
 
 		// debug objects
 		enum {
-			DEBUG_OBJECT_DIAGNOSTIC = 0,
-			DEBUG_OBJECT_AXIS,
+			DEBUG_OBJECT_AXIS = 0,
 			DEBUG_OBJECT_BLOCK,
+			DEBUG_OBJECT_DIAGNOSTIC,
 		};
 
-		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_BLOCK
+		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_DIAGNOSTIC
 
 		static const std::vector<renderer_config> DEBUG_RENDERER_CONFIGURATION = {
-			{ "./res/vert_string.glsl", "./res/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
-				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
-				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
 			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT, RENDERER_BLEND_DFACTOR_DEFAULT,
 				RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_DEPTH_DEFAULT,
 				RENDERER_DEPTH_MODE_DEFAULT }, // axis
 			{ "./res/vert_block.glsl", "./res/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, false, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // block
+			{ "./res/vert_string.glsl", "./res/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
 			};
 
 		static const std::map<uint32_t, std::string> DEBUG_BLOCK_FACE = {
@@ -230,7 +230,7 @@ namespace nomic {
 
 						entry->enable(false);
 						entry->show(false);
-						entry->register_renderer(m_chunk_renderer->get_id());
+						entry->register_renderer(m_chunk_renderer->type());
 					}
 				}
 			}
@@ -347,18 +347,18 @@ namespace nomic {
 						position.z += BACKDROP_OFFSET_DEFAULT;
 						backdrop.back()->position() = position;
 						backdrop.back()->show(true);
-						backdrop.back()->register_renderer(backdrop_renderer.get_id());
+						backdrop.back()->register_renderer(backdrop_renderer.type());
 					}
 				}
 			}
 
 			diagnostic.enable(true);
 			diagnostic.show(true);
-			diagnostic.register_renderer(diagnostic_renderer.get_id());
+			diagnostic.register_renderer(diagnostic_renderer.type());
 
 			message.enable(true);
 			message.show(true);
-			message.register_renderer(message_renderer.get_id());
+			message.register_renderer(message_renderer.type());
 			message.text() = "Generating chunk objects...";
 
 			update();
@@ -404,7 +404,7 @@ namespace nomic {
 
 					entry->enable(false);
 					entry->show(false);
-					entry->register_renderer(m_chunk_renderer->get_id());
+					entry->register_renderer(m_chunk_renderer->type());
 				}
 			}
 
@@ -545,7 +545,7 @@ namespace nomic {
 
 				m_entity_object_background.at(iter)->enable(false);
 				m_entity_object_background.at(iter)->show(false);
-				m_entity_object_background.at(iter)->register_renderer(m_entity_renderer_background.at(iter)->get_id());
+				m_entity_object_background.at(iter)->register_renderer(m_entity_renderer_background.at(iter)->type());
 			}
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building foreground entity objects...");
@@ -595,10 +595,9 @@ namespace nomic {
 					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
 				}
 
-				m_entity_object_foreground.at(iter)->defer(true);
 				m_entity_object_foreground.at(iter)->enable(false);
 				m_entity_object_foreground.at(iter)->show(false);
-				m_entity_object_foreground.at(iter)->register_renderer(m_entity_renderer_foreground.at(iter)->get_id());
+				m_entity_object_foreground.at(iter)->register_renderer(m_entity_renderer_foreground.at(iter)->type());
 			}
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Building debug objects...");
@@ -654,10 +653,9 @@ namespace nomic {
 					THROW_NOMIC_SESSION_MANAGER_EXCEPTION_FORMAT(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE, "Object=%u", iter);
 				}
 
-				m_debug_object.at(iter)->defer(true);
 				m_debug_object.at(iter)->enable(false);
 				m_debug_object.at(iter)->show(false);
-				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->get_id());
+				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->type());
 			}
 
 			generate_chunks_spawn();

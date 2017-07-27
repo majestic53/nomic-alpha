@@ -38,25 +38,25 @@ namespace nomic {
 				~manager(void);
 
 				void add(
-					__in nomic::core::renderer *handle
+					__in nomic::core::renderer *renderer
 					);
 
 				bool contains(
-					__in GLuint id
+					__in uint32_t type
 					);
 
-				bool contains_registration(
-					__in nomic::core::entity *handle,
-					__in GLuint id
+				bool contains_entity(
+					__in nomic::core::entity *entity,
+					__in uint32_t type
 					);
 
 				void remove(
-					__in nomic::core::renderer *handle
+					__in nomic::core::renderer *renderer
 					);
 
 				void register_entity(
-					__in nomic::core::entity *handle,
-					__in GLuint id
+					__in nomic::core::entity *entity,
+					__in uint32_t type
 					);
 
 				void render(
@@ -75,12 +75,12 @@ namespace nomic {
 					) const;
 
 				void unregister_all_entities(
-					__in GLuint id
+					__in uint32_t type
 					);
 
 				void unregister_entity(
-					__in nomic::core::entity *handle,
-					__in GLuint id
+					__in nomic::core::entity *entity,
+					__in uint32_t type
 					);
 
 			protected:
@@ -97,19 +97,15 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
-				std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>::iterator find_handle(
-					__in nomic::core::renderer *handle
-					);
-
-				std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator find_id(
-					__in GLuint id
+				std::map<uint32_t, std::pair<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator find(
+					__in uint32_t type
 					);
 
 				bool on_initialize(void);
 
 				void on_uninitialize(void);
 
-				std::map<GLuint, std::map<nomic::core::renderer *, std::set<nomic::core::entity *>>> m_id;
+				std::map<uint32_t, std::pair<nomic::core::renderer *, std::set<nomic::core::entity *>>> m_entry;
 
 				std::mutex m_mutex;
 		};

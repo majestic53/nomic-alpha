@@ -101,7 +101,7 @@ namespace nomic {
 				color.x, color.y, color.z, color.w, scale, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z,
 				up.x, up.y, up.z);
 
-			reconfigure();
+			setup();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -116,7 +116,7 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			reconfigure();
+			setup();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -175,15 +175,28 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			arr.set_subdata(SELECTOR_INDEX_COLOR, 0, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
+				&color[0]);
+			arr.set_subdata(SELECTOR_INDEX_VERTEX, 0, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
+				&vertex[0]);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		selector::setup(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::vao &arr = vertex_array();
 			arr.disable_all();
 			arr.remove_all();
 			arr.clear();
-			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
-				((uint8_t *) &color[0]) + ((SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				SELECTOR_INDEX_COLOR, SELECTOR_SEGMENT_WIDTH_COLOR, GL_FLOAT);
-			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
-				((uint8_t *) &vertex[0]) + ((SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))),
-				GL_STATIC_DRAW), SELECTOR_INDEX_VERTEX, SELECTOR_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
+				GL_DYNAMIC_DRAW), SELECTOR_INDEX_COLOR, SELECTOR_SEGMENT_WIDTH_COLOR, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
+				GL_DYNAMIC_DRAW), SELECTOR_INDEX_VERTEX, SELECTOR_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 			arr.enable(SELECTOR_INDEX_COLOR);
 			arr.enable(SELECTOR_INDEX_VERTEX);
 

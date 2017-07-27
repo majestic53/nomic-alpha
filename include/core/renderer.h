@@ -57,8 +57,6 @@ namespace nomic {
 
 				bool depth(void) const;
 
-				GLuint get_id(void) const;
-
 				uint32_t mode(void) const;
 
 				void set_blend(

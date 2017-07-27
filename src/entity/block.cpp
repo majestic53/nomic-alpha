@@ -83,43 +83,43 @@ namespace nomic {
 			{ 1.f, 0.f, },
 			};
 
-		static const float BLOCK_VERTEX[] = {
-			BLOCK_WIDTH, 0.f, 0.f, // right
-			BLOCK_WIDTH, 0.f, BLOCK_WIDTH,
-			BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH,
-			BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH,
-			BLOCK_WIDTH, BLOCK_WIDTH, 0.f,
-			BLOCK_WIDTH, 0.f, 0.f,
-			0.f, 0.f, BLOCK_WIDTH, // left
-			0.f, 0.f, 0.f,
-			0.f, BLOCK_WIDTH, 0.f,
-			0.f, BLOCK_WIDTH, 0.f,
-			0.f, BLOCK_WIDTH, BLOCK_WIDTH,
-			0.f, 0.f, BLOCK_WIDTH,
-			0.f, BLOCK_WIDTH, 0.f, // top
-			BLOCK_WIDTH, BLOCK_WIDTH, 0.f,
-			BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH,
-			BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH,
-			0.f, BLOCK_WIDTH, BLOCK_WIDTH,
-			0.f, BLOCK_WIDTH, 0.f,
-			0.f, 0.f, 0.f, // bottom
-			0.f, 0.f, BLOCK_WIDTH,
-			BLOCK_WIDTH, 0.f, 0.f,
-			BLOCK_WIDTH, 0.f, 0.f,
-			0.f, 0.f, BLOCK_WIDTH,
-			BLOCK_WIDTH, 0.f, BLOCK_WIDTH,
-			0.f, 0.f, BLOCK_WIDTH, // back
-			0.f, BLOCK_WIDTH, BLOCK_WIDTH,
-			BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH,
-			BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH,
-			BLOCK_WIDTH, 0.f, BLOCK_WIDTH,
-			0.f, 0.f, BLOCK_WIDTH,
-			0.f, BLOCK_WIDTH, 0.f, // front
-			0.f, 0.f, 0.f,
-			BLOCK_WIDTH, 0.f, 0.f,
-			BLOCK_WIDTH, 0.f, 0.f,
-			BLOCK_WIDTH, BLOCK_WIDTH, 0.f,
-			0.f, BLOCK_WIDTH, 0.f,
+		static const glm::vec3 BLOCK_VERTEX[] = {
+			{ BLOCK_WIDTH, 0.f, 0.f, }, // right
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ 0.f, 0.f, BLOCK_WIDTH, }, // left
+			{ 0.f, 0.f, 0.f, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, 0.f, }, // top
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
+			{ 0.f, 0.f, 0.f, }, // bottom
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, },
+			{ 0.f, 0.f, BLOCK_WIDTH, }, // back
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, },
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, 0.f, }, // front
+			{ 0.f, 0.f, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
 			};
 
 		block::block(
@@ -211,7 +211,8 @@ namespace nomic {
 		void 
 		block::reconfigure(void)
 		{
-			std::vector<float> vertex;
+			glm::vec3 scale;
+			std::vector<glm::vec3> vertex;
 			std::vector<glm::vec4> color;
 			std::vector<glm::vec2> coordinate;
 
@@ -225,8 +226,10 @@ namespace nomic {
 				}
 			}
 
-			for(uint32_t iter = 0; iter < (BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_VERTEX); ++iter) {
-				vertex.push_back(BLOCK_VERTEX[iter] * m_scale);
+			scale = glm::vec3(m_scale, m_scale, m_scale);
+
+			for(uint32_t iter = 0; iter < BLOCK_SEGMENT_COUNT; ++iter) {
+				vertex.push_back(BLOCK_VERTEX[iter] * scale);
 			}
 
 			nomic::graphic::vao &arr = vertex_array();

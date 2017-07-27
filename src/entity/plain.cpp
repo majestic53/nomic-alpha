@@ -35,31 +35,31 @@ namespace nomic {
 			PLAIN_INDEX_VERTEX,
 		};
 
-		static const float PLAIN_COLOR[] = {
-			PLAIN_COLOR_RGBA_DEFAULT, // bottom left corner
-			PLAIN_COLOR_RGBA_DEFAULT, // top left corner
-			PLAIN_COLOR_RGBA_DEFAULT, // top right corner
-			PLAIN_COLOR_RGBA_DEFAULT, // bottom left corner
-			PLAIN_COLOR_RGBA_DEFAULT, // top right corner
-			PLAIN_COLOR_RGBA_DEFAULT, // bottom right corner
+		static const glm::vec4 PLAIN_COLOR[] = {
+			{ PLAIN_COLOR_RGBA_DEFAULT, }, // bottom left corner
+			{ PLAIN_COLOR_RGBA_DEFAULT, }, // top left corner
+			{ PLAIN_COLOR_RGBA_DEFAULT, }, // top right corner
+			{ PLAIN_COLOR_RGBA_DEFAULT, }, // bottom left corner
+			{ PLAIN_COLOR_RGBA_DEFAULT, }, // top right corner
+			{ PLAIN_COLOR_RGBA_DEFAULT, }, // bottom right corner
 			};
 
-		static const float PLAIN_COORDINATE[] = {
-			1.f, 1.f, // bottom left
-			1.f, 0.f, // top left
-			0.f, 0.f, // top right
-			1.f, 1.f, // bottom left
-			0.f, 0.f, // top right
-			0.f, 1.f, // bottom right
+		static const glm::vec2 PLAIN_COORDINATE[] = {
+			{ 1.f, 1.f, }, // bottom left
+			{ 1.f, 0.f, }, // top left
+			{ 0.f, 0.f, }, // top right
+			{ 1.f, 1.f, }, // bottom left
+			{ 0.f, 0.f, }, // top right
+			{ 0.f, 1.f, }, // bottom right
 			};
 
-		static const float PLAIN_VERTEX[] = {
-			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // bottom left corner
-			-BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // top left corner
-			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // top right corner
-			-BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // bottom left corner
-			BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, // top right corner
-			BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, // bottom right corner
+		static const glm::vec3 PLAIN_VERTEX[] = {
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, }, // bottom left corner
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // top left corner
+			{ BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // top right corner
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, }, // bottom left corner
+			{ BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // top right corner
+			{ BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, }, // bottom right corner
 			};
 
 		plain::plain(

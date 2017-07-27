@@ -74,6 +74,8 @@ namespace nomic {
 
 				void reconfigure(void);
 
+				void setup(void);
+
 				glm::vec4 m_color;
 
 				uint8_t m_face;

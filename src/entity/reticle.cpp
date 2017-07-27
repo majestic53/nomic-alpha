@@ -24,25 +24,20 @@ namespace nomic {
 
 	namespace entity {
 
-		#define RETICLE_HORIZONTAL_LEFT 0
-		#define RETICLE_HORIZONTAL_RIGHT 1
 		#define RETICLE_SEGMENT_COUNT 4
-		#define RETICLE_SEGMENT_WIDTH 3
-		#define RETICLE_WIDTH 0.04f
+		#define RETICLE_SEGMENT_WIDTH_COLOR 4
+		#define RETICLE_SEGMENT_WIDTH_VERTEX 3
 
 		enum {
 			RETICLE_INDEX_COLOR = 0,
 			RETICLE_INDEX_VERTEX,
 		};
 
-		static const float RETICLE_COLOR[] = {
-			1.f, 1.f, 1.f, 1.f, 1.f, 1.f, // white
-			1.f, 1.f, 1.f, 1.f, 1.f, 1.f, // white
-			};
-
-		static const float RETICLE_VERTEX[] = {
-			-RETICLE_WIDTH, 0.f, 0.f, RETICLE_WIDTH, 0.f, 0.f, // horizontal
-			0.0f, -RETICLE_WIDTH, 0.f, 0.f, RETICLE_WIDTH, 0.f,  // vertical
+		static const glm::vec3 RETICLE_VERTEX[] = {
+			{ 0.f, RETICLE_WIDTH, 0.f }, // vertical
+			{ 0.0f, -RETICLE_WIDTH, 0.f },
+			{ RETICLE_WIDTH, 0.f, 0.f }, // horizontal
+			{ -RETICLE_WIDTH, 0.f, 0.f },
 			};
 
 		reticle::reticle(void) :
@@ -117,6 +112,7 @@ namespace nomic {
 		reticle::setup(void)
 		{
 			float ratio;
+			std::vector<glm::vec4> color;
 			std::vector<glm::vec3> vertex;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -124,8 +120,8 @@ namespace nomic {
 			ratio = (m_view_dimensions.y / (float) m_view_dimensions.x);
 
 			for(uint32_t iter = 0; iter < RETICLE_SEGMENT_COUNT; ++iter) {
-				uint32_t offset = (iter * RETICLE_SEGMENT_WIDTH);
-				vertex.push_back(glm::vec3(RETICLE_VERTEX[offset], RETICLE_VERTEX[offset + 1], RETICLE_VERTEX[offset + 2]));
+				color.push_back(RETICLE_COLOR_DEFAULT);
+				vertex.push_back(RETICLE_VERTEX[iter]);
 
 				if((iter == RETICLE_HORIZONTAL_LEFT) || (iter == RETICLE_HORIZONTAL_RIGHT)) {
 					vertex.back().x *= ratio;
@@ -136,12 +132,12 @@ namespace nomic {
 			arr.disable_all();
 			arr.remove_all();
 			arr.clear();
-			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &RETICLE_COLOR[0],
-				((uint8_t *) &RETICLE_COLOR[0]) + ((RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				RETICLE_INDEX_COLOR, RETICLE_SEGMENT_WIDTH, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
+				((uint8_t *) &color[0]) + ((RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				RETICLE_INDEX_COLOR, RETICLE_SEGMENT_WIDTH_COLOR, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
-				((uint8_t *) &vertex[0]) + ((RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				RETICLE_INDEX_VERTEX, RETICLE_SEGMENT_WIDTH, GL_FLOAT);
+				((uint8_t *) &vertex[0]) + ((RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				RETICLE_INDEX_VERTEX, RETICLE_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 			arr.enable(RETICLE_INDEX_COLOR);
 			arr.enable(RETICLE_INDEX_VERTEX);
 
