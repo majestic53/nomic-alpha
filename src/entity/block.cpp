@@ -237,13 +237,13 @@ namespace nomic {
 			arr.remove_all();
 			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
-				((uint8_t *) &color[0]) + ((BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))),
+				((uint8_t *) &color[0]) + (BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_COLOR * sizeof(GLfloat))),
 				GL_STATIC_DRAW), BLOCK_INDEX_COLOR, BLOCK_SEGMENT_WIDTH_COLOR, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &coordinate[0],
-				((uint8_t *) &coordinate[0]) + ((BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_COORDINATE) * sizeof(GLfloat))),
+				((uint8_t *) &coordinate[0]) + (BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
 				GL_STATIC_DRAW), BLOCK_INDEX_COORDINATE, BLOCK_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
-				((uint8_t *) &vertex[0]) + ((BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))),
+				((uint8_t *) &vertex[0]) + (BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
 				GL_STATIC_DRAW), BLOCK_INDEX_VERTEX, BLOCK_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 			arr.enable(BLOCK_INDEX_COLOR);
 			arr.enable(BLOCK_INDEX_COORDINATE);

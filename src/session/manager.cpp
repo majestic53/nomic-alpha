@@ -284,48 +284,84 @@ namespace nomic {
 		void 
 		manager::generate_chunks_spawn(void)
 		{
+			nomic::entity::message *message = nullptr;
 			std::vector<nomic::entity::plain *> backdrop;
-			nomic::core::renderer backdrop_renderer(RENDERER_SPAWN_BACKDROP), diagnostic_renderer(RENDERER_SPAWN_DIAGNOSTIC),
-				message_renderer(RENDERER_SPAWN_MESSAGE);
+			nomic::entity::diagnostic *diagnostic = nullptr;
+			nomic::graphic::bitmap *backdrop_texture = nullptr;
 			uint32_t completed = 0, current, previous = 0, total = (VIEW_WIDTH * VIEW_WIDTH);
+			nomic::core::renderer *backdrop_renderer = nullptr, *diagnostic_renderer = nullptr, *message_renderer = nullptr;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			const renderer_config &config = DEBUG_RENDERER_CONFIGURATION.at(DEBUG_OBJECT_DIAGNOSTIC);
-			diagnostic_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
-			diagnostic_renderer.set_mode(std::get<RENDERER_MODE>(config));
-			diagnostic_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
+
+			diagnostic_renderer = new nomic::core::renderer(RENDERER_SPAWN_DIAGNOSTIC);
+			if(!diagnostic_renderer) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+			}
+
+			diagnostic_renderer->set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
+			diagnostic_renderer->set_mode(std::get<RENDERER_MODE>(config));
+			diagnostic_renderer->set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
 				std::get<RENDERER_BLEND_DFACTOR>(config));
-			diagnostic_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
-			diagnostic_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
+			diagnostic_renderer->set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
+			diagnostic_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
 
-			nomic::entity::diagnostic diagnostic(false);
+			diagnostic = new nomic::entity::diagnostic(false);
+			if(!diagnostic) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+			}
 
-			nomic::entity::message message;
-			message_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
-			message_renderer.set_mode(std::get<RENDERER_MODE>(config));
-			message_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
+			diagnostic->enable(false);
+			diagnostic->show(false);
+			diagnostic->register_renderer(diagnostic_renderer->type());
+
+			message_renderer = new nomic::core::renderer(RENDERER_SPAWN_MESSAGE);
+			if(!message_renderer) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+			}
+
+			message_renderer->set_shaders(std::get<RENDERER_SHADER_VERTEX>(config), std::get<RENDERER_SHADER_FRAGMENT>(config));
+			message_renderer->set_mode(std::get<RENDERER_MODE>(config));
+			message_renderer->set_blend(std::get<RENDERER_BLEND_ENABLED>(config), std::get<RENDERER_BLEND_SFACTOR>(config),
 				std::get<RENDERER_BLEND_DFACTOR>(config));
-			message_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
-			message_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
+			message_renderer->set_cull(std::get<RENDERER_CULL_ENABLED>(config), std::get<RENDERER_CULL_MODE>(config));
+			message_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(config), std::get<RENDERER_DEPTH_MODE>(config));
 
-			backdrop_renderer.set_shaders(std::get<RENDERER_SHADER_VERTEX>(BACKDROP_RENDERER_CONFIGURATION),
+			message = new nomic::entity::message;
+			if(!message) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+			}
+
+			message->enable(false);
+			message->show(false);
+			message->register_renderer(message_renderer->type());
+
+			backdrop_renderer = new nomic::core::renderer(RENDERER_SPAWN_BACKDROP);
+			if(!backdrop_renderer) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+			}
+
+			backdrop_renderer->set_shaders(std::get<RENDERER_SHADER_VERTEX>(BACKDROP_RENDERER_CONFIGURATION),
 				std::get<RENDERER_SHADER_FRAGMENT>(BACKDROP_RENDERER_CONFIGURATION));
-			backdrop_renderer.set_mode(std::get<RENDERER_MODE>(BACKDROP_RENDERER_CONFIGURATION));
-			backdrop_renderer.set_blend(std::get<RENDERER_BLEND_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
+			backdrop_renderer->set_mode(std::get<RENDERER_MODE>(BACKDROP_RENDERER_CONFIGURATION));
+			backdrop_renderer->set_blend(std::get<RENDERER_BLEND_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
 				std::get<RENDERER_BLEND_SFACTOR>(BACKDROP_RENDERER_CONFIGURATION),
 				std::get<RENDERER_BLEND_DFACTOR>(BACKDROP_RENDERER_CONFIGURATION));
-			backdrop_renderer.set_cull(std::get<RENDERER_CULL_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
+			backdrop_renderer->set_cull(std::get<RENDERER_CULL_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
 				std::get<RENDERER_CULL_MODE>(BACKDROP_RENDERER_CONFIGURATION));
-			backdrop_renderer.set_depth(std::get<RENDERER_DEPTH_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
+			backdrop_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(BACKDROP_RENDERER_CONFIGURATION),
 				std::get<RENDERER_DEPTH_MODE>(BACKDROP_RENDERER_CONFIGURATION));
 
-			nomic::graphic::bitmap backdrop_texture(BACKDROP_PATH_DEFAULT);
+			backdrop_texture = new nomic::graphic::bitmap(BACKDROP_PATH_DEFAULT);
+			if(!backdrop_texture) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+			}
 
-			const void *backdrop_texture_data_ref = backdrop_texture.pixels();
+			const void *backdrop_texture_data_ref = backdrop_texture->pixels();
 			if(backdrop_texture_data_ref) {
-				uint8_t backdrop_texture_depth = (backdrop_texture.depth() / CHAR_WIDTH);
-				glm::uvec2 backdrop_texture_dimensions = glm::uvec2(backdrop_texture.width(), backdrop_texture.height());
+				uint8_t backdrop_texture_depth = (backdrop_texture->depth() / CHAR_WIDTH);
+				glm::uvec2 backdrop_texture_dimensions = glm::uvec2(backdrop_texture->width(), backdrop_texture->height());
 				std::vector<uint8_t> backdrop_texture_data((uint8_t *) backdrop_texture_data_ref,
 					((uint8_t *) backdrop_texture_data_ref) + (backdrop_texture_dimensions.x
 						* backdrop_texture_dimensions.y * backdrop_texture_depth));
@@ -347,40 +383,20 @@ namespace nomic {
 						position.z += BACKDROP_OFFSET_DEFAULT;
 						backdrop.back()->position() = position;
 						backdrop.back()->show(true);
-						backdrop.back()->register_renderer(backdrop_renderer.type());
+						backdrop.back()->register_renderer(backdrop_renderer->type());
 					}
 				}
 			}
 
-			diagnostic.enable(true);
-			diagnostic.show(true);
-			diagnostic.register_renderer(diagnostic_renderer.type());
+			diagnostic->enable(true);
+			diagnostic->show(true);
 
-			message.enable(true);
-			message.show(true);
-			message.register_renderer(message_renderer.type());
-			message.text() = "Generating chunk objects...";
+			message->enable(true);
+			message->show(true);
+			message->text() = "Generating chunk objects...";
 
 			update();
 			render();
-
-			TRACE_MESSAGE(LEVEL_INFORMATION, "Building chunk objects...");
-
-			m_chunk_renderer = new nomic::core::renderer(RENDERER_CHUNK);
-			if(!m_chunk_renderer) {
-				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
-			}
-
-			m_chunk_renderer->set_shaders(std::get<RENDERER_SHADER_VERTEX>(CHUNK_RENDERER_CONFIGURATION),
-				std::get<RENDERER_SHADER_FRAGMENT>(CHUNK_RENDERER_CONFIGURATION));
-			m_chunk_renderer->set_mode(std::get<RENDERER_MODE>(CHUNK_RENDERER_CONFIGURATION));
-			m_chunk_renderer->set_blend(std::get<RENDERER_BLEND_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
-				std::get<RENDERER_BLEND_SFACTOR>(CHUNK_RENDERER_CONFIGURATION),
-				std::get<RENDERER_BLEND_DFACTOR>(CHUNK_RENDERER_CONFIGURATION));
-			m_chunk_renderer->set_cull(std::get<RENDERER_CULL_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
-				std::get<RENDERER_CULL_MODE>(CHUNK_RENDERER_CONFIGURATION));
-			m_chunk_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
-				std::get<RENDERER_DEPTH_MODE>(CHUNK_RENDERER_CONFIGURATION));
 
 			for(int32_t z = -VIEW_RADIUS_SPAWN; z < VIEW_RADIUS_SPAWN; ++z) {
 
@@ -390,7 +406,7 @@ namespace nomic {
 					if(current && (current != previous)) {
 						std::stringstream stream;
 						stream << "Generating chunk objects... " << current << "%";
-						message.text() = stream.str();
+						message->text() = stream.str();
 						update();
 						render();
 						previous = current;
@@ -418,7 +434,7 @@ namespace nomic {
 					if(current && (current != previous)) {
 						std::stringstream stream;
 						stream << "Joining chunk objects... " << current << "%";
-						message.text() = stream.str();
+						message->text() = stream.str();
 						update();
 						render();
 						previous = current;
@@ -471,19 +487,78 @@ namespace nomic {
 
 			backdrop.clear();
 
+			if(backdrop_texture) {
+				delete backdrop_texture;
+				backdrop_texture = nullptr;
+			}
+
+			if(backdrop_renderer) {
+				delete backdrop_renderer;
+				backdrop_renderer = nullptr;
+			}
+
+			if(message) {
+				delete message;
+				message = nullptr;
+			}
+
+			if(message_renderer) {
+				delete message_renderer;
+				message_renderer = nullptr;
+			}
+
+			if(diagnostic) {
+				delete diagnostic;
+				diagnostic = nullptr;
+			}
+
+			if(diagnostic_renderer) {
+				delete diagnostic_renderer;
+				diagnostic_renderer = nullptr;
+			}
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
 		manager::generate_spawn_location(void)
 		{
+			uint8_t type;
+			glm::uvec3 block;
+			glm::ivec2 chunk;
+			glm::vec3 position;
+
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			// TODO: choose spawn location
-			m_camera->position().y = BLOCK_LEVEL_GRASS;
-			// ---
+#ifdef SPAWN_RANDOM
+			chunk.x = (m_random_integer.next() % SPAWN_RADIUS);
+			chunk.y = (m_random_integer.next() % SPAWN_RADIUS);
+			block.x = (std::abs(m_random_integer.next()) % (CHUNK_WIDTH - 1));
+			block.z = (std::abs(m_random_integer.next()) % (CHUNK_WIDTH - 1));
+#else
+			nomic::utility::position_as_block(m_camera->position(), chunk, block);
+#endif // SPAWN_RANDOM
 
+			block.y = (CHUNK_HEIGHT - PLAYER_HEIGHT - 1);
+			for(; block.y > BLOCK_HEIGHT_BOUNDARY; --block.y) {
+
+				type = m_manager_terrain.at(chunk)->block_type(block);
+				if(type != BLOCK_AIR) {
+					break;
+				}
+			}
+
+			block.y += (PLAYER_HEIGHT + 1);
+			if(block.y < (BLOCK_HEIGHT_BOUNDARY + PLAYER_HEIGHT)) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_SPAWN);
+			}
+
+			position = nomic::utility::block_as_position(chunk, block);
+			m_camera->position() = position;
 			m_spawn = m_camera->position();
+
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Spawn location set. Position={%f, %f, %f} (Chunk={%i, %i}, Block={%u, %u, %u})",
+				position.x, position.y, position.z, chunk.x, chunk.y, block.x, block.y, block.z);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -658,6 +733,24 @@ namespace nomic {
 				m_debug_object.at(iter)->register_renderer(m_debug_renderer.at(iter)->type());
 			}
 
+			TRACE_MESSAGE(LEVEL_INFORMATION, "Building chunk objects...");
+
+			m_chunk_renderer = new nomic::core::renderer(RENDERER_CHUNK);
+			if(!m_chunk_renderer) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_ALLOCATE);
+			}
+
+			m_chunk_renderer->set_shaders(std::get<RENDERER_SHADER_VERTEX>(CHUNK_RENDERER_CONFIGURATION),
+				std::get<RENDERER_SHADER_FRAGMENT>(CHUNK_RENDERER_CONFIGURATION));
+			m_chunk_renderer->set_mode(std::get<RENDERER_MODE>(CHUNK_RENDERER_CONFIGURATION));
+			m_chunk_renderer->set_blend(std::get<RENDERER_BLEND_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
+				std::get<RENDERER_BLEND_SFACTOR>(CHUNK_RENDERER_CONFIGURATION),
+				std::get<RENDERER_BLEND_DFACTOR>(CHUNK_RENDERER_CONFIGURATION));
+			m_chunk_renderer->set_cull(std::get<RENDERER_CULL_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
+				std::get<RENDERER_CULL_MODE>(CHUNK_RENDERER_CONFIGURATION));
+			m_chunk_renderer->set_depth(std::get<RENDERER_DEPTH_ENABLED>(CHUNK_RENDERER_CONFIGURATION),
+				std::get<RENDERER_DEPTH_MODE>(CHUNK_RENDERER_CONFIGURATION));
+
 			generate_chunks_spawn();
 			generate_spawn_location();
 
@@ -786,6 +879,8 @@ namespace nomic {
 			m_camera->enable(false);
 			m_camera->show(false);
 			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
+			m_random_float.setup(m_manager_terrain.generator().seed());
+			m_random_integer.setup(m_manager_terrain.generator().seed());
 
 			initialize_entities();
 			m_underwater = false;
@@ -937,9 +1032,24 @@ namespace nomic {
 			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
 			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
 				chunk->remove_block(m_block_selected_block);
+				m_block_selected = false;
 				m_block_selected_face = BLOCK_FACE_UNDEFINED;
 
-				// TODO: update adjacent blocks to avoid holes when removing blocks from position 0 or 15
+				if((m_block_selected_block.x == (CHUNK_WIDTH - 1)) && m_manager_terrain.contains(glm::ivec2(
+							m_block_selected_chunk.x + 1, m_block_selected_chunk.y))) { // right
+					m_manager_terrain.at(glm::ivec2(m_block_selected_chunk.x + 1, m_block_selected_chunk.y))->update();
+				} else if((m_block_selected_block.x == 0) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x - 1,
+							m_block_selected_chunk.y))) { // left
+					m_manager_terrain.at(glm::ivec2(m_block_selected_chunk.x - 1, m_block_selected_chunk.y))->update();
+				}
+
+				if((m_block_selected_block.z == (CHUNK_WIDTH - 1)) && m_manager_terrain.contains(glm::ivec2(
+							m_block_selected_chunk.x, m_block_selected_chunk.y + 1))) { // back
+					m_manager_terrain.at(glm::ivec2(m_block_selected_chunk.x, m_block_selected_chunk.y + 1))->update();
+				} else if((m_block_selected_block.z == 0) && m_manager_terrain.contains(glm::ivec2(m_block_selected_chunk.x,
+							m_block_selected_chunk.y - 1))) { // front
+					m_manager_terrain.at(glm::ivec2(m_block_selected_chunk.x, m_block_selected_chunk.y - 1))->update();
+				}
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -1052,6 +1162,8 @@ namespace nomic {
 			}
 
 			m_manager_terrain.generator().setup(seed, octaves, amplitude, max);
+			m_random_float.setup(seed);
+			m_random_integer.setup(seed);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -1433,7 +1545,7 @@ namespace nomic {
 			if(selector_ref) {
 
 				if(m_block_selected) {
-					uint8_t face = BLOCK_FACE_TOP;
+					uint8_t face = BLOCK_FACE_UNDEFINED;
 					glm::vec3 position_block = nomic::utility::block_as_position(m_block_selected_chunk, m_block_selected_block),
 						position_block_offset = position;
 
@@ -1489,19 +1601,7 @@ namespace nomic {
 
 			block = m_camera->block();
 			chunk = m_camera->chunk();
-
-			if(block.y < (CHUNK_HEIGHT - 1)) {
-				++block.y;
-
-				if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
-					--block.y;
-
-					if(m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER) {
-						underwater = true;
-					}
-				}
-			}
-
+			underwater = ((block.y < (CHUNK_HEIGHT - 1)) && (m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER));
 			m_underwater = underwater;
 
 			TRACE_EXIT(LEVEL_VERBOSE);

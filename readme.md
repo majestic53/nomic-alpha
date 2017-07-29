@@ -26,6 +26,11 @@ Changelog
 
 Version 0.1.1730
 ----------------
+*Updated: 7/29/2017*
+
+* Dynamic spawn location
+* Code cleanup/bug fixes
+
 *Updated: 7/27/2017*
 
 * Refactored render manager to guarentee render order

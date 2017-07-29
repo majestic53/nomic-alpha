@@ -95,7 +95,7 @@ namespace nomic {
 	#define CAMERA_FOV_MIN 10.f
 	#define CAMERA_PITCH_MAX 89.f
 	#define CAMERA_PITCH_MIN -CAMERA_PITCH_MAX
-	#define CAMERA_POSITION_DEFAULT glm::vec3(CHUNK_RADIUS, BLOCK_LEVEL_GRASS, CHUNK_RADIUS)
+	#define CAMERA_POSITION_DEFAULT glm::vec3(0.f, 0.f, 0.f)
 	#define CAMERA_ROTATION_DEFAULT glm::vec3(1.f, -0.06f, -0.03f)
 	#define CAMERA_SENSITIVITY 0.55f
 	#define CAMERA_SPEED 0.35f
@@ -201,14 +201,14 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 356.0
 
-	#define NOISE_SEED_DEFAULT 612443400 //0
+	#define NOISE_SEED_DEFAULT 0 //612443400
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1730
 
 	#define OBJECT_COUNT 1
@@ -217,6 +217,8 @@ namespace nomic {
 	#define PLAIN_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define PLAIN_DIMENSION_DEFAULT glm::vec2(1.f)
 	#define PLAIN_SCALE_DEFAULT 1.f
+
+	#define PLAYER_HEIGHT 2.f
 
 	#define RANDOM_SEED_DEFAULT 0
 
@@ -268,6 +270,9 @@ namespace nomic {
 	#define SESSION_DEBUG_DEFAULT true
 
 	#define SKYBOX_RADIUS 1.f
+
+	#define SPAWN_RADIUS 6
+	#define SPAWN_RANDOM
 
 	#define STRING_EMPTY "<EMPTY>"
 	#define STRING_INVALID "<INVALID>"

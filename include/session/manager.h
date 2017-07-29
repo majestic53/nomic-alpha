@@ -205,6 +205,10 @@ namespace nomic {
 
 				nomic::terrain::manager &m_manager_terrain;
 
+				nomic::core::random<float> m_random_float;
+
+				nomic::core::random<int32_t> m_random_integer;
+
 				void *m_runtime;
 
 				glm::vec3 m_spawn;

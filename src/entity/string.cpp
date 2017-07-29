@@ -256,9 +256,6 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
-			arr.disable_all();
-			arr.remove_all();
-			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, STRING_SEGMENT_COUNT * STRING_SEGMENT_WIDTH * sizeof(GLfloat), GL_DYNAMIC_DRAW),
 				STRING_INDEX_VERTEX, STRING_SEGMENT_WIDTH, GL_FLOAT);
 			arr.enable(STRING_INDEX_VERTEX);

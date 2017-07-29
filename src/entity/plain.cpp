@@ -259,13 +259,13 @@ namespace nomic {
 			arr.remove_all();
 			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
-				((uint8_t *) &color[0]) + ((PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))),
+				((uint8_t *) &color[0]) + (PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_COLOR * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PLAIN_INDEX_COLOR, PLAIN_SEGMENT_WIDTH_COLOR, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &PLAIN_COORDINATE[0],
-				((uint8_t *) &PLAIN_COORDINATE[0]) + ((PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_COORDINATE) * sizeof(GLfloat))),
+				((uint8_t *) &PLAIN_COORDINATE[0]) + (PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PLAIN_INDEX_COORDINATE, PLAIN_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
-				((uint8_t *) &vertex[0]) + ((PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))),
+				((uint8_t *) &vertex[0]) + (PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PLAIN_INDEX_VERTEX, PLAIN_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 			arr.enable(PLAIN_INDEX_COLOR);
 			arr.enable(PLAIN_INDEX_COORDINATE);
@@ -282,6 +282,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Color={%f, %f, %f, %f}", color.x, color.y, color.z, color.w);
 
 			m_color = color;
+			reconfigure();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -296,6 +297,7 @@ namespace nomic {
 
 			m_dimensions.x = (dimensions.x * scale);
 			m_dimensions.y = (dimensions.y * scale);
+			reconfigure();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

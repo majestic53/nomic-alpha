@@ -354,7 +354,10 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
 			if(!m_face.empty()) {
-				vertex_array().bind();
+				nomic::graphic::vao &arr = vertex_array();
+				arr.bind();
+				arr.enable(CHUNK_INDEX_COORDINATE);
+				arr.enable(CHUNK_INDEX_VERTEX);
 
 				if(textures) {
 					nomic::graphic::atlas *texture_ref = (nomic::graphic::atlas *) textures;
@@ -406,15 +409,14 @@ namespace nomic {
 				arr.disable_all();
 				arr.remove_all();
 				arr.clear();
-				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, coordinate.size() * CHUNK_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat),
-					GL_DYNAMIC_DRAW), CHUNK_INDEX_COORDINATE, CHUNK_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
-				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, vertex.size() * CHUNK_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
-					GL_DYNAMIC_DRAW), CHUNK_INDEX_VERTEX, CHUNK_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
+				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &coordinate[0],
+					((uint8_t *) &coordinate[0]) + (coordinate.size() * CHUNK_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
+					GL_STATIC_DRAW), CHUNK_INDEX_COORDINATE, CHUNK_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
+				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
+					((uint8_t *) &vertex[0]) + (vertex.size() * CHUNK_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
+					GL_STATIC_DRAW), CHUNK_INDEX_VERTEX, CHUNK_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 				arr.enable(CHUNK_INDEX_COORDINATE);
 				arr.enable(CHUNK_INDEX_VERTEX);
-				arr.set_subdata(CHUNK_INDEX_COORDINATE, 0, coordinate.size() * CHUNK_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat),
-					&coordinate[0]);
-				arr.set_subdata(CHUNK_INDEX_VERTEX, 0, vertex.size() * CHUNK_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat), &vertex[0]);
 			}
 
 #ifdef VIEW_SELECTIVE_SHOW

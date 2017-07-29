@@ -80,15 +80,7 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			nomic::graphic::vao &arr = vertex_array();
-			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_COLOR[0],
-				((uint8_t *) &AXIS_COLOR[0]) + ((AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				AXIS_INDEX_COLOR, AXIS_SEGMENT_WIDTH_COLOR, GL_FLOAT);
-			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_VERTEX[0],
-				((uint8_t *) &AXIS_VERTEX[0]) + ((AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))), GL_STATIC_DRAW),
-				AXIS_INDEX_VERTEX, AXIS_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
-			arr.enable(AXIS_INDEX_COLOR);
-			arr.enable(AXIS_INDEX_VERTEX);
+			setup();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -99,6 +91,9 @@ namespace nomic {
 				nomic::entity::object(other)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			setup();
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -137,6 +132,24 @@ namespace nomic {
 
 			vertex_array().bind();
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, AXIS_SEGMENT_COUNT);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		axis::setup(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::graphic::vao &arr = vertex_array();
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_COLOR[0],
+				((uint8_t *) &AXIS_COLOR[0]) + (AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH_COLOR * sizeof(GLfloat))), GL_STATIC_DRAW),
+				AXIS_INDEX_COLOR, AXIS_SEGMENT_WIDTH_COLOR, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &AXIS_VERTEX[0],
+				((uint8_t *) &AXIS_VERTEX[0]) + (AXIS_SEGMENT_COUNT * AXIS_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))), GL_STATIC_DRAW),
+				AXIS_INDEX_VERTEX, AXIS_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
+			arr.enable(AXIS_INDEX_COLOR);
+			arr.enable(AXIS_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

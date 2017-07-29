@@ -129,14 +129,11 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
-			arr.disable_all();
-			arr.remove_all();
-			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
-				((uint8_t *) &color[0]) + ((RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_COLOR) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				((uint8_t *) &color[0]) + (RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_COLOR * sizeof(GLfloat))), GL_STATIC_DRAW),
 				RETICLE_INDEX_COLOR, RETICLE_SEGMENT_WIDTH_COLOR, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
-				((uint8_t *) &vertex[0]) + ((RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_VERTEX) * sizeof(GLfloat))), GL_STATIC_DRAW),
+				((uint8_t *) &vertex[0]) + (RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))), GL_STATIC_DRAW),
 				RETICLE_INDEX_VERTEX, RETICLE_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 			arr.enable(RETICLE_INDEX_COLOR);
 			arr.enable(RETICLE_INDEX_VERTEX);

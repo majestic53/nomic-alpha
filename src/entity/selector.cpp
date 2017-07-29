@@ -180,6 +180,8 @@ namespace nomic {
 				&color[0]);
 			arr.set_subdata(SELECTOR_INDEX_VERTEX, 0, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
 				&vertex[0]);
+			arr.enable(SELECTOR_INDEX_COLOR);
+			arr.enable(SELECTOR_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -190,9 +192,6 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::graphic::vao &arr = vertex_array();
-			arr.disable_all();
-			arr.remove_all();
-			arr.clear();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
 				GL_DYNAMIC_DRAW), SELECTOR_INDEX_COLOR, SELECTOR_SEGMENT_WIDTH_COLOR, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
@@ -223,13 +222,15 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Face=%x(%s)", face, BLOCK_FACE_STRING(face));
 
-			if((face < BLOCK_FACE_MIN) || (face > BLOCK_FACE_MAX)) {
+			if(((face < BLOCK_FACE_MIN) || (face > BLOCK_FACE_MAX)) && (face != BLOCK_FACE_UNDEFINED)) {
 				THROW_NOMIC_ENTITY_SELECTOR_EXCEPTION_FORMAT(NOMIC_ENTITY_SELECTOR_EXCEPTION_FACE_INVALID,
 					"Face=%x", face);
 			}
 
 			m_face = face;
-			reconfigure();
+			if(m_face != BLOCK_FACE_UNDEFINED) {
+				reconfigure();
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

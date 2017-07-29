@@ -227,7 +227,7 @@ namespace nomic {
 
 			m_entry.erase(find(type));
 
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer removed. Renderer=%p, Id=%x, Type=%x(%s)", renderer, type,
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Renderer removed. Renderer=%p, Type=%x(%s)", renderer, type,
 				RENDERER_STRING(type));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -267,7 +267,7 @@ namespace nomic {
 
 			iter->second.second.insert(entity);
 
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity registered. Entity=%p, Renderer=%p, Id=%x, Type=%x(%s)",
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity registered. Entity=%p, Renderer=%p, Type=%x(%s)",
 				entity, iter->second.first, type, RENDERER_STRING(type));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -402,7 +402,7 @@ namespace nomic {
 			iter = find(type);
 			iter->second.second.clear();
 
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "All entities unregistered. Renderer=%p, Id=%x, Type=%x(%s)",
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "All entities unregistered. Renderer=%p, Type=%x(%s)",
 				iter->second.first, type, RENDERER_STRING(type));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -449,7 +449,7 @@ namespace nomic {
 
 			iter->second.second.erase(iter_entity);
 
-			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity unregistered. Entity=%p, Renderer=%p, Id=%x, Type=%x(%s)",
+			TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Entity unregistered. Entity=%p, Renderer=%p, Type=%x(%s)",
 				entity, iter->second.first, type, RENDERER_STRING(type));
 
 			TRACE_EXIT(LEVEL_VERBOSE);

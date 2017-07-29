@@ -51,6 +51,10 @@ namespace nomic {
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
+
+			protected:
+
+				void setup(void);
 		};
 	}
 }
