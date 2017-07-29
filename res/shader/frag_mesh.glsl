@@ -31,8 +31,8 @@ uniform sampler2D out_texture;
 const vec4 FOG_COLOR = vec4(0.52f, 0.6f, 0.9f, 1.f);
 const float FOG_FALLOFF = 0.004f;
 
-const vec4 WATER_COLOR = vec4(0.06f, 0.25f, 1.f, 1.f);
-const float WATER_FALLOFF = 0.05f;
+const vec4 WATER_COLOR = vec4(0.06f, 0.25f, 1.f, 0.85f);
+const float WATER_FALLOFF = 0.08f;
 
 vec4 
 add_fog_constant(

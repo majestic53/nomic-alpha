@@ -52,13 +52,13 @@ namespace nomic {
 		typedef std::tuple<std::string, std::string, uint32_t, bool, uint32_t, uint32_t, bool, uint32_t, bool, uint32_t> renderer_config;
 
 		static const renderer_config BACKDROP_RENDERER_CONFIGURATION = {
-			"./res/vert_plain.glsl", "./res/frag_plain.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			"./res/shader/vert_plain.glsl", "./res/shader/frag_plain.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
 			};
 
 		static const renderer_config CHUNK_RENDERER_CONFIGURATION = {
-			"./res/vert_mesh.glsl", "./res/frag_mesh.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			"./res/shader/vert_mesh.glsl", "./res/shader/frag_mesh.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_FRONT,
 			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
 			};
@@ -73,24 +73,24 @@ namespace nomic {
 		#define DEBUG_OBJECT_MAX DEBUG_OBJECT_DIAGNOSTIC
 
 		static const std::vector<renderer_config> DEBUG_RENDERER_CONFIGURATION = {
-			{ "./res/vert_axis.glsl", "./res/frag_axis.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT, RENDERER_BLEND_DFACTOR_DEFAULT,
-				RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_DEPTH_DEFAULT,
-				RENDERER_DEPTH_MODE_DEFAULT }, // axis
-			{ "./res/vert_block.glsl", "./res/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			{ "./res/shader/vert_axis.glsl", "./res/shader/frag_axis.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // axis
+			{ "./res/shader/vert_block.glsl", "./res/shader/frag_block.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, false, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // block
-			{ "./res/vert_string.glsl", "./res/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
+			{ "./res/shader/vert_string.glsl", "./res/shader/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
 			};
 
 		static const std::map<uint32_t, std::string> DEBUG_BLOCK_FACE = {
-			{ BLOCK_FACE_RIGHT, "./res/debug.bmp" },
-			{ BLOCK_FACE_LEFT, "./res/debug.bmp" },
-			{ BLOCK_FACE_TOP, "./res/debug.bmp" },
-			{ BLOCK_FACE_BOTTOM, "./res/debug.bmp" },
-			{ BLOCK_FACE_BACK, "./res/debug.bmp" },
-			{ BLOCK_FACE_FRONT, "./res/debug.bmp" },
+			{ BLOCK_FACE_RIGHT, "./res/texture/debug.bmp" },
+			{ BLOCK_FACE_LEFT, "./res/texture/debug.bmp" },
+			{ BLOCK_FACE_TOP, "./res/texture/debug.bmp" },
+			{ BLOCK_FACE_BOTTOM, "./res/texture/debug.bmp" },
+			{ BLOCK_FACE_BACK, "./res/texture/debug.bmp" },
+			{ BLOCK_FACE_FRONT, "./res/texture/debug.bmp" },
 			};
 
 		#define DEBUG_BLOCK_SCALE 0.2f
@@ -103,18 +103,18 @@ namespace nomic {
 		#define ENTITY_OBJECT_BACKGROUND_MAX ENTITY_OBJECT_BACKGROUND_SKYBOX
 
 		static const std::vector<renderer_config> ENTITY_RENDERER_BACKGROUND_CONFIGURATION = {
-			{ "./res/vert_skybox.glsl", "./res/frag_skybox.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			{ "./res/shader/vert_skybox.glsl", "./res/shader/frag_skybox.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT,
 				RENDERER_CULL_MODE_DEFAULT, false, RENDERER_DEPTH_MODE_DEFAULT }, // skybox
 			};
 
 		static const std::map<uint32_t, std::string> ENTITY_SKYBOX_FACE = {
-			{ GL_TEXTURE_CUBE_MAP_POSITIVE_X, "./res/skybox_side.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "./res/skybox_side.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "./res/skybox_top.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "./res/skybox_bottom.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "./res/skybox_side.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "./res/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_POSITIVE_X, "./res/texture/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "./res/texture/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "./res/texture/skybox_top.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "./res/texture/skybox_bottom.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "./res/texture/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "./res/texture/skybox_side.bmp" },
 			};
 
 		// entity foreground objects
@@ -126,10 +126,10 @@ namespace nomic {
 		#define ENTITY_OBJECT_FOREGROUND_MAX ENTITY_OBJECT_FOREGROUND_SELECTOR
 
 		static const std::vector<renderer_config> ENTITY_RENDERER_FOREGROUND_CONFIGURATION = {
-			{ "./res/vert_reticle.glsl", "./res/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			{ "./res/shader/vert_reticle.glsl", "./res/shader/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
-			{ "./res/vert_selector.glsl", "./res/frag_selector.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			{ "./res/shader/vert_selector.glsl", "./res/shader/frag_selector.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT,
 				RENDERER_CULL_MODE_DEFAULT, false, RENDERER_DEPTH_MODE_DEFAULT }, // selector
 			};

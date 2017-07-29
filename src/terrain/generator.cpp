@@ -268,8 +268,8 @@ namespace nomic {
 			__in nomic::terrain::chunk &chunk
 			)
 		{
-			bool top = true;
 			uint32_t depth = 0, zone;
+			bool bottom = false, top = true;
 			uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT, type;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
@@ -417,7 +417,26 @@ namespace nomic {
 				}
 
 				for(; y >= BLOCK_HEIGHT_BOUNDARY; --y) { // block column < min and > boundary
-					chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_STONE, BLOCK_ATTRIBUTES_DEFAULT);
+					type = BLOCK_STONE;
+					attribute = BLOCK_ATTRIBUTES_DEFAULT;
+
+					if(y <= (BLOCK_HEIGHT_BOUNDARY + BLOCK_DEPTH_BOUNDARY_MAX)) { // stone/boundary
+
+						if(!bottom) {
+							type = chunk_block_blend(y, BLOCK_HEIGHT_BOUNDARY,
+								BLOCK_HEIGHT_BOUNDARY + BLOCK_DEPTH_BOUNDARY_MAX,
+								BLOCK_STONE, BLOCK_BOUNDARY);
+							bottom = (type == BLOCK_BOUNDARY);
+						} else {
+							type = BLOCK_BOUNDARY;
+						}
+					}
+
+					if(type == BLOCK_BOUNDARY) {
+						attribute &= ~BLOCK_ATTRIBUTE_BREAKABLE;
+					}
+
+					chunk.set_block(glm::uvec3(position.x, y, position.z), type, attribute);
 				}
 
 				chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_BOUNDARY, // boundary
