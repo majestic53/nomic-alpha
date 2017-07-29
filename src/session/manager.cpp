@@ -1019,7 +1019,101 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			// TODO: add block at selected block face
+			if(m_block_selected) {
+				bool place = false;
+				glm::uvec3 block = m_block_selected_block;
+				glm::ivec2 chunk = m_block_selected_chunk;
+
+				switch(m_block_selected_face) {
+					case BLOCK_FACE_RIGHT:
+
+						place = (block.x < (CHUNK_WIDTH - 1));
+						if(place) { // right
+							++block.x;
+						} else { // right (boundary)
+
+							place = m_manager_terrain.contains(glm::ivec2(chunk.x + 1, chunk.y));
+							if(place) {								
+								block.x = 0;
+								++chunk.x;
+							}
+						}
+						break;
+					case BLOCK_FACE_LEFT:
+
+						place = (block.x > 0);
+						if(place) { // left
+							--block.x;
+						} else { // left (boundary)
+
+							place = m_manager_terrain.contains(glm::ivec2(chunk.x - 1, chunk.y));
+							if(place) {								
+								block.x = (CHUNK_WIDTH - 1);
+								--chunk.x;
+							}
+						}
+						break;
+					case BLOCK_FACE_TOP:
+
+						place = (block.y < (CHUNK_HEIGHT - 1));
+						if(place) {
+							++block.y;
+						}
+						break;
+					case BLOCK_FACE_BOTTOM:
+
+						place = (block.y > 0);
+						if(place) {
+							--block.y;
+						}
+						break;
+					case BLOCK_FACE_BACK:
+
+						place = (block.z < (CHUNK_WIDTH - 1));
+						if(place) { // back
+							++block.z;
+						} else { // back (boundary)
+
+							place = m_manager_terrain.contains(glm::ivec2(chunk.x, chunk.y + 1));
+							if(place) {
+								block.z = 0;
+								++chunk.y;
+							}
+						}
+						break;
+					case BLOCK_FACE_FRONT:
+
+						place = (block.z > 0);
+						if(place) { // front
+							--block.z;
+						} else { // front (boundary)
+
+							place = m_manager_terrain.contains(glm::ivec2(chunk.x, chunk.y - 1));
+							if(place) {
+								block.z = (CHUNK_WIDTH - 1);
+								--chunk.y;
+							}
+						}
+						break;
+					default:
+						break;
+				}
+
+				if(place) {
+					uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT, type;
+
+					// TODO: get block type from gui
+					type = BLOCK_DIRT;
+					// ---
+
+					TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Adding block. Chunk={%i, %i}, Block={%u, %u, %u}",
+						chunk.x, chunk.y, block.x, block.y, block.z);
+
+					m_manager_terrain.at(chunk)->set_block(block, type, attribute);
+					m_block_selected = false;
+					m_block_selected_face = BLOCK_FACE_UNDEFINED;
+				}
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -1031,6 +1125,10 @@ namespace nomic {
 
 			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
 			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
+				TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Removing block. Chunk={%i, %i}, Block={%u, %u, %u}",
+					m_block_selected_chunk.x, m_block_selected_chunk.y, m_block_selected_block.x,
+					m_block_selected_block.y, m_block_selected_block.z);
+
 				chunk->remove_block(m_block_selected_block);
 				m_block_selected = false;
 				m_block_selected_face = BLOCK_FACE_UNDEFINED;
