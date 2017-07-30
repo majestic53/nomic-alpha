@@ -142,12 +142,12 @@ namespace nomic {
 	#define DISPLAY_DEFAULT_BLUE 1.f
 	#define DISPLAY_DEFAULT_FULLSCREEN false
 	#define DISPLAY_DEFAULT_GREEN 0.25f
-	#define DISPLAY_DEFAULT_HEIGHT 1080 //768
+	#define DISPLAY_DEFAULT_HEIGHT 768
 	#define DISPLAY_DEFAULT_ICON "./res/texture/icon.bmp"
 	#define DISPLAY_DEFAULT_RED 0.06f
 	#define DISPLAY_DEFAULT_TITLE NOMIC
 	#define DISPLAY_DEFAULT_VSYNC false
-	#define DISPLAY_DEFAULT_WIDTH 1920 //1024
+	#define DISPLAY_DEFAULT_WIDTH 1024
 	#define DISPLAY_FLAGS_CLEAR (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 	#define DISPLAY_FLAGS_DEFAULT (SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_OPENGL)
 	#define DISPLAY_MOUSE_RELATIVE SDL_TRUE
@@ -202,14 +202,14 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 356.0
 
-	#define NOISE_SEED_DEFAULT 3447053438 //612443400 //0
+	#define NOISE_SEED_DEFAULT 0 //3447053438 //612443400
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 7
+	#define NOMIC_VERSION_REVISION 8
 	#define NOMIC_VERSION_WEEK 1730
 
 	#define OBJECT_COUNT 1
@@ -218,8 +218,10 @@ namespace nomic {
 	#define PANEL_ATLAS_DIMENSIONS_DEFAULT glm::uvec2(64, 64)
 	#define PANEL_ATLAS_WIDTH_DEFAULT 6
 	#define PANEL_INDEX_DEFAULT 0
-	#define PANEL_INDEX_MAX 6
-	#define PANEL_WIDTH 0.4f
+	#define PANEL_INDEX_MAX 9
+	//#define PANEL_LOOPING
+	#define PANEL_PADDING_LOWER 0.02f
+	#define PANEL_WIDTH 0.15f
 
 	#define PLAIN_COLOR_DEFAULT glm::vec4(PLAIN_COLOR_RGBA_DEFAULT)
 	#define PLAIN_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
@@ -385,13 +387,28 @@ namespace nomic {
 		BLOCK_SANDSTONE,
 		BLOCK_SANDSTONE_SIDE,
 		BLOCK_WATER,
+		BLOCK_PLANK,
+		BLOCK_WOOD,
+		BLOCK_WOOD_SIDE,
+		BLOCK_COBBLESTONE,
+		BLOCK_COBBLESTONE_MOSSY,
+		BLOCK_OBSIDIAN,
+		BLOCK_ORE_GOLD,
+		BLOCK_ORE_IRON,
+		BLOCK_ORE_COAL,
+		BLOCK_ORE_DIAMOND,
+		BLOCK_GLASS,
+		BLOCK_LEAVES,
+		BLOCK_GRASS_TALL,
 	};
 
-	#define BLOCK_MAX BLOCK_WATER
+	#define BLOCK_MAX BLOCK_GRASS_TALL
 
 	static const std::string BLOCK_STR[] = {
 		"Air", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone", "Stone/Snow", "Snow",
-		"Gravel", "Sand", "Sandstone", "Sandstone/Side", "Water",
+		"Gravel", "Sand", "Sandstone", "Sandstone/Side", "Water", "Plank", "Wood",
+		"Wood-side", "Cobblestone", "Mossy-Cobblestone", "Obsidian", "Gold-Ore", "Iron-Ore",
+		"Coal-Ore", "Diamond-Ore", "Glass", "Leaves", "Tall-Grass",
 		};
 
 	#define BLOCK_STRING(_TYPE_) \
@@ -401,6 +418,10 @@ namespace nomic {
 		BLOCK_ATTRIBUTE_STATIC = 1,
 		BLOCK_ATTRIBUTE_BREAKABLE = 2,
 		BLOCK_ATTRIBUTE_HIDDEN = 4,
+		BLOCK_ATTRIBUTE_ROTATED_RIGHT = 8,
+		BLOCK_ATTRIBUTE_ROTATED_LEFT = 16,
+		BLOCK_ATTRIBUTE_ROTATED_BACK = 32,
+		BLOCK_ATTRIBUTE_ROTATED_FRONT = 64,
 	};
 
 	enum {

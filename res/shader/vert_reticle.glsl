@@ -31,5 +31,5 @@ void
 main(void)
 {
 	out_color = in_color;
-	gl_Position = vec4(in_vertex, 1.f);
+	gl_Position = vec4(in_vertex.xy, 0.f, 1.f);
 }

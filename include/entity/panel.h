@@ -28,7 +28,7 @@ namespace nomic {
 
 	namespace entity {
 
-		typedef std::tuple<uint8_t, uint32_t, uint32_t> panel_data;
+		typedef std::tuple<uint8_t, uint32_t, uint32_t, uint32_t, uint32_t> panel_data;
 
 		class panel :
 				public nomic::entity::object {

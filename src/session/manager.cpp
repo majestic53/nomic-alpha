@@ -128,10 +128,10 @@ namespace nomic {
 		#define ENTITY_OBJECT_FOREGROUND_MAX ENTITY_OBJECT_FOREGROUND_SELECTOR
 
 		static const std::vector<renderer_config> ENTITY_RENDERER_FOREGROUND_CONFIGURATION = {
-			{ "./res/shader/vert_panel.glsl", "./res/shader/frag_panel.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			{ "./res/shader/vert_panel.glsl", "./res/shader/frag_panel.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, GL_FRONT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // panel
-			{ "./res/shader/vert_reticle.glsl", "./res/shader/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			{ "./res/shader/vert_reticle.glsl", "./res/shader/frag_reticle.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
 			{ "./res/shader/vert_selector.glsl", "./res/shader/frag_selector.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
@@ -143,9 +143,12 @@ namespace nomic {
 			BLOCK_DIRT,
 			BLOCK_GRASS,
 			BLOCK_STONE,
-			BLOCK_GRAVEL,
+			BLOCK_COBBLESTONE,
 			BLOCK_SAND,
-			BLOCK_SANDSTONE,
+			BLOCK_GLASS,
+			BLOCK_PLANK,
+			BLOCK_WOOD,
+			BLOCK_LEAVES,
 			};
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
@@ -984,9 +987,9 @@ namespace nomic {
 			for(uint32_t iter = 0; iter < y; ++iter) {
 
 				if(right) {
-					panel_move_right();
-				} else {
 					panel_move_left();
+				} else {
+					panel_move_right();
 				}
 			}
 
@@ -1090,6 +1093,8 @@ namespace nomic {
 		void 
 		manager::selected_block_add(void)
 		{
+			uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT;
+
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			if(m_block_selected) {
@@ -1102,11 +1107,13 @@ namespace nomic {
 
 						place = (block.x < (CHUNK_WIDTH - 1));
 						if(place) { // right
+							attribute |= BLOCK_ATTRIBUTE_ROTATED_RIGHT;
 							++block.x;
 						} else { // right (boundary)
 
 							place = m_manager_terrain.contains(glm::ivec2(chunk.x + 1, chunk.y));
-							if(place) {								
+							if(place) {
+								attribute |= BLOCK_ATTRIBUTE_ROTATED_RIGHT;
 								block.x = 0;
 								++chunk.x;
 							}
@@ -1116,11 +1123,13 @@ namespace nomic {
 
 						place = (block.x > 0);
 						if(place) { // left
+							attribute |= BLOCK_ATTRIBUTE_ROTATED_LEFT;
 							--block.x;
 						} else { // left (boundary)
 
 							place = m_manager_terrain.contains(glm::ivec2(chunk.x - 1, chunk.y));
-							if(place) {								
+							if(place) {
+								attribute |= BLOCK_ATTRIBUTE_ROTATED_LEFT;
 								block.x = (CHUNK_WIDTH - 1);
 								--chunk.x;
 							}
@@ -1144,11 +1153,13 @@ namespace nomic {
 
 						place = (block.z < (CHUNK_WIDTH - 1));
 						if(place) { // back
+							attribute |= BLOCK_ATTRIBUTE_ROTATED_BACK;
 							++block.z;
 						} else { // back (boundary)
 
 							place = m_manager_terrain.contains(glm::ivec2(chunk.x, chunk.y + 1));
 							if(place) {
+								attribute |= BLOCK_ATTRIBUTE_ROTATED_BACK;
 								block.z = 0;
 								++chunk.y;
 							}
@@ -1158,11 +1169,13 @@ namespace nomic {
 
 						place = (block.z > 0);
 						if(place) { // front
+							attribute |= BLOCK_ATTRIBUTE_ROTATED_FRONT;
 							--block.z;
 						} else { // front (boundary)
 
 							place = m_manager_terrain.contains(glm::ivec2(chunk.x, chunk.y - 1));
 							if(place) {
+								attribute |= BLOCK_ATTRIBUTE_ROTATED_FRONT;
 								block.z = (CHUNK_WIDTH - 1);
 								--chunk.y;
 							}
@@ -1173,9 +1186,8 @@ namespace nomic {
 				}
 
 				if(place) {
-					uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT,
-						type = ((nomic::entity::panel *)
-							m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_PANEL))->selected();
+					uint8_t type = ((nomic::entity::panel *) m_entity_object_foreground.at(
+						ENTITY_OBJECT_FOREGROUND_PANEL))->selected();
 
 					TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Adding block. Type=%x Chunk={%i, %i}, Block={%u, %u, %u}",
 						type, chunk.x, chunk.y, block.x, block.y, block.z);

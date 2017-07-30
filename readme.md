@@ -26,6 +26,11 @@ Changelog
 
 Version 0.1.1730
 ----------------
+*Updated: 7/30/2017*
+
+* Added block gui (incomplete)
+* Added additional block types
+
 *Updated: 7/29/2017*
 
 * Dynamic spawn location

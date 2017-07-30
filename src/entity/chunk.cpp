@@ -205,20 +205,32 @@ namespace nomic {
 		std::map<uint8_t, chunk_data>::iterator 
 		chunk::add_face_type(
 			__in uint8_t type,
-			__in uint32_t face
+			__in uint32_t face,
+			__in_opt uint8_t attributes
 			)
 		{
 			std::map<uint8_t, chunk_data>::iterator result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Face=%x", type, face);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Face=%x, Attributes=%x", type, face, attributes);
 
 			switch(type) {
 				case BLOCK_AIR:
 				case BLOCK_BOUNDARY:
+				case BLOCK_COBBLESTONE:
+				case BLOCK_COBBLESTONE_MOSSY:
 				case BLOCK_DIRT:
+				case BLOCK_GLASS:
 				case BLOCK_GRAVEL:
+				case BLOCK_LEAVES:
+				case BLOCK_OBSIDIAN:
+				case BLOCK_ORE_GOLD:
+				case BLOCK_ORE_IRON:
+				case BLOCK_ORE_COAL:
+				case BLOCK_ORE_DIAMOND:
+				case BLOCK_PLANK:
 				case BLOCK_SAND:
 				case BLOCK_STONE:
+				case BLOCK_GRASS_TALL:
 				case BLOCK_WATER:
 					break;
 				case BLOCK_GRASS:
@@ -246,6 +258,8 @@ namespace nomic {
 					switch(face) {
 						case BLOCK_FACE_BACK:
 						case BLOCK_FACE_FRONT:
+							type = BLOCK_SANDSTONE_SIDE;
+							break;
 						case BLOCK_FACE_LEFT:
 						case BLOCK_FACE_RIGHT:
 							type = BLOCK_SANDSTONE_SIDE;
@@ -264,6 +278,8 @@ namespace nomic {
 					switch(face) {
 						case BLOCK_FACE_BACK:
 						case BLOCK_FACE_FRONT:
+							type = BLOCK_STONE_SNOW_SIDE;
+							break;
 						case BLOCK_FACE_LEFT:
 						case BLOCK_FACE_RIGHT:
 							type = BLOCK_STONE_SNOW_SIDE;
@@ -278,6 +294,9 @@ namespace nomic {
 							THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_FACE_INVALID,
 								"Face=%x", face);
 					}
+					break;
+				case BLOCK_WOOD:
+					type = determine_face_type(face, attributes, BLOCK_WOOD, BLOCK_WOOD, BLOCK_WOOD_SIDE);
 					break;
 				default:
 					THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_TYPE_INVALID,
@@ -341,6 +360,115 @@ namespace nomic {
 			result = nomic::terrain::chunk::type(position);
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x(%u)", (uint16_t) result, (uint16_t) result);
+			return result;
+		}
+
+		uint8_t 
+		chunk::determine_face_type(
+			__in uint32_t face,
+			__in uint8_t attributes,
+			__in uint8_t type_top,
+			__in uint8_t type_bottom,
+			__in uint8_t type_side
+			)
+		{
+			uint8_t result = type_top;
+			bool back, front, left, right;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type={%x, %x, %x}, Face=%x, Attributes=%x", type_bottom, type_top, type_side,
+				face, attributes);
+
+			back = (attributes & BLOCK_ATTRIBUTE_ROTATED_BACK);
+			front = (attributes & BLOCK_ATTRIBUTE_ROTATED_FRONT);
+			left = (attributes & BLOCK_ATTRIBUTE_ROTATED_LEFT);
+			right = (attributes & BLOCK_ATTRIBUTE_ROTATED_RIGHT);
+
+			switch(face) {
+				case BLOCK_FACE_BACK:
+
+					if(back) {
+						result = type_top;
+					} else if(front) {
+						result = type_bottom;
+					} else {
+						result = type_side;
+					}
+					break;
+				case BLOCK_FACE_FRONT:
+
+					if(back) {
+						result = type_bottom;
+					} else if(front) {
+						result = type_top;
+					} else {
+						result = type_side;
+					}
+					break;
+				case BLOCK_FACE_LEFT:
+
+					if(left) {
+						result = type_top;
+					} else if(right) {
+						result = type_bottom;
+					} else {
+						result = type_side;
+					}
+					break;
+				case BLOCK_FACE_RIGHT:
+
+					if(left) {
+						result = type_bottom;
+					} else if(right) {
+						result = type_top;
+					} else {
+						result = type_side;
+					}
+					break;
+				case BLOCK_FACE_BOTTOM:
+
+					if(back || front || left || right) {
+						result = type_side;
+					} else {
+						result = type_bottom;
+					}
+					break;
+				case BLOCK_FACE_TOP:
+
+					if(back || front || left || right) {
+						result = type_side;
+					} else {
+						result = type_top;
+					}
+					break;
+				default:
+					THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_FACE_INVALID,
+						"Face=%x", face);
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		bool 
+		chunk::determine_transparent(
+			__in uint8_t type
+			)
+		{
+			bool result = false;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
+
+			switch(type) {
+				case BLOCK_AIR:
+				case BLOCK_GLASS:
+				case BLOCK_WATER:
+					result = true;
+					break;
+				default:
+					break;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
 		}
 
@@ -491,17 +619,17 @@ namespace nomic {
 									if((x + 1) < CHUNK_WIDTH) { // right
 
 										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x + 1, y, z));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_RIGHT,
-												add_face_type(type, BLOCK_FACE_RIGHT));
+												add_face_type(type, BLOCK_FACE_RIGHT, attributes));
 											++count;
 										}
 									} else if((x + 1) == CHUNK_WIDTH) { // right (boundary)
 
 										type_adjacent = right->block_type(glm::uvec3(0, y, z));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_RIGHT,
-												add_face_type(type, BLOCK_FACE_RIGHT));
+												add_face_type(type, BLOCK_FACE_RIGHT, attributes));
 											++count;
 										}
 									}
@@ -512,17 +640,17 @@ namespace nomic {
 									if((x - 1) >= 0) { // left
 
 										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x - 1, y, z));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_LEFT,
-												add_face_type(type, BLOCK_FACE_LEFT));
+												add_face_type(type, BLOCK_FACE_LEFT, attributes));
 											++count;
 										}
 									} else if((x - 1) < 0) { // left (boundary)
 
 										type_adjacent = left->block_type(glm::uvec3(CHUNK_WIDTH - 1, y, z));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_LEFT,
-												add_face_type(type, BLOCK_FACE_LEFT));
+												add_face_type(type, BLOCK_FACE_LEFT, attributes));
 											++count;
 										}
 									}
@@ -533,17 +661,17 @@ namespace nomic {
 									if((z + 1) < CHUNK_WIDTH) { // back
 
 										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y, z + 1));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_BACK,
-												add_face_type(type, BLOCK_FACE_BACK));
+												add_face_type(type, BLOCK_FACE_BACK, attributes));
 											++count;
 										}
 									} else if((z + 1) == CHUNK_WIDTH) { // back (boundary)
 
 										type_adjacent = back->block_type(glm::uvec3(x, y, 0));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_BACK,
-												add_face_type(type, BLOCK_FACE_BACK));
+												add_face_type(type, BLOCK_FACE_BACK, attributes));
 											++count;
 										}
 									}
@@ -554,17 +682,17 @@ namespace nomic {
 									if((z - 1) >= 0) { // front
 
 										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y, z - 1));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_FRONT,
-												add_face_type(type, BLOCK_FACE_FRONT));
+												add_face_type(type, BLOCK_FACE_FRONT, attributes));
 											++count;
 										}
 									} else if((z - 1) < 0) { // front (boundary)
 
 										type_adjacent = front->block_type(glm::uvec3(x, y, CHUNK_WIDTH - 1));
-										if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+										if(determine_transparent(type_adjacent)) {
 											add_face(position + position_relative, BLOCK_FACE_FRONT,
-												add_face_type(type, BLOCK_FACE_FRONT));
+												add_face_type(type, BLOCK_FACE_FRONT, attributes));
 											++count;
 										}
 									}
@@ -574,9 +702,9 @@ namespace nomic {
 							if((y - 1) >= 0) { // bottom
 
 								type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y - 1, z));
-								if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+								if(determine_transparent(type_adjacent)) {
 									add_face(position + position_relative, BLOCK_FACE_BOTTOM,
-										add_face_type(type, BLOCK_FACE_BOTTOM));
+										add_face_type(type, BLOCK_FACE_BOTTOM, attributes));
 									++count;
 								}
 							}
@@ -584,9 +712,9 @@ namespace nomic {
 							if((y + 1) < CHUNK_HEIGHT) { // top
 
 								type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y + 1, z));
-								if((type_adjacent == BLOCK_AIR) || (type_adjacent == BLOCK_WATER)) {
+								if(determine_transparent(type_adjacent)) {
 									add_face(position + position_relative, BLOCK_FACE_TOP, add_face_type(type,
-										BLOCK_FACE_TOP));
+										BLOCK_FACE_TOP, attributes));
 									++count;
 								}
 							}
