@@ -19,7 +19,6 @@
 #version 330 core
 
 in vec2 out_coordinate;
-in vec3 out_vertex;
 
 uniform sampler2D out_texture;
 

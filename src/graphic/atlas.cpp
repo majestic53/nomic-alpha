@@ -162,13 +162,13 @@ namespace nomic {
 					"Dimensions={%u, %u}", dimensions.x, dimensions.y);
 			}
 
+			m_dimensions = dimensions;
+			m_width = width;
+
 			if(m_bitmap.width() != (m_dimensions.x * m_width)) {
 				THROW_NOMIC_GRAPHIC_ATLAS_EXCEPTION_FORMAT(NOMIC_GRAPHIC_ATLAS_EXCEPTION_WIDTH_MISMATCH,
 					"Width=%u", width);
 			}
-
-			m_dimensions = dimensions;
-			m_width = width;
 
 			for(uint32_t z = 0; z < (m_bitmap.height() / m_dimensions.y); ++z) {
 

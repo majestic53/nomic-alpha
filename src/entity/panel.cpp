@@ -24,10 +24,53 @@ namespace nomic {
 
 	namespace entity {
 
+		#define PANEL_SEGMENT_COUNT 6
+		#define PANEL_SEGMENT_WIDTH_COORDINATE 2
+		#define PANEL_SEGMENT_WIDTH_VERTEX 3
+
+		enum {
+			PANEL_ATLAS_LEFT_UNSELECTED = 0,
+			PANEL_ATLAS_CENTER_UNSELECTED,
+			PANEL_ATLAS_RIGHT_UNSELECTED,
+			PANEL_ATLAS_LEFT_SELECTED,
+			PANEL_ATLAS_CENTER_SELECTED,
+			PANEL_ATLAS_RIGHT_SELECTED,
+		};
+
+		enum {
+			PANEL_INDEX_COORDINATE,
+			PANEL_INDEX_VERTEX,
+		};
+
+		enum {
+			VAO_TYPE = 0,
+			VAO_BASE,
+			VAO_OFFSET,
+		};
+
+		static const glm::vec2 PANEL_COORDINATE[] = {
+			{ 1.f, 1.f, }, // bottom left
+			{ 1.f, 0.f, }, // top left
+			{ 0.f, 0.f, }, // top right
+			{ 1.f, 1.f, }, // bottom left
+			{ 0.f, 0.f, }, // top right
+			{ 0.f, 1.f, }, // bottom right
+			};
+
+		static const glm::vec3 PANEL_VERTEX[] = {
+			{ 0.f, 0.f, 0.f, }, // bottom left corner
+			{ 0.f, PANEL_WIDTH, 0.f, }, // top left corner
+			{ PANEL_WIDTH, PANEL_WIDTH, 0.f, }, // top right corner
+			{ 0.f, 0.f, 0.f, }, // bottom left corner
+			{ PANEL_WIDTH, PANEL_WIDTH, 0.f, }, // top right corner
+			{ PANEL_WIDTH, 0.f, 0.f, }, // bottom right corner
+			};
+
 		panel::panel(
 			__in const std::vector<uint8_t> &selection
 			) :
 				nomic::entity::object(ENTITY_PANEL),
+				m_atlas(PANEL_ATLAS_PATH_DEFAULT, PANEL_ATLAS_DIMENSIONS_DEFAULT, PANEL_ATLAS_WIDTH_DEFAULT),
 				m_index(0)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Selection[%u]=%p", selection.size(), &selection);
@@ -41,6 +84,7 @@ namespace nomic {
 			__in const panel &other
 			) :
 				nomic::entity::object(other),
+				m_atlas(other.m_atlas),
 				m_index(0)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -65,6 +109,8 @@ namespace nomic {
 
 			if(this != &other) {
 				nomic::entity::object::operator=(other);
+				m_atlas = other.m_atlas;
+				m_index = 0;
 				setup(other.m_selection);
 			}
 
@@ -91,13 +137,11 @@ namespace nomic {
 
 			if(m_index > 0) {
 				--m_index;
+			} else {
+				m_index = (m_selection.size() - 1);
 			}
 
-			result = m_selection.at(m_index);
-
-			if(m_index != previous) {
-				reconfigure();
-			}
+			result = std::get<VAO_TYPE>(m_selection.at(m_index));
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -114,13 +158,11 @@ namespace nomic {
 
 			if(m_index < (m_selection.size() - 1)) {
 				++m_index;
+			} else {
+				m_index = 0;
 			}
 
-			result = m_selection.at(m_index);
-
-			if(m_index != previous) {
-				reconfigure();
-			}
+			result = std::get<VAO_TYPE>(m_selection.at(m_index));
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -135,17 +177,42 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
-			// TODO: render panel
+			if(!m_selection.empty()) {
+				nomic::graphic::vao &arr = vertex_array();
+				arr.bind();
+				arr.enable(PANEL_INDEX_COORDINATE);
+				arr.enable(PANEL_INDEX_VERTEX);
 
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
+				if(textures) {
+					uint32_t count = 0;
+					//nomic::graphic::atlas *texture_ref = (nomic::graphic::atlas *) textures;
 
-		void 
-		panel::reconfigure(void)
-		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
+					for(std::vector<panel_data>::iterator iter = m_selection.begin(); iter != m_selection.end();
+							++count, ++iter) {
+						uint32_t type = PANEL_ATLAS_CENTER_UNSELECTED;
 
-			// TODO: rebuild panel
+						if(m_selection.size() > 1) {
+
+							if(iter == m_selection.begin()) {
+								type = PANEL_ATLAS_LEFT_UNSELECTED;
+							} else if(iter == (m_selection.end() - 1)) {
+								type = PANEL_ATLAS_RIGHT_UNSELECTED;
+							}
+						}
+
+						if(count == m_index) {
+							type += PANEL_ATLAS_LEFT_SELECTED;
+						}
+
+						m_atlas.enable(type);
+						GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, std::get<VAO_BASE>(*iter),
+							std::get<VAO_OFFSET>(*iter));
+
+						// TODO: draw block
+						//texture_ref->enable(std::get<VAO_TYPE>(*iter));
+					}
+				}
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -162,7 +229,7 @@ namespace nomic {
 					"Index=%u", m_index);
 			}
 
-			result = m_selection.at(m_index);
+			result = std::get<VAO_TYPE>(m_selection.at(m_index));
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
@@ -181,7 +248,6 @@ namespace nomic {
 			}
 
 			m_index = index;
-			reconfigure();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -202,9 +268,75 @@ namespace nomic {
 					"Selection[%u] (can be at most %u)", selection.size(), PANEL_INDEX_MAX);
 			}
 
-			m_selection = selection;
+			m_selection.clear();
 
-			// TODO: build panel and push into vao
+			for(std::vector<uint8_t>::const_iterator iter = selection.begin(); iter != selection.end(); ++iter) {
+				m_selection.push_back(std::make_tuple(*iter, 0, 0));
+			}
+
+			setup_vertex_array();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		panel::setup(
+			__in const std::vector<panel_data> &selection
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Selection[%u]=%p", selection.size(), &selection);
+
+			if(selection.empty()) {
+				THROW_NOMIC_ENTITY_PANEL_EXCEPTION(NOMIC_ENTITY_PANEL_EXCEPTION_EMPTY);
+			}
+
+			if(selection.size() > PANEL_INDEX_MAX) {
+				THROW_NOMIC_ENTITY_PANEL_EXCEPTION_FORMAT(NOMIC_ENTITY_PANEL_EXCEPTION_FULL,
+					"Selection[%u] (can be at most %u)", selection.size(), PANEL_INDEX_MAX);
+			}
+
+			m_selection = selection;
+			setup_vertex_array();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		panel::setup_vertex_array(void)
+		{
+			float ratio;
+			std::vector<glm::vec3> vertex;
+			std::vector<glm::vec2> coordinate;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			ratio = (m_view_dimensions.y / (float) m_view_dimensions.x);
+
+			for(uint32_t base = 0, iter = 0; iter < m_selection.size(); ++iter) {
+				coordinate.insert(coordinate.end(), &PANEL_COORDINATE[0], &PANEL_COORDINATE[0] + PANEL_SEGMENT_COUNT);
+
+				for(uint32_t iter_segment = 0; iter_segment < PANEL_SEGMENT_COUNT; ++iter_segment) {
+					vertex.push_back((PANEL_VERTEX[iter_segment] * glm::vec3(ratio * PANEL_WIDTH, PANEL_WIDTH, 0.f))
+						/*+ glm::vec3(iter * PANEL_WIDTH, 0.f, 0.f)*/);
+				}
+
+				nomic::entity::panel_data &data = m_selection.at(iter);
+				std::get<VAO_BASE>(data) = base;
+				std::get<VAO_OFFSET>(data) = PANEL_SEGMENT_COUNT;
+				base += PANEL_SEGMENT_COUNT;
+
+				// TODO
+			}
+
+			nomic::graphic::vao &arr = vertex_array();
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &coordinate[0],
+				((uint8_t *) &coordinate[0]) + (coordinate.size() * PANEL_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
+				GL_STATIC_DRAW), PANEL_INDEX_COORDINATE, PANEL_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
+				((uint8_t *) &vertex[0]) + (vertex.size() * PANEL_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
+				GL_STATIC_DRAW), PANEL_INDEX_VERTEX, PANEL_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
+			arr.enable(PANEL_INDEX_COORDINATE);
+			arr.enable(PANEL_INDEX_VERTEX);
 
 			m_index = PANEL_INDEX_DEFAULT;
 			set_selected(m_index);
@@ -225,14 +357,15 @@ namespace nomic {
 
 			if(verbose) {
 				result << " Base=" << nomic::entity::object::to_string(verbose)
+					<< ", Atlas=" << m_atlas.to_string(verbose)
 					<< ", Selection[" << m_selection.size() << "]";
 
 				if(!m_selection.empty()) {
 					uint8_t count = 0;
 					result << "={";
 
-					for(std::vector<uint8_t>::const_iterator iter = m_selection.begin(); iter != m_selection.end();
-							++count, ++iter) {
+					for(std::vector<panel_data>::const_iterator iter = m_selection.begin();
+							iter != m_selection.end(); ++count, ++iter) {
 
 						if(iter != m_selection.begin()) {
 							result << ", ";
@@ -242,7 +375,8 @@ namespace nomic {
 							result << "[";
 						}
 
-						result << SCALAR_AS_HEX(uint8_t, *iter);
+						result << SCALAR_AS_HEX(uint8_t, std::get<VAO_TYPE>(*iter))
+							<< ", {" << std::get<VAO_BASE>(*iter) << ", " << std::get<VAO_OFFSET>(*iter) << "}";
 
 						if(count == m_index) {
 							result << "]";

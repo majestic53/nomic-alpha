@@ -26,12 +26,10 @@ uniform mat4 projection;
 uniform mat4 view;
 
 out vec2 out_coordinate;
-out vec3 out_vertex;
 
 void
 main(void)
 {
 	out_coordinate = in_coordinate;
-	out_vertex = in_vertex;
 	gl_Position = vec4(in_vertex, 1.f);
 }

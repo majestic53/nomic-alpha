@@ -53,7 +53,7 @@ namespace nomic {
 #endif // __inout_opt
 
 	#define ATLAS_DIMENSIONS_DEFAULT glm::uvec2(16, 16)
-	#define ATLAS_PATH_DEFAULT "./res/texture/atlas.bmp"
+	#define ATLAS_PATH_DEFAULT "./res/texture/block.bmp"
 	#define ATLAS_WIDTH_DEFAULT 16
 
 	#define BACKDROP_HEIGHT_DEFAULT 10
@@ -209,13 +209,17 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 6
+	#define NOMIC_VERSION_REVISION 7
 	#define NOMIC_VERSION_WEEK 1730
 
 	#define OBJECT_COUNT 1
 
+	#define PANEL_ATLAS_PATH_DEFAULT "./res/texture/panel.bmp"
+	#define PANEL_ATLAS_DIMENSIONS_DEFAULT glm::uvec2(64, 64)
+	#define PANEL_ATLAS_WIDTH_DEFAULT 6
 	#define PANEL_INDEX_DEFAULT 0
 	#define PANEL_INDEX_MAX 6
+	#define PANEL_WIDTH 0.4f
 
 	#define PLAIN_COLOR_DEFAULT glm::vec4(PLAIN_COLOR_RGBA_DEFAULT)
 	#define PLAIN_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f

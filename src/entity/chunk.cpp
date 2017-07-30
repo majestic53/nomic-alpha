@@ -30,7 +30,7 @@ namespace nomic {
 		#define CHUNK_SEGMENT_WIDTH_VERTEX 3
 
 		enum {
-			CHUNK_INDEX_COORDINATE,
+			CHUNK_INDEX_COORDINATE = 0,
 			CHUNK_INDEX_VERTEX,
 		};
 

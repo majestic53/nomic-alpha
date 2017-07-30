@@ -19,12 +19,16 @@
 #ifndef NOMIC_ENTITY_PANEL_H_
 #define NOMIC_ENTITY_PANEL_H_
 
+#include <tuple>
 #include "./object.h"
 #include "../event/input.h"
+#include "../graphic/atlas.h"
 
 namespace nomic {
 
 	namespace entity {
+
+		typedef std::tuple<uint8_t, uint32_t, uint32_t> panel_data;
 
 		class panel :
 				public nomic::entity::object {
@@ -69,15 +73,21 @@ namespace nomic {
 
 			protected:
 
-				void reconfigure(void);
-
 				void setup(
 					__in const std::vector<uint8_t> &selection
 					);
 
+				void setup(
+					__in const std::vector<panel_data> &selection
+					);
+
+				void setup_vertex_array(void);
+
+				nomic::graphic::atlas m_atlas;
+
 				uint8_t m_index;
 
-				std::vector<uint8_t> m_selection;
+				std::vector<panel_data> m_selection;
 		};
 	}
 }
