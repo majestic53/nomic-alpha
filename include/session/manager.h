@@ -153,6 +153,16 @@ namespace nomic {
 
 				void on_uninitialize(void);
 
+				void on_wheel(
+					__in uint32_t direction,
+					__in int32_t x,
+					__in int32_t y
+					);
+
+				void panel_move_left(void);
+
+				void panel_move_right(void);
+
 				void selected_block_add(void);
 
 				void selected_block_remove(void);

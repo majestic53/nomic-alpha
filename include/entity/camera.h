@@ -75,6 +75,8 @@ namespace nomic {
 
 				glm::uvec2 dimensions(void) const;
 
+				void flush(void);
+
 				float fov(void) const;
 
 				void key(

@@ -24,6 +24,7 @@
 #include "../../include/entity/block.h"
 #include "../../include/entity/diagnostic.h"
 #include "../../include/entity/message.h"
+#include "../../include/entity/panel.h"
 #include "../../include/entity/plain.h"
 #include "../../include/entity/reticle.h"
 #include "../../include/entity/selector.h"
@@ -119,19 +120,32 @@ namespace nomic {
 
 		// entity foreground objects
 		enum {
-			ENTITY_OBJECT_FOREGROUND_RETICLE = 0,
+			ENTITY_OBJECT_FOREGROUND_PANEL = 0,
+			ENTITY_OBJECT_FOREGROUND_RETICLE,
 			ENTITY_OBJECT_FOREGROUND_SELECTOR,
 		};
 
 		#define ENTITY_OBJECT_FOREGROUND_MAX ENTITY_OBJECT_FOREGROUND_SELECTOR
 
 		static const std::vector<renderer_config> ENTITY_RENDERER_FOREGROUND_CONFIGURATION = {
+			{ "./res/shader/vert_panel.glsl", "./res/shader/frag_panel.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // panel
 			{ "./res/shader/vert_reticle.glsl", "./res/shader/frag_reticle.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
 			{ "./res/shader/vert_selector.glsl", "./res/shader/frag_selector.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT,
 				RENDERER_CULL_MODE_DEFAULT, false, RENDERER_DEPTH_MODE_DEFAULT }, // selector
+			};
+
+		static const std::vector<uint8_t> FOREGROUND_PANEL_SELECTION = {
+			BLOCK_DIRT,
+			BLOCK_GRASS,
+			BLOCK_STONE,
+			BLOCK_GRAVEL,
+			BLOCK_SAND,
+			BLOCK_SANDSTONE,
 			};
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
@@ -554,6 +568,7 @@ namespace nomic {
 			}
 
 			position = nomic::utility::block_as_position(chunk, block);
+			m_camera->rotation() = CAMERA_ROTATION_DEFAULT;
 			m_camera->position() = position;
 			m_spawn = m_camera->position();
 
@@ -628,6 +643,8 @@ namespace nomic {
 			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_FOREGROUND_MAX; ++iter) {
 
 				switch(iter) {
+					case ENTITY_OBJECT_FOREGROUND_PANEL:
+						type = RENDERER_FOREGROUND_PANEL;
 					case ENTITY_OBJECT_FOREGROUND_RETICLE:
 						type = RENDERER_FOREGROUND_RETICLE;
 						break;
@@ -656,6 +673,9 @@ namespace nomic {
 				}
 
 				switch(iter) {
+					case ENTITY_OBJECT_FOREGROUND_PANEL:
+						m_entity_object_foreground.push_back(new nomic::entity::panel(FOREGROUND_PANEL_SELECTION));
+						break;
 					case ENTITY_OBJECT_FOREGROUND_RETICLE:
 						m_entity_object_foreground.push_back(new nomic::entity::reticle);
 						break;
@@ -752,7 +772,6 @@ namespace nomic {
 				std::get<RENDERER_DEPTH_MODE>(CHUNK_RENDERER_CONFIGURATION));
 
 			generate_chunks_spawn();
-			generate_spawn_location();
 
 			for(uint32_t iter = 0; iter <= ENTITY_OBJECT_BACKGROUND_MAX; ++iter) {
 				m_entity_object_background.at(iter)->enable(true);
@@ -881,9 +900,11 @@ namespace nomic {
 			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
 			m_random_float.setup(m_manager_terrain.generator().seed());
 			m_random_integer.setup(m_manager_terrain.generator().seed());
+			m_underwater = false;
 
 			initialize_entities();
-			m_underwater = false;
+			generate_spawn_location();
+
 			nomic::event::input::sync();
 			nomic::core::thread::start(true);
 			nomic::core::thread::notify();
@@ -936,6 +957,57 @@ namespace nomic {
 			m_manager_display.uninitialize();
 
 			TRACE_MESSAGE(LEVEL_INFORMATION, "Session manager uninitialized");
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::on_wheel(
+			__in uint32_t direction,
+			__in int32_t x,
+			__in int32_t y
+			)
+		{
+			bool right;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Direction=%x(%s), Position={%i, %i}", direction,
+				(direction == SDL_MOUSEWHEEL_NORMAL) ? "Normal" : "Flipped", x, y);
+
+			if(direction == SDL_MOUSEWHEEL_FLIPPED) {
+				y *= -1;
+			}
+
+			right = (y > 0);
+			y = std::abs(y);
+
+			for(uint32_t iter = 0; iter < y; ++iter) {
+
+				if(right) {
+					panel_move_right();
+				} else {
+					panel_move_left();
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::panel_move_left(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			((nomic::entity::panel *) m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_PANEL))->move_left();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::panel_move_right(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			((nomic::entity::panel *) m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_PANEL))->move_right();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -1100,14 +1172,12 @@ namespace nomic {
 				}
 
 				if(place) {
-					uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT, type;
+					uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT,
+						type = ((nomic::entity::panel *)
+							m_entity_object_foreground.at(ENTITY_OBJECT_FOREGROUND_PANEL))->selected();
 
-					// TODO: get block type from gui
-					type = BLOCK_DIRT;
-					// ---
-
-					TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Adding block. Chunk={%i, %i}, Block={%u, %u, %u}",
-						chunk.x, chunk.y, block.x, block.y, block.z);
+					TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Adding block. Type=%x Chunk={%i, %i}, Block={%u, %u, %u}",
+						type, chunk.x, chunk.y, block.x, block.y, block.z);
 
 					m_manager_terrain.at(chunk)->set_block(block, type, attribute);
 					m_block_selected = false;

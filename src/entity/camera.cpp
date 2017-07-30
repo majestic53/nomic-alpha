@@ -207,6 +207,16 @@ namespace nomic {
 			return m_dimensions;
 		}
 
+		void 
+		camera::flush(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			nomic::event::input::sync();
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		float 
 		camera::fov(void) const
 		{
@@ -322,7 +332,11 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Direction=%x(%s), Position={%i, %i}", direction,
 				(direction == SDL_MOUSEWHEEL_NORMAL) ? "Normal" : "Flipped", x, y);
 
-			m_wheel += y;
+			/*if(direction == SDL_MOUSEWHEEL_FLIPPED) {
+				y *= -1;
+			}
+
+			m_wheel += y;*/
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

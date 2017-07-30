@@ -62,9 +62,6 @@ namespace nomic {
 		reticle::~reticle(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-
-			vertex_array().disable_all();
-
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 

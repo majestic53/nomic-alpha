@@ -214,6 +214,9 @@ namespace nomic {
 
 	#define OBJECT_COUNT 1
 
+	#define PANEL_INDEX_DEFAULT 0
+	#define PANEL_INDEX_MAX 6
+
 	#define PLAIN_COLOR_DEFAULT glm::vec4(PLAIN_COLOR_RGBA_DEFAULT)
 	#define PLAIN_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define PLAIN_DIMENSION_DEFAULT glm::vec2(1.f)
@@ -448,6 +451,7 @@ namespace nomic {
 		ENTITY_AXIS,
 		ENTITY_RETICLE,
 		ENTITY_SELECTOR,
+		ENTITY_PANEL,
 	};
 
 	enum {
@@ -493,6 +497,7 @@ namespace nomic {
 		RENDERER_DEBUG_DIAGNOSTIC,
 		RENDERER_FOREGROUND_RETICLE,
 		RENDERER_FOREGROUND_SELECTOR,
+		RENDERER_FOREGROUND_PANEL,
 		RENDERER_SPAWN_BACKDROP,
 		RENDERER_SPAWN_DIAGNOSTIC,
 		RENDERER_SPAWN_MESSAGE,
@@ -502,7 +507,7 @@ namespace nomic {
 
 	static const std::string RENDERER_STR[] = {
 		"Background-Skybox", "Chunk", "Debug-Axis", "Debug-Block", "Debug-Diagnostic", "Foreground-Reticle",
-		"Foreground-Selector", "Spawn-Backdrop", "Spawn-Diagnostic", "Spawn-Message",
+		"Foreground-Selector", "Foreground-Panel", "Spawn-Backdrop", "Spawn-Diagnostic", "Spawn-Message",
 	};
 
 	#define RENDERER_STRING(_TYPE_) \
