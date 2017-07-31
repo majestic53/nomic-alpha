@@ -61,11 +61,11 @@ namespace nomic {
 
 		static const glm::vec3 PANEL_VERTEX[] = {
 			{ 0.f, 0.f, 0.f, }, // bottom left corner
-			{ 0.f, PANEL_WIDTH, 0.f, }, // top left corner
-			{ PANEL_WIDTH, PANEL_WIDTH, 0.f, }, // top right corner
+			{ 0.f, 1.f, 0.f, }, // top left corner
+			{ 1.f, 1.f, 0.f, }, // top right corner
 			{ 0.f, 0.f, 0.f, }, // bottom left corner
-			{ PANEL_WIDTH, PANEL_WIDTH, 0.f, }, // top right corner
-			{ PANEL_WIDTH, 0.f, 0.f, }, // bottom right corner
+			{ 1.f, 1.f, 0.f, }, // top right corner
+			{ 1.f, 0.f, 0.f, }, // bottom right corner
 			};
 
 		panel::panel(
@@ -193,7 +193,7 @@ namespace nomic {
 
 				if(textures) {
 					uint32_t count = 0;
-					//nomic::graphic::atlas *texture_ref = (nomic::graphic::atlas *) textures;
+					nomic::graphic::atlas *texture_ref = (nomic::graphic::atlas *) textures;
 
 					for(std::vector<panel_data>::iterator iter = m_selection.begin(); iter != m_selection.end();
 							++count, ++iter) {
@@ -215,9 +215,13 @@ namespace nomic {
 						m_atlas.enable(type);
 						GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, std::get<VAO_BASE>(*iter),
 							std::get<VAO_OFFSET>(*iter));
+					}
 
-						// TODO: draw block
-						//texture_ref->enable(std::get<VAO_TYPE>(*iter));
+					for(std::vector<panel_data>::iterator iter = m_selection.begin(); iter != m_selection.end();
+							++count, ++iter) {
+						texture_ref->enable(std::get<VAO_TYPE>(*iter));
+						GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, std::get<VAO_BASE_TEXTURE>(*iter),
+							std::get<VAO_OFFSET_TEXTURE>(*iter));
 					}
 				}
 			}
@@ -325,7 +329,7 @@ namespace nomic {
 				coordinate.insert(coordinate.end(), &PANEL_COORDINATE[0], &PANEL_COORDINATE[0] + PANEL_SEGMENT_COUNT);
 
 				for(uint32_t iter_segment = 0; iter_segment < PANEL_SEGMENT_COUNT; ++iter_segment) {
-					vertex.push_back(PANEL_VERTEX[iter_segment] * glm::vec3(ratio, 1.f, 0.f));
+					vertex.push_back(PANEL_VERTEX[iter_segment] * glm::vec3(PANEL_WIDTH * ratio, PANEL_WIDTH, 0.f));
 
 					if(iter) {
 						vertex.back() += glm::vec3(iter * ratio * PANEL_WIDTH, 0.f, 0.f);
@@ -341,7 +345,26 @@ namespace nomic {
 				base += PANEL_SEGMENT_COUNT;
 			}
 
-			// TODO: add texture vertex, coordinates
+			for(uint32_t iter = 0; iter < m_selection.size(); ++iter) {
+				coordinate.insert(coordinate.end(), &PANEL_COORDINATE[0], &PANEL_COORDINATE[0] + PANEL_SEGMENT_COUNT);
+
+				for(uint32_t iter_segment = 0; iter_segment < PANEL_SEGMENT_COUNT; ++iter_segment) {
+					vertex.push_back(PANEL_VERTEX[iter_segment] * glm::vec3(PANEL_WIDTH_TEXTURE * ratio, PANEL_WIDTH_TEXTURE, 0.f));
+
+					if(iter) {
+						vertex.back() += glm::vec3(iter * ratio * PANEL_WIDTH, 0.f, 0.f);
+					}
+
+					vertex.back() -= glm::vec3(((m_selection.size() * ratio * PANEL_WIDTH) / 2.f)
+						- ((PANEL_WIDTH * ratio) / 2.f) + ((PANEL_WIDTH_TEXTURE * ratio) / 2.f),
+						(1.f - PANEL_PADDING_LOWER) - (PANEL_WIDTH / 2.f) + (PANEL_WIDTH_TEXTURE / 2.f), 0.f);
+				}
+
+				nomic::entity::panel_data &data = m_selection.at(iter);
+				std::get<VAO_BASE_TEXTURE>(data) = base;
+				std::get<VAO_OFFSET_TEXTURE>(data) = PANEL_SEGMENT_COUNT;
+				base += PANEL_SEGMENT_COUNT;
+			}
 
 			nomic::graphic::vao &arr = vertex_array();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &coordinate[0],

@@ -24,11 +24,17 @@ make release
 Changelog
 =========
 
+Version 0.1.1731
+----------------
+*Updated: 7/31/2017*
+
+* Added textured blocks to block gui
+
 Version 0.1.1730
 ----------------
 *Updated: 7/30/2017*
 
-* Added block gui (incomplete)
+* Added block gui <s>(incomplete)</s>
 * Added additional block types
 
 *Updated: 7/29/2017*
@@ -44,27 +50,6 @@ Version 0.1.1730
 *Updated: 7/25/2017*
 
 * Added block face selection
-
-Version 0.1.1729
-----------------
-*Updated: 7/23/2017*
-
-* Block removal (incomplete)
-
-*Updated: 7/20-22/2017*
-
-* Added block selector <s>(incomplete)</s>
-* Added non-constant density fog
-
-*Updated: 7/19/2017*
-
-* Fixed bug in underwater detection
-* Fixed bug in fog/water effect shader routines
-
-*Updated: 7/17-18/2017*
-
-* Added underwater detection to shader
-* Fixed coordinate system
 
 *Changelog truncated (see file history for full log)*
 
