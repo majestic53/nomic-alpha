@@ -29,6 +29,7 @@
 #include "../../include/entity/reticle.h"
 #include "../../include/entity/selector.h"
 #include "../../include/entity/skybox.h"
+#include "../../include/entity/sun.h"
 #include "../../include/graphic/vao.h"
 #include "../../include/trace.h"
 #include "./manager_type.h"
@@ -99,14 +100,18 @@ namespace nomic {
 		// entity background objects
 		enum {
 			ENTITY_OBJECT_BACKGROUND_SKYBOX = 0,
+			ENTITY_OBJECT_BACKGROUND_SUN,
 		};
 
-		#define ENTITY_OBJECT_BACKGROUND_MAX ENTITY_OBJECT_BACKGROUND_SKYBOX
+		#define ENTITY_OBJECT_BACKGROUND_MAX ENTITY_OBJECT_BACKGROUND_SUN
 
 		static const std::vector<renderer_config> ENTITY_RENDERER_BACKGROUND_CONFIGURATION = {
 			{ "./res/shader/vert_skybox.glsl", "./res/shader/frag_skybox.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT,
 				RENDERER_CULL_MODE_DEFAULT, false, RENDERER_DEPTH_MODE_DEFAULT }, // skybox
+			{ "./res/shader/vert_sun.glsl", "./res/shader/frag_sun.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, GL_FRONT,
+				false, RENDERER_DEPTH_MODE_DEFAULT }, // sun
 			};
 
 		static const std::map<uint32_t, std::string> ENTITY_SKYBOX_FACE = {
@@ -135,8 +140,8 @@ namespace nomic {
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				false, RENDERER_DEPTH_MODE_DEFAULT }, // reticle
 			{ "./res/shader/vert_selector.glsl", "./res/shader/frag_selector.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
-				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT,
-				RENDERER_CULL_MODE_DEFAULT, false, RENDERER_DEPTH_MODE_DEFAULT }, // selector
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, GL_FRONT,
+				false, RENDERER_DEPTH_MODE_DEFAULT }, // selector
 			};
 
 		static const std::vector<uint8_t> FOREGROUND_PANEL_SELECTION = {
@@ -596,6 +601,9 @@ namespace nomic {
 					case ENTITY_OBJECT_BACKGROUND_SKYBOX:
 						type = RENDERER_BACKGROUND_SKYBOX;
 						break;
+					case ENTITY_OBJECT_BACKGROUND_SUN:
+						type = RENDERER_BACKGROUND_SUN;
+						break;
 					default:
 						break;
 				}
@@ -627,6 +635,9 @@ namespace nomic {
 						}
 
 						((nomic::entity::skybox *) m_entity_object_background.back())->set(ENTITY_SKYBOX_FACE);
+						break;
+					case ENTITY_OBJECT_BACKGROUND_SUN:
+						m_entity_object_background.push_back(new nomic::entity::sun);
 						break;
 					default:
 						break;

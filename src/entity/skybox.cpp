@@ -136,7 +136,9 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
 			nomic::graphic::cubemap::bind();
-			vertex_array().bind();
+			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			arr.enable(SKYBOX_INDEX_VERTEX);
 			GL_CHECK(LEVEL_WARNING, glEnable, GL_TEXTURE_CUBE_MAP_SEAMLESS);
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, SKYBOX_SEGMENT_COUNT);
 			GL_CHECK(LEVEL_WARNING, glDisable, GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -184,10 +186,10 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &SKYBOX_VERTEX[0],
 				((uint8_t *) &SKYBOX_VERTEX[0]) + (SKYBOX_SEGMENT_COUNT * SKYBOX_SEGMENT_WIDTH * sizeof(GLfloat))), GL_STATIC_DRAW),
 				SKYBOX_INDEX_VERTEX, SKYBOX_SEGMENT_WIDTH, GL_FLOAT);
-			arr.enable(SKYBOX_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

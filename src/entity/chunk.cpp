@@ -230,7 +230,6 @@ namespace nomic {
 				case BLOCK_PLANK:
 				case BLOCK_SAND:
 				case BLOCK_STONE:
-				case BLOCK_GRASS_TALL:
 				case BLOCK_WATER:
 					break;
 				case BLOCK_GRASS:
@@ -537,14 +536,13 @@ namespace nomic {
 				arr.disable_all();
 				arr.remove_all();
 				arr.clear();
+				arr.bind();
 				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &coordinate[0],
 					((uint8_t *) &coordinate[0]) + (coordinate.size() * CHUNK_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
 					GL_STATIC_DRAW), CHUNK_INDEX_COORDINATE, CHUNK_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
 				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
 					((uint8_t *) &vertex[0]) + (vertex.size() * CHUNK_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
 					GL_STATIC_DRAW), CHUNK_INDEX_VERTEX, CHUNK_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
-				arr.enable(CHUNK_INDEX_COORDINATE);
-				arr.enable(CHUNK_INDEX_VERTEX);
 			}
 
 #ifdef VIEW_SELECTIVE_SHOW

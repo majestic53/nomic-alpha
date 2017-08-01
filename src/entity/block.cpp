@@ -193,7 +193,11 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
-			vertex_array().bind();
+			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			arr.enable(BLOCK_INDEX_COLOR);
+			arr.enable(BLOCK_INDEX_COORDINATE);
+			arr.enable(BLOCK_INDEX_VERTEX);
 
 			if(!m_face.empty()) {
 
@@ -236,6 +240,7 @@ namespace nomic {
 			arr.disable_all();
 			arr.remove_all();
 			arr.clear();
+			arr.bind();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
 				((uint8_t *) &color[0]) + (BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_COLOR * sizeof(GLfloat))),
 				GL_STATIC_DRAW), BLOCK_INDEX_COLOR, BLOCK_SEGMENT_WIDTH_COLOR, GL_FLOAT);
@@ -245,9 +250,6 @@ namespace nomic {
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
 				((uint8_t *) &vertex[0]) + (BLOCK_SEGMENT_COUNT * BLOCK_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
 				GL_STATIC_DRAW), BLOCK_INDEX_VERTEX, BLOCK_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
-			arr.enable(BLOCK_INDEX_COLOR);
-			arr.enable(BLOCK_INDEX_COORDINATE);
-			arr.enable(BLOCK_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

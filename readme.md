@@ -26,6 +26,10 @@ Changelog
 
 Version 0.1.1731
 ----------------
+*Updated: 8/1/2017*
+
+* Added sun entity class (incomplete)
+
 *Updated: 7/31/2017*
 
 * Added textured blocks to block gui

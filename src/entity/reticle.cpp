@@ -89,7 +89,10 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
-			vertex_array().bind();
+			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			arr.enable(RETICLE_INDEX_COLOR);
+			arr.enable(RETICLE_INDEX_VERTEX);
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, RETICLE_SEGMENT_COUNT);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -126,14 +129,13 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
 				((uint8_t *) &color[0]) + (RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_COLOR * sizeof(GLfloat))), GL_STATIC_DRAW),
 				RETICLE_INDEX_COLOR, RETICLE_SEGMENT_WIDTH_COLOR, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
 				((uint8_t *) &vertex[0]) + (RETICLE_SEGMENT_COUNT * RETICLE_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))), GL_STATIC_DRAW),
 				RETICLE_INDEX_VERTEX, RETICLE_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
-			arr.enable(RETICLE_INDEX_COLOR);
-			arr.enable(RETICLE_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

@@ -219,7 +219,11 @@ namespace nomic {
 				nomic::graphic::texture::bind();
 			}
 
-			vertex_array().bind();
+			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			arr.enable(PLAIN_INDEX_COLOR);
+			arr.enable(PLAIN_INDEX_COORDINATE);
+			arr.enable(PLAIN_INDEX_VERTEX);
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, PLAIN_SEGMENT_COUNT);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -258,6 +262,7 @@ namespace nomic {
 			arr.disable_all();
 			arr.remove_all();
 			arr.clear();
+			arr.bind();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &color[0],
 				((uint8_t *) &color[0]) + (PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_COLOR * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PLAIN_INDEX_COLOR, PLAIN_SEGMENT_WIDTH_COLOR, GL_FLOAT);
@@ -267,9 +272,6 @@ namespace nomic {
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
 				((uint8_t *) &vertex[0]) + (PLAIN_SEGMENT_COUNT * PLAIN_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PLAIN_INDEX_VERTEX, PLAIN_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
-			arr.enable(PLAIN_INDEX_COLOR);
-			arr.enable(PLAIN_INDEX_COORDINATE);
-			arr.enable(PLAIN_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

@@ -18,10 +18,12 @@
 
 #version 330 core
 
-in vec4 out_color;
+in vec2 out_coordinate;
+
+uniform sampler2D out_texture;
 
 void
 main(void)
 {
-	gl_FragColor = out_color;
+	gl_FragColor = texture(out_texture, out_coordinate);
 }

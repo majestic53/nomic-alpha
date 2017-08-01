@@ -367,14 +367,13 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &coordinate[0],
 				((uint8_t *) &coordinate[0]) + (coordinate.size() * PANEL_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PANEL_INDEX_COORDINATE, PANEL_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
 				((uint8_t *) &vertex[0]) + (vertex.size() * PANEL_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
 				GL_STATIC_DRAW), PANEL_INDEX_VERTEX, PANEL_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
-			arr.enable(PANEL_INDEX_COORDINATE);
-			arr.enable(PANEL_INDEX_VERTEX);
 
 			m_index = PANEL_INDEX_DEFAULT;
 			set_selected(m_index);

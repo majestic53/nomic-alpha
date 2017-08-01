@@ -124,6 +124,7 @@ namespace nomic {
 			y = (m_view_dimensions.y - m_position.y);
 			nomic::graphic::vao &arr = vertex_array();
 			arr.bind();
+			arr.enable(STRING_INDEX_VERTEX);
 			GL_CHECK(LEVEL_WARNING, glActiveTexture, GL_TEXTURE0);
 			renderer.set_uniform(renderer.uniform_location(UNIFORM_COLOR), m_color);
 
@@ -256,9 +257,9 @@ namespace nomic {
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
 			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, STRING_SEGMENT_COUNT * STRING_SEGMENT_WIDTH * sizeof(GLfloat), GL_DYNAMIC_DRAW),
 				STRING_INDEX_VERTEX, STRING_SEGMENT_WIDTH, GL_FLOAT);
-			arr.enable(STRING_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

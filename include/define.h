@@ -202,14 +202,14 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 356.0
 
-	#define NOISE_SEED_DEFAULT 0 //3447053438 //612443400
+	#define NOISE_SEED_DEFAULT 0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1731
 
 	#define OBJECT_COUNT 1
@@ -245,10 +245,10 @@ namespace nomic {
 	#define RENDERER_DEPTH_DEFAULT true
 	#define RENDERER_DEPTH_MODE_DEFAULT GL_LESS
 
-	#define RETICLE_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
+	#define RETICLE_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.9f)
 	#define RETICLE_HORIZONTAL_LEFT 2
 	#define RETICLE_HORIZONTAL_RIGHT 3
-	#define RETICLE_WIDTH 0.02f
+	#define RETICLE_WIDTH 0.03f
 
 	#define RUNTIME_PAUSE_DELAY 200
 	#define RUNTIME_TICKS_PER_SECOND 60
@@ -264,7 +264,8 @@ namespace nomic {
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
-	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
+	#define SELECTOR_COLOR_ALPHA 0.08f
+	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.9f)
 	#define SELECTOR_DISTANCE_MAX 60.f
 	#define SELECTOR_DISTANCE_STEP 0.1f
 	#define SELECTOR_DISTANCE_SCALE glm::vec3(SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP)
@@ -365,7 +366,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 30 //36
+	#define VIEW_WIDTH 30
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -400,16 +401,15 @@ namespace nomic {
 		BLOCK_ORE_DIAMOND,
 		BLOCK_GLASS,
 		BLOCK_LEAVES,
-		BLOCK_GRASS_TALL,
 	};
 
-	#define BLOCK_MAX BLOCK_GRASS_TALL
+	#define BLOCK_MAX BLOCK_LEAVES
 
 	static const std::string BLOCK_STR[] = {
 		"Air", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone", "Stone/Snow", "Snow",
 		"Gravel", "Sand", "Sandstone", "Sandstone/Side", "Water", "Plank", "Wood",
 		"Wood-side", "Cobblestone", "Mossy-Cobblestone", "Obsidian", "Gold-Ore", "Iron-Ore",
-		"Coal-Ore", "Diamond-Ore", "Glass", "Leaves", "Tall-Grass",
+		"Coal-Ore", "Diamond-Ore", "Glass", "Leaves",
 		};
 
 	#define BLOCK_STRING(_TYPE_) \
@@ -470,6 +470,7 @@ namespace nomic {
 	enum {
 		ENTITY_CAMERA = 0,
 		ENTITY_SKYBOX,
+		ENTITY_SUN,
 		ENTITY_STRING,
 		ENTITY_PLAIN,
 		ENTITY_BLOCK,
@@ -517,6 +518,7 @@ namespace nomic {
 
 	enum {
 		RENDERER_BACKGROUND_SKYBOX = 0,
+		RENDERER_BACKGROUND_SUN,
 		RENDERER_CHUNK,
 		RENDERER_DEBUG_AXIS,
 		RENDERER_DEBUG_BLOCK,

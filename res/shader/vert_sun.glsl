@@ -18,10 +18,18 @@
 
 #version 330 core
 
-in vec4 out_color;
+layout(location = 0) in vec2 in_coordinate;
+layout(location = 1) in vec3 in_vertex;
+
+uniform mat4 model;
+uniform mat4 projection;
+uniform mat4 view;
+
+out vec2 out_coordinate;
 
 void
 main(void)
 {
-	gl_FragColor = out_color;
+	out_coordinate = in_coordinate;
+	gl_Position = (projection * view * model * vec4(in_vertex, 1.f));
 }

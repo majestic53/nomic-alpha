@@ -25,6 +25,7 @@ namespace nomic {
 	namespace entity {
 
 		#define SELECTOR_SEGMENT_COUNT 8
+		#define SELECTOR_SEGMENT_COUNT_COLOR 6
 		#define SELECTOR_SEGMENT_WIDTH_COLOR 4
 		#define SELECTOR_SEGMENT_WIDTH_VERTEX 3
 
@@ -82,6 +83,45 @@ namespace nomic {
 			{ 0.f, BLOCK_WIDTH, 0.f },
 			{ BLOCK_WIDTH, 0.f, 0.f },
 			{ 0.f, 0.f, 0.f },
+			};
+
+		static const glm::vec3 SELECTOR_VERTEX_COLOR[] = {
+			{ BLOCK_WIDTH, 0.f, 0.f, }, // right
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ 0.f, 0.f, BLOCK_WIDTH, }, // left
+			{ 0.f, 0.f, 0.f, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, 0.f, }, // top
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
+			{ 0.f, 0.f, 0.f, }, // bottom
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, },
+			{ 0.f, 0.f, BLOCK_WIDTH, }, // back
+			{ 0.f, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, BLOCK_WIDTH, },
+			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH, },
+			{ 0.f, 0.f, BLOCK_WIDTH, },
+			{ 0.f, BLOCK_WIDTH, 0.f, }, // front
+			{ 0.f, 0.f, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ BLOCK_WIDTH, 0.f, 0.f, },
+			{ BLOCK_WIDTH, BLOCK_WIDTH, 0.f, },
+			{ 0.f, BLOCK_WIDTH, 0.f, },
 			};
 
 		selector::selector(
@@ -154,7 +194,9 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
-			vertex_array().bind();
+			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, SELECTOR_SEGMENT_COUNT, SELECTOR_SEGMENT_COUNT_COLOR);
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, SELECTOR_SEGMENT_COUNT);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -166,6 +208,7 @@ namespace nomic {
 			std::vector<glm::vec4> color;
 			std::vector<glm::vec3> vertex;
 			glm::vec3 scale(m_scale, m_scale, m_scale);
+			glm::vec4 color_inner = glm::vec4(m_color.x, m_color.y, m_color.z, SELECTOR_COLOR_ALPHA);
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
@@ -174,11 +217,18 @@ namespace nomic {
 				vertex.push_back(SELECTOR_VERTEX[(m_face * SELECTOR_SEGMENT_COUNT) + iter] * scale);
 			}
 
+			for(uint32_t iter = 0; iter < SELECTOR_SEGMENT_COUNT_COLOR; ++iter) {
+				color.push_back(color_inner);
+				vertex.push_back(SELECTOR_VERTEX_COLOR[(m_face * SELECTOR_SEGMENT_COUNT_COLOR) + iter] * scale);
+			}
+
 			nomic::graphic::vao &arr = vertex_array();
 			arr.bind();
-			arr.set_subdata(SELECTOR_INDEX_COLOR, 0, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
+			arr.set_subdata(SELECTOR_INDEX_COLOR, 0, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR
+				* SELECTOR_SEGMENT_COUNT_COLOR * SELECTOR_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
 				&color[0]);
-			arr.set_subdata(SELECTOR_INDEX_VERTEX, 0, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
+			arr.set_subdata(SELECTOR_INDEX_VERTEX, 0, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX
+				* SELECTOR_SEGMENT_COUNT_COLOR * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
 				&vertex[0]);
 			arr.enable(SELECTOR_INDEX_COLOR);
 			arr.enable(SELECTOR_INDEX_VERTEX);
@@ -192,9 +242,12 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			nomic::graphic::vao &arr = vertex_array();
-			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
+			arr.bind();
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_COLOR
+				* SELECTOR_SEGMENT_COUNT_COLOR * SELECTOR_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
 				GL_DYNAMIC_DRAW), SELECTOR_INDEX_COLOR, SELECTOR_SEGMENT_WIDTH_COLOR, GL_FLOAT);
-			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SELECTOR_SEGMENT_COUNT * SELECTOR_SEGMENT_WIDTH_VERTEX
+				* SELECTOR_SEGMENT_COUNT_COLOR * SELECTOR_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat),
 				GL_DYNAMIC_DRAW), SELECTOR_INDEX_VERTEX, SELECTOR_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
 			arr.enable(SELECTOR_INDEX_COLOR);
 			arr.enable(SELECTOR_INDEX_VERTEX);
