@@ -15,7 +15,13 @@ Build
 
 __NOTE__: Tested with the Clang C++ compilers. Modification to the makefiles might be required to build with a different compiler.
 
-To build the entire project, run the following command from the projects root directory:
+To build the entire project, first install the required libraries:
+
+* libSDL2
+* libGLEW
+* libFreeType
+
+Next, run the following command from the projects root directory:
 
 ```
 make release
@@ -26,9 +32,9 @@ Changelog
 
 Version 0.1.1731
 ----------------
-*Updated: 8/1/2017*
+*Updated: 8/1-3/2017*
 
-* Added sun entity class (incomplete)
+* Added sun entity class <s>(incomplete)</s>
 
 *Updated: 7/31/2017*
 

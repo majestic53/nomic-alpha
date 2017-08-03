@@ -17,6 +17,8 @@
  */
 
 #include "../../include/entity/sun.h"
+#include "../../include/entity/camera.h"
+#include "../../include/runtime.h"
 #include "../../include/trace.h"
 #include "./sun_type.h"
 
@@ -25,7 +27,8 @@ namespace nomic {
 	namespace entity {
 
 		sun::sun(void) :
-			nomic::entity::object(ENTITY_SUN)
+			nomic::entity::plain(SUN_PATH_DEFAULT),
+			m_radius(0)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
@@ -37,7 +40,8 @@ namespace nomic {
 		sun::sun(
 			__in const sun &other
 			) :
-				nomic::entity::object(other)
+				nomic::entity::plain(other),
+				m_radius(other.m_radius)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -57,25 +61,12 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			if(this != &other) {
-				nomic::entity::object::operator=(other);
+				nomic::entity::plain::operator=(other);
+				m_radius = other.m_radius;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
 			return *this;
-		}
-
-		void 
-		sun::on_render(
-			__in nomic::core::renderer &renderer,
-			__in void *textures,
-			__in float delta
-			)
-		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
-
-			// TODO
-
-			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -86,7 +77,32 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
-			// TODO
+			if(runtime) {
+				glm::vec4 color;
+				glm::vec3 center, &position = nomic::entity::plain::position();
+				float angle, delta = ((nomic::runtime *) runtime)->tick_cycle();
+
+				if(camera) {
+					position = ((nomic::entity::camera *) camera)->position();
+					position.y = 0.f;
+				}
+
+				angle = (SUN_ANGLE_BEGIN - (SUN_ANGLE_OFFSET * delta));
+				position.y += (m_radius * glm::cos(glm::radians(angle)));
+				position.z -= (m_radius * glm::sin(glm::radians(angle)));
+
+				if(delta <= 0.5) {
+					color = SUN_COLOR_RISE;
+					color.y += ((SUN_COLOR_APOGEE.y - SUN_COLOR_RISE.y) * (delta * 2.f));
+					color.z += ((SUN_COLOR_APOGEE.z - SUN_COLOR_RISE.z) * (delta * 2.f));
+				} else {
+					color = SUN_COLOR_APOGEE;
+					color.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET.y) * ((delta - 0.5f) * 2.f));
+					color.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET.z) * ((delta - 0.5f) * 2.f));
+				}
+
+				nomic::entity::plain::set_color(color);
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -96,7 +112,8 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			// TODO
+			nomic::entity::plain::set_dimensions(glm::vec2(SUN_SCALE_DEFAULT, SUN_SCALE_DEFAULT));
+			m_radius = ((VIEW_RADIUS_RUNTIME * CHUNK_WIDTH) + (2 * CHUNK_WIDTH));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -113,7 +130,8 @@ namespace nomic {
 			result << NOMIC_ENTITY_SUN_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
-				result << " Base=" << nomic::entity::object::to_string(verbose);
+				result << " Base=" << nomic::entity::plain::to_string(verbose)
+					<< ", Radius=" << m_radius;
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

@@ -134,6 +134,8 @@ namespace nomic {
 
 				glm::vec2 m_dimensions;
 
+				float m_scale;
+
 				bool m_texture_set;
 		};
 	}

@@ -19,14 +19,14 @@
 #ifndef NOMIC_ENTITY_SUN_H_
 #define NOMIC_ENTITY_SUN_H_
 
-#include "./object.h"
+#include "./plain.h"
 
 namespace nomic {
 
 	namespace entity {
 
 		class sun :
-				public nomic::entity::object {
+				public nomic::entity::plain {
 
 			public:
 
@@ -42,12 +42,6 @@ namespace nomic {
 					__in const sun &other
 					);
 
-				virtual void on_render(
-					__in nomic::core::renderer &renderer,
-					__in void *textures,
-					__in float delta
-					);
-
 				virtual void on_update(
 					__in void *runtime,
 					__in void *camera
@@ -60,6 +54,8 @@ namespace nomic {
 			protected:
 
 				void setup(void);
+
+				float m_radius;
 		};
 	}
 }

@@ -18,18 +18,36 @@
 
 #version 330 core
 
-layout(location = 0) in vec2 in_coordinate;
-layout(location = 1) in vec3 in_vertex;
+layout(location = 0) in vec4 in_color;
+layout(location = 1) in vec2 in_coordinate;
+layout(location = 2) in vec3 in_vertex;
 
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 
+out vec4 out_color;
 out vec2 out_coordinate;
 
 void
 main(void)
 {
+	mat4 viewmodel = view * model;
+
+	// billboard
+	viewmodel[0][0] = 1;
+	viewmodel[0][1] = 0;
+	viewmodel[0][2] = 0;
+
+	viewmodel[1][0] = 0;
+	viewmodel[1][1] = 1;
+	viewmodel[1][2] = 0;
+
+	viewmodel[2][0] = 0;
+	viewmodel[2][1] = 0;
+	viewmodel[2][2] = 1;
+
+	out_color = in_color;
 	out_coordinate = in_coordinate;
-	gl_Position = (projection * view * model * vec4(in_vertex, 1.f));
+	gl_Position = (projection * viewmodel * vec4(in_vertex, 1.f));
 }

@@ -28,8 +28,7 @@ namespace nomic {
 	namespace entity {
 
 		class camera :
-				public nomic::entity::object,
-				protected nomic::event::input {
+				public nomic::entity::object {
 
 			public:
 
@@ -59,14 +58,6 @@ namespace nomic {
 
 				glm::uvec3 block_previous(void);
 
-				void button(
-					__in uint8_t button,
-					__in uint8_t state,
-					__in uint8_t clicks,
-					__in int32_t x,
-					__in int32_t y
-					);
-
 				glm::ivec2 chunk(void);
 
 				bool chunk_changed(void);
@@ -74,8 +65,6 @@ namespace nomic {
 				glm::ivec2 chunk_previous(void);
 
 				glm::uvec2 dimensions(void) const;
-
-				void flush(void);
 
 				float fov(void) const;
 
@@ -121,34 +110,6 @@ namespace nomic {
 				glm::mat4 &view(void);
 
 			protected:
-
-				void on_button(
-					__in uint8_t button,
-					__in uint8_t state,
-					__in uint8_t clicks,
-					__in int32_t x,
-					__in int32_t y
-					);
-
-				void on_key(
-					__in uint16_t scancode,
-					__in uint16_t modifier,
-					__in uint8_t state
-					);
-
-				void on_motion(
-					__in uint32_t state,
-					__in int32_t x,
-					__in int32_t y,
-					__in int32_t x_relative,
-					__in int32_t y_relative
-					);
-
-				void on_wheel(
-					__in uint32_t direction,
-					__in int32_t x,
-					__in int32_t y
-					);
 
 				void update_perspective(void);
 

@@ -66,8 +66,8 @@ namespace nomic {
 	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define BLOCK_DEPTH_BOUNDARY_MAX 3
 	#define BLOCK_DEPTH_DIRT_MAX 4
-	#define BLOCK_DEPTH_GRAVEL_MAX 4
-	#define BLOCK_DEPTH_SAND_MAX 4
+	#define BLOCK_DEPTH_GRAVEL_MAX 3
+	#define BLOCK_DEPTH_SAND_MAX 3
 	#define BLOCK_DEPTH_SANDSTONE_MAX 4
 	#define BLOCK_FILTER_MAG_DEFAULT GL_NEAREST
 	#define BLOCK_FILTER_MIN_DEFAULT GL_NEAREST
@@ -78,10 +78,10 @@ namespace nomic {
 	#define BLOCK_LEVEL_ALPINE_PEAK 96
 	#define BLOCK_LEVEL_ALPINE 90
 	#define BLOCK_LEVEL_GRASS_STEP 86
-	#define BLOCK_LEVEL_GRASS 60
-	#define BLOCK_LEVEL_BEACH_ROCKS 58
-	#define BLOCK_LEVEL_BEACH_GRAVEL 56
-	#define BLOCK_LEVEL_BEACH_SAND 50
+	#define BLOCK_LEVEL_GRASS 47
+	#define BLOCK_LEVEL_BEACH_ROCKS 46
+	#define BLOCK_LEVEL_BEACH_GRAVEL 44
+	#define BLOCK_LEVEL_BEACH_SAND 42
 	#define BLOCK_RADIUS (BLOCK_WIDTH / 2.f)
 	#define BLOCK_SCALE_DEFAULT 1.f
 	#define BLOCK_SCALE_MIN 0.f
@@ -91,6 +91,7 @@ namespace nomic {
 
 	#define CAMERA_CLIP_MAX 1000.f
 	#define CAMERA_CLIP_MIN 0.1f
+	//#define CAMERA_FOV_CONFIGURABLE
 	#define CAMERA_FOV_DEFAULT 75.f
 	#define CAMERA_FOV_MAX 90.f
 	#define CAMERA_FOV_MIN 10.f
@@ -132,8 +133,8 @@ namespace nomic {
 
 	#define DELTA_FULL 1.f
 
-	#define DIAGNOSTIC_FONT_DEFAULT "/usr/share/fonts/TTF/c64_pro_mono.ttf"
-	#define DIAGNOSTIC_FONT_SIZE_DEFAULT 12
+	#define DIAGNOSTIC_FONT_DEFAULT "./res/font/block.otf"
+	#define DIAGNOSTIC_FONT_SIZE_DEFAULT 14
 	#define DIAGNOSTIC_TEXT_DEFAULT STRING_INVALID
 	#define DIAGNOSTIC_TEXT_LEFT_DEFAULT 10.f
 	#define DIAGNOSTIC_TEXT_TOP_DEFAULT 25.f
@@ -200,7 +201,7 @@ namespace nomic {
 	#define NOISE_OCTAVES_DEFAULT 10
 	#define NOISE_PERSISTENCE_DEFAULT 1.0
 	#define NOISE_PERSISTENCE_MIN 0.0
-	#define NOISE_SCALE 356.0
+	#define NOISE_SCALE 475.0
 
 	#define NOISE_SEED_DEFAULT 0
 
@@ -209,7 +210,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_REVISION 3
 	#define NOMIC_VERSION_WEEK 1731
 
 	#define OBJECT_COUNT 1
@@ -292,11 +293,11 @@ namespace nomic {
 
 	#define STRING_ADVANCE_SHIFT 6
 	#define STRING_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
-	#define STRING_FONT_DEFAULT "/usr/share/fonts/TTF/c64_pro_mono.ttf"
-	#define STRING_FONT_SIZE_DEFAULT 12
+	#define STRING_FONT_DEFAULT "./res/font/block.otf"
+	#define STRING_FONT_SIZE_DEFAULT 14
 	#define STRING_POSITION_DEFAULT glm::uvec2(10, 10)
 	#define STRING_SCALE_DEFAULT 1.f
-	#define STRING_VERTICAL_PAD 5
+	#define STRING_VERTICAL_PAD 8
 
 	#define STRING_CHECK(_STR_) (_STR_.empty() ? STRING_EMPTY : _STR_.c_str())
 
@@ -304,6 +305,14 @@ namespace nomic {
 	#define STRING_CONCAT(_STRING_) _STRING_CONCAT(_STRING_)
 
 	#define SUBTYPE_UNDEFINED SCALAR_INVALID(uint32_t)
+
+	#define SUN_ANGLE_BEGIN 90.f
+	#define SUN_ANGLE_OFFSET 180.f
+	#define SUN_COLOR_APOGEE glm::vec4(1.f, 1.f, 1.f, 1.f)
+	#define SUN_COLOR_RISE glm::vec4(1.f, 0.95f, 0.53f, 1.f)
+	#define SUN_COLOR_SET glm::vec4(1.f, 0.72f, 0.23f, 1.f)
+	#define SUN_PATH_DEFAULT "./res/texture/sun.bmp"
+	#define SUN_SCALE_DEFAULT 80.f
 
 	#define TEXTURE_FILTER_MAG_DEFAULT GL_NEAREST
 	#define TEXTURE_FILTER_MIN_DEFAULT GL_NEAREST
@@ -315,6 +324,8 @@ namespace nomic {
 	#define THROW_EXCEPTION(_EXCEPT_) THROW_EXCEPTION_FORMAT(_EXCEPT_, "", "")
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
+
+	#define TICKS_PER_CYCLE 32000
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 
@@ -470,9 +481,8 @@ namespace nomic {
 	enum {
 		ENTITY_CAMERA = 0,
 		ENTITY_SKYBOX,
-		ENTITY_SUN,
-		ENTITY_STRING,
 		ENTITY_PLAIN,
+		ENTITY_STRING,
 		ENTITY_BLOCK,
 		ENTITY_CHUNK,
 		ENTITY_AXIS,

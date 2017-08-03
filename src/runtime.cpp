@@ -567,6 +567,19 @@ namespace nomic {
 		return m_tick;
 	}
 
+	float 
+	runtime::tick_cycle(void)
+	{
+		float result;
+
+		TRACE_ENTRY(LEVEL_VERBOSE);
+
+		result = ((tick() % TICKS_PER_CYCLE) / (float) TICKS_PER_CYCLE);
+
+		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%f", result);
+		return result;
+	}
+
 	std::string 
 	runtime::to_string(
 		__in_opt bool verbose

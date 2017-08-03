@@ -56,6 +56,8 @@ namespace nomic {
 
 			uint32_t tick(void);
 
+			float tick_cycle(void);
+
 			std::string to_string(
 				__in_opt bool verbose = false
 				) const;

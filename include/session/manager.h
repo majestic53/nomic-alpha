@@ -147,7 +147,21 @@ namespace nomic {
 					__in int32_t y
 					);
 
+				void on_key(
+					__in uint16_t scancode,
+					__in uint16_t modifier,
+					__in uint8_t state
+					);
+
 				bool on_initialize(void);
+
+				void on_motion(
+					__in uint32_t state,
+					__in int32_t x,
+					__in int32_t y,
+					__in int32_t x_relative,
+					__in int32_t y_relative
+					);
 
 				bool on_run(void);
 

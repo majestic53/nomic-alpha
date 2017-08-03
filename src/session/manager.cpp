@@ -60,7 +60,7 @@ namespace nomic {
 			};
 
 		static const renderer_config CHUNK_RENDERER_CONFIGURATION = {
-			"./res/shader/vert_mesh.glsl", "./res/shader/frag_mesh.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
+			"./res/shader/vert_chunk.glsl", "./res/shader/frag_chunk.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 			RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, GL_FRONT,
 			RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT
 			};
@@ -82,7 +82,7 @@ namespace nomic {
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, false, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // block
 			{ "./res/shader/vert_string.glsl", "./res/shader/frag_string.glsl", RENDER_ORTHOGONAL, RENDERER_BLEND_DEFAULT,
-				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_MODE_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
 				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // diagnostic
 			};
 
@@ -107,11 +107,11 @@ namespace nomic {
 
 		static const std::vector<renderer_config> ENTITY_RENDERER_BACKGROUND_CONFIGURATION = {
 			{ "./res/shader/vert_skybox.glsl", "./res/shader/frag_skybox.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
-				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT,
-				RENDERER_CULL_MODE_DEFAULT, false, RENDERER_DEPTH_MODE_DEFAULT }, // skybox
+				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, RENDERER_CULL_MODE_DEFAULT,
+				false, RENDERER_DEPTH_MODE_DEFAULT }, // skybox
 			{ "./res/shader/vert_sun.glsl", "./res/shader/frag_sun.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, GL_FRONT,
-				false, RENDERER_DEPTH_MODE_DEFAULT }, // sun
+				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // sun
 			};
 
 		static const std::map<uint32_t, std::string> ENTITY_SKYBOX_FACE = {
@@ -838,6 +838,23 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		void 
+		manager::on_key(
+			__in uint16_t scancode,
+			__in uint16_t modifier,
+			__in uint8_t state
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Scancode=%x, Modifier=%x, State=%x(%s)", scancode, modifier, state,
+				(state == SDL_PRESSED) ? "Press" : "Release");
+
+			if(m_camera) {
+				m_camera->key(scancode, modifier, state);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		bool 
 		manager::on_initialize(void)
 		{
@@ -930,6 +947,25 @@ namespace nomic {
 			return result;
 		}
 
+		void 
+		manager::on_motion(
+			__in uint32_t state,
+			__in int32_t x,
+			__in int32_t y,
+			__in int32_t x_relative,
+			__in int32_t y_relative
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "State=%x, Position={%i, %i}, Relative={%i, %i}", state, x, y,
+				x_relative, y_relative);
+
+			if(m_camera) {
+				m_camera->motion(state, x, y, x_relative, y_relative);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		bool 
 		manager::on_run(void)
 		{
@@ -992,6 +1028,7 @@ namespace nomic {
 				y *= -1;
 			}
 
+#ifndef CAMERA_FOV_CONFIGURABLE
 			right = (y > 0);
 			y = std::abs(y);
 
@@ -1003,6 +1040,12 @@ namespace nomic {
 					panel_move_right();
 				}
 			}
+#else
+
+			if(m_camera) {
+				m_camera->wheel(direction, x, y);
+			}
+#endif // CAMERA_FOV_CONFIGURABLE
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

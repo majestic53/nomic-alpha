@@ -76,15 +76,14 @@ namespace nomic {
 			) :
 				nomic::entity::object(ENTITY_PLAIN, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_color(PLAIN_COLOR_DEFAULT),
-				m_dimensions(PLAIN_DIMENSION_DEFAULT),
+				m_dimensions(dimensions),
+				m_scale(scale),
 				m_texture_set(false)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
 				"Path[%u]=%s, Dimension={%f, %f}, Scale=%f, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}",
 				path.size(), STRING_CHECK(path), dimensions.x, dimensions.y, scale, position.x, position.y, position.z,
 				rotation.x, rotation.y, rotation.z, up.x, up.y, up.z);
-
-			set_dimensions(dimensions, scale);
 
 			if(!path.empty()) {
 				set_texture(path, wrap_s, wrap_t, filter_min, filter_mag);
@@ -111,7 +110,8 @@ namespace nomic {
 			) :
 				nomic::entity::object(ENTITY_PLAIN, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_color(PLAIN_COLOR_DEFAULT),
-				m_dimensions(PLAIN_DIMENSION_DEFAULT),
+				m_dimensions(dimensions),
+				m_scale(scale),
 				m_texture_set(false)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
@@ -119,7 +119,6 @@ namespace nomic {
 				data.size(), &data[0], data_dimensions.x, data_dimensions.y, (int) data_depth, dimensions.x, dimensions.y, scale,
 				position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, up.x, up.y, up.z);
 
-			set_dimensions(dimensions, scale);
 			set_texture(data, data_dimensions, data_depth, wrap_s, wrap_t, filter_min, filter_mag);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -135,7 +134,8 @@ namespace nomic {
 			) :
 				nomic::entity::object(ENTITY_PLAIN, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_color(color),
-				m_dimensions(PLAIN_DIMENSION_DEFAULT),
+				m_dimensions(dimensions),
+				m_scale(scale),
 				m_texture_set(false)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
@@ -143,7 +143,6 @@ namespace nomic {
 				color.x, color.y, color.z, color.w, dimensions.x, dimensions.y, scale, position.x, position.y, position.z,
 				rotation.x, rotation.y, rotation.z, up.x, up.y, up.z);
 
-			set_dimensions(dimensions, scale);
 			clear_texture();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -156,6 +155,7 @@ namespace nomic {
 				nomic::graphic::texture(other),
 				m_color(other.m_color),
 				m_dimensions(other.m_dimensions),
+				m_scale(other.m_scale),
 				m_texture_set(other.m_texture_set)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -180,6 +180,7 @@ namespace nomic {
 				nomic::graphic::texture::operator=(other);
 				m_color = other.m_color;
 				m_dimensions = other.m_dimensions;
+				m_scale = other.m_scale;
 				m_texture_set = other.m_texture_set;
 			}
 
@@ -241,21 +242,18 @@ namespace nomic {
 					(glm::vec3 *) &PLAIN_VERTEX[0] + (sizeof(glm::vec3) * PLAIN_SEGMENT_COUNT));
 
 			for(std::vector<glm::vec3>::iterator iter = vertex.begin(); iter != vertex.end(); ++iter) {
-				iter->x *= m_dimensions.x;
-				iter->y *= m_dimensions.y;
+				iter->x *= (m_dimensions.x * m_scale);
+				iter->y *= (m_dimensions.y * m_scale);
 			}
 
 			color = std::vector<glm::vec4>((glm::vec4 *) &PLAIN_COLOR[0],
 					(glm::vec4 *) &PLAIN_COLOR[0] + (sizeof(glm::vec4) * PLAIN_SEGMENT_COUNT));
 
-			if(!m_texture_set) {
-
-				for(std::vector<glm::vec4>::iterator iter = color.begin(); iter != color.end(); ++iter) {
-					iter->x = m_color.x;
-					iter->y = m_color.y;
-					iter->z = m_color.z;
-					iter->w = m_color.w;
-				}
+			for(std::vector<glm::vec4>::iterator iter = color.begin(); iter != color.end(); ++iter) {
+				iter->x = m_color.x;
+				iter->y = m_color.y;
+				iter->z = m_color.z;
+				iter->w = m_color.w;
 			}
 
 			nomic::graphic::vao &arr = vertex_array();
@@ -297,8 +295,8 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimension={%f, %f}, Scale=%f", dimensions.x, dimensions.y, scale);
 
-			m_dimensions.x = (dimensions.x * scale);
-			m_dimensions.y = (dimensions.y * scale);
+			m_dimensions = dimensions;
+			m_scale = scale;
 			reconfigure();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -374,6 +372,7 @@ namespace nomic {
 			if(verbose) {
 				result << " Base=" << nomic::entity::object::to_string(verbose)
 					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
+					<< ", Scale =" << m_scale
 					<< ", Mode=" << (m_texture_set ? "Texture" : "Color");
 
 				if(m_texture_set) {

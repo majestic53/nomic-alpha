@@ -18,12 +18,21 @@
 
 #version 330 core
 
+in vec4 out_color;
 in vec2 out_coordinate;
 
 uniform sampler2D out_texture;
 
+const float SUN_COLOR_MIX = 0.5f;
+
 void
 main(void)
 {
-	gl_FragColor = texture(out_texture, out_coordinate);
+
+	vec4 color = texture(out_texture, out_coordinate);
+	if(color.w > 0.5f) {
+		color = mix(color, out_color, SUN_COLOR_MIX);
+	}
+
+	gl_FragColor = color;
 }
