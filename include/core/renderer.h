@@ -59,6 +59,10 @@ namespace nomic {
 
 				uint32_t mode(void) const;
 
+				void set_ambient(
+					__in const glm::vec4 &ambient
+					);
+
 				void set_blend(
 					__in bool blend,
 					__in_opt GLenum sfactor = RENDERER_BLEND_SFACTOR_DEFAULT,
@@ -68,6 +72,10 @@ namespace nomic {
 				void set_cull(
 					__in bool cull,
 					__in_opt GLenum mode = RENDERER_CULL_MODE_DEFAULT
+					);
+
+				void set_cycle(
+					__in GLfloat cycle
 					);
 
 				void set_depth(
@@ -119,6 +127,8 @@ namespace nomic {
 				void use(
 					__in const glm::vec3 &position,
 					__in const glm::vec3 &rotation,
+					__in GLfloat cycle,
+					__in const glm::vec4 &ambient,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection
 					);
@@ -126,6 +136,8 @@ namespace nomic {
 				void use(
 					__in const glm::vec3 &position,
 					__in const glm::vec3 &rotation,
+					__in GLfloat cycle,
+					__in const glm::vec4 &ambient,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view
@@ -134,6 +146,8 @@ namespace nomic {
 				void use(
 					__in const glm::vec3 &position,
 					__in const glm::vec3 &rotation,
+					__in GLfloat cycle,
+					__in const glm::vec4 &ambient,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view,
@@ -165,6 +179,10 @@ namespace nomic {
 				uint32_t m_mode;
 
 				uint32_t m_type;
+
+				GLint m_uniform_ambient;
+
+				GLint m_uniform_cycle;
 
 				GLint m_uniform_model;
 

@@ -27,15 +27,18 @@ namespace nomic {
 	namespace entity {
 
 		#define CHUNK_SEGMENT_WIDTH_COORDINATE 2
+		#define CHUNK_SEGMENT_WIDTH_NORMAL 3
 		#define CHUNK_SEGMENT_WIDTH_VERTEX 3
 
 		enum {
 			CHUNK_INDEX_COORDINATE = 0,
+			CHUNK_INDEX_NORMAL,
 			CHUNK_INDEX_VERTEX,
 		};
 
 		enum {
 			VAO_COORDINATES = 0,
+			VAO_NORMAL,
 			VAO_VERTEX,
 			VAO_BASE,
 			VAO_OFFSET,
@@ -78,6 +81,45 @@ namespace nomic {
 			{ 0.f, 1.f, },
 			{ 0.f, 0.f, },
 			{ 1.f, 0.f, },
+			};
+
+		static const glm::vec2 CHUNK_COORDINATE_ROTATED[] = {
+			{ 1.f, 0.f, }, // right
+			{ 1.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 0.f, }, // left
+			{ 1.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 0.f, }, // top
+			{ 1.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 0.f, 0.f, }, // bottom
+			{ 1.f, 0.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 1.f, 1.f, }, // back
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
+			{ 0.f, 0.f, },
+			{ 1.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 0.f, 0.f, }, // front
+			{ 1.f, 0.f, },
+			{ 1.f, 1.f, },
+			{ 1.f, 1.f, },
+			{ 0.f, 1.f, },
+			{ 0.f, 0.f, },
 			};
 
 		static const glm::vec3 CHUNK_VERTEX[] = {
@@ -186,16 +228,39 @@ namespace nomic {
 		chunk::add_face(
 			__in const glm::vec3 &position,
 			__in uint32_t face,
+			__in uint32_t attributes,
 			__in std::map<uint8_t, chunk_data>::iterator entry
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Face=%x", position.x, position.y, position.z, face);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%f, %f, %f}, Face=%x, Attributes=%x", position.x, position.y, position.z, face,
+				attributes);
 
 			std::vector<glm::vec2> &coordinate = std::get<VAO_COORDINATES>(entry->second);
+			std::vector<glm::vec3> &normal = std::get<VAO_NORMAL>(entry->second);
 			std::vector<glm::vec3> &vertex = std::get<VAO_VERTEX>(entry->second);
 
 			for(uint32_t iter = 0; iter < BLOCK_FACE_COUNT; ++iter) {
-				coordinate.push_back(CHUNK_COORDINATE[(face * BLOCK_FACE_COUNT) + iter]);
+
+				if((attributes & BLOCK_ATTRIBUTE_ROTATED_RIGHT) || (attributes & BLOCK_ATTRIBUTE_ROTATED_LEFT)) {
+
+					if((face == BLOCK_FACE_BOTTOM) || (face == BLOCK_FACE_TOP)
+							|| (face == BLOCK_FACE_BACK) || (face == BLOCK_FACE_FRONT)) {
+						coordinate.push_back(CHUNK_COORDINATE_ROTATED[(face * BLOCK_FACE_COUNT) + iter]);
+					} else {
+						coordinate.push_back(CHUNK_COORDINATE[(face * BLOCK_FACE_COUNT) + iter]);
+					}
+				} else if((attributes & BLOCK_ATTRIBUTE_ROTATED_BACK) || (attributes & BLOCK_ATTRIBUTE_ROTATED_FRONT)) {
+
+					if((face == BLOCK_FACE_LEFT) || (face == BLOCK_FACE_RIGHT)) {
+						coordinate.push_back(CHUNK_COORDINATE_ROTATED[(face * BLOCK_FACE_COUNT) + iter]);
+					} else {
+						coordinate.push_back(CHUNK_COORDINATE[(face * BLOCK_FACE_COUNT) + iter]);
+					}
+				} else {
+					coordinate.push_back(CHUNK_COORDINATE[(face * BLOCK_FACE_COUNT) + iter]);
+				}
+
+				normal.push_back(BLOCK_FACE_NORMAL(iter));
 				vertex.push_back(CHUNK_VERTEX[(face * BLOCK_FACE_COUNT) + iter] + position);
 			}
 
@@ -211,7 +276,7 @@ namespace nomic {
 		{
 			std::map<uint8_t, chunk_data>::iterator result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Face=%x, Attributes=%x", type, face, attributes);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Face=%x, Attributes=%x", type, face, rotate, attributes);
 
 			switch(type) {
 				case BLOCK_AIR:
@@ -257,8 +322,6 @@ namespace nomic {
 					switch(face) {
 						case BLOCK_FACE_BACK:
 						case BLOCK_FACE_FRONT:
-							type = BLOCK_SANDSTONE_SIDE;
-							break;
 						case BLOCK_FACE_LEFT:
 						case BLOCK_FACE_RIGHT:
 							type = BLOCK_SANDSTONE_SIDE;
@@ -277,8 +340,6 @@ namespace nomic {
 					switch(face) {
 						case BLOCK_FACE_BACK:
 						case BLOCK_FACE_FRONT:
-							type = BLOCK_STONE_SNOW_SIDE;
-							break;
 						case BLOCK_FACE_LEFT:
 						case BLOCK_FACE_RIGHT:
 							type = BLOCK_STONE_SNOW_SIDE;
@@ -410,6 +471,8 @@ namespace nomic {
 					} else if(right) {
 						result = type_bottom;
 					} else {
+
+
 						result = type_side;
 					}
 					break;
@@ -484,6 +547,7 @@ namespace nomic {
 				nomic::graphic::vao &arr = vertex_array();
 				arr.bind();
 				arr.enable(CHUNK_INDEX_COORDINATE);
+				arr.enable(CHUNK_INDEX_NORMAL);
 				arr.enable(CHUNK_INDEX_VERTEX);
 
 				if(textures) {
@@ -514,21 +578,24 @@ namespace nomic {
 
 			if(m_changed) {
 				std::vector<glm::vec2> coordinate;
-				std::vector<glm::vec3> vertex;
+				std::vector<glm::vec3> normal, vertex;
 
 				m_changed = false;
 				rebuild(m_chunk_right, m_chunk_left, m_chunk_back, m_chunk_front);
 
 				for(std::map<uint8_t, chunk_data>::iterator iter = m_face.begin(); iter != m_face.end(); ++iter) {
 					std::vector<glm::vec2> &iter_coordinate = std::get<VAO_COORDINATES>(iter->second);
+					std::vector<glm::vec3> &iter_normal = std::get<VAO_NORMAL>(iter->second);
 					std::vector<glm::vec3> &iter_vertex = std::get<VAO_VERTEX>(iter->second);
 
 					coordinate.insert(coordinate.end(), iter_coordinate.begin(), iter_coordinate.end());
+					normal.insert(normal.end(), iter_normal.begin(), iter_normal.end());
 					std::get<VAO_BASE>(iter->second) = vertex.size();
 					std::get<VAO_OFFSET>(iter->second) = iter_vertex.size();
 					vertex.insert(vertex.end(), iter_vertex.begin(), iter_vertex.end());
 
 					std::get<VAO_COORDINATES>(iter->second).clear();
+					std::get<VAO_NORMAL>(iter->second).clear();
 					std::get<VAO_VERTEX>(iter->second).clear();
 				}
 
@@ -540,9 +607,15 @@ namespace nomic {
 				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &coordinate[0],
 					((uint8_t *) &coordinate[0]) + (coordinate.size() * CHUNK_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
 					GL_STATIC_DRAW), CHUNK_INDEX_COORDINATE, CHUNK_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
+				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &normal[0],
+					((uint8_t *) &normal[0]) + (normal.size() * CHUNK_SEGMENT_WIDTH_NORMAL * sizeof(GLfloat))),
+					GL_STATIC_DRAW), CHUNK_INDEX_NORMAL, CHUNK_SEGMENT_WIDTH_NORMAL, GL_FLOAT);
 				arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
 					((uint8_t *) &vertex[0]) + (vertex.size() * CHUNK_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
 					GL_STATIC_DRAW), CHUNK_INDEX_VERTEX, CHUNK_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
+				arr.enable(CHUNK_INDEX_COORDINATE);
+				arr.enable(CHUNK_INDEX_NORMAL);
+				arr.enable(CHUNK_INDEX_VERTEX);
 			}
 
 #ifdef VIEW_SELECTIVE_SHOW
@@ -608,7 +681,6 @@ namespace nomic {
 
 						if((type != BLOCK_AIR) && !(attributes & BLOCK_ATTRIBUTE_HIDDEN)) {
 							position.y = 0;
-							uint32_t type_adjacent;
 
 							if(type != BLOCK_WATER) {
 
@@ -616,18 +688,19 @@ namespace nomic {
 
 									if((x + 1) < CHUNK_WIDTH) { // right
 
-										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x + 1, y, z));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(nomic::terrain::chunk::type(
+												glm::uvec3(x + 1, y, z)))) {
 											add_face(position + position_relative, BLOCK_FACE_RIGHT,
-												add_face_type(type, BLOCK_FACE_RIGHT, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_RIGHT,
+												attributes));
 											++count;
 										}
 									} else if((x + 1) == CHUNK_WIDTH) { // right (boundary)
 
-										type_adjacent = right->block_type(glm::uvec3(0, y, z));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(right->block_type(glm::uvec3(0, y, z)))) {
 											add_face(position + position_relative, BLOCK_FACE_RIGHT,
-												add_face_type(type, BLOCK_FACE_RIGHT, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_RIGHT,
+												attributes));
 											++count;
 										}
 									}
@@ -637,18 +710,20 @@ namespace nomic {
 
 									if((x - 1) >= 0) { // left
 
-										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x - 1, y, z));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(nomic::terrain::chunk::type(
+												glm::uvec3(x - 1, y, z)))) {
 											add_face(position + position_relative, BLOCK_FACE_LEFT,
-												add_face_type(type, BLOCK_FACE_LEFT, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_LEFT,
+												attributes));
 											++count;
 										}
 									} else if((x - 1) < 0) { // left (boundary)
 
-										type_adjacent = left->block_type(glm::uvec3(CHUNK_WIDTH - 1, y, z));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(left->block_type(glm::uvec3(
+												CHUNK_WIDTH - 1, y, z)))) {
 											add_face(position + position_relative, BLOCK_FACE_LEFT,
-												add_face_type(type, BLOCK_FACE_LEFT, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_LEFT,
+												attributes));
 											++count;
 										}
 									}
@@ -658,18 +733,19 @@ namespace nomic {
 
 									if((z + 1) < CHUNK_WIDTH) { // back
 
-										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y, z + 1));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(nomic::terrain::chunk::type(
+												glm::uvec3(x, y, z + 1)))) {
 											add_face(position + position_relative, BLOCK_FACE_BACK,
-												add_face_type(type, BLOCK_FACE_BACK, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_BACK,
+												attributes));
 											++count;
 										}
 									} else if((z + 1) == CHUNK_WIDTH) { // back (boundary)
 
-										type_adjacent = back->block_type(glm::uvec3(x, y, 0));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(back->block_type(glm::uvec3(x, y, 0)))) {
 											add_face(position + position_relative, BLOCK_FACE_BACK,
-												add_face_type(type, BLOCK_FACE_BACK, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_BACK,
+												attributes));
 											++count;
 										}
 									}
@@ -679,18 +755,20 @@ namespace nomic {
 
 									if((z - 1) >= 0) { // front
 
-										type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y, z - 1));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(nomic::terrain::chunk::type(
+												glm::uvec3(x, y, z - 1)))) {
 											add_face(position + position_relative, BLOCK_FACE_FRONT,
-												add_face_type(type, BLOCK_FACE_FRONT, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_FRONT,
+												attributes));
 											++count;
 										}
 									} else if((z - 1) < 0) { // front (boundary)
 
-										type_adjacent = front->block_type(glm::uvec3(x, y, CHUNK_WIDTH - 1));
-										if(determine_transparent(type_adjacent)) {
+										if(determine_transparent(front->block_type(glm::uvec3(
+												x, y, CHUNK_WIDTH - 1)))) {
 											add_face(position + position_relative, BLOCK_FACE_FRONT,
-												add_face_type(type, BLOCK_FACE_FRONT, attributes));
+												attributes, add_face_type(type, BLOCK_FACE_FRONT,
+												attributes));
 											++count;
 										}
 									}
@@ -699,20 +777,18 @@ namespace nomic {
 
 							if((y - 1) >= 0) { // bottom
 
-								type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y - 1, z));
-								if(determine_transparent(type_adjacent)) {
+								if(determine_transparent(nomic::terrain::chunk::type(glm::uvec3(x, y - 1, z)))) {
 									add_face(position + position_relative, BLOCK_FACE_BOTTOM,
-										add_face_type(type, BLOCK_FACE_BOTTOM, attributes));
+										attributes, add_face_type(type, BLOCK_FACE_BOTTOM, attributes));
 									++count;
 								}
 							}
 
 							if((y + 1) < CHUNK_HEIGHT) { // top
 
-								type_adjacent = nomic::terrain::chunk::type(glm::uvec3(x, y + 1, z));
-								if(determine_transparent(type_adjacent)) {
-									add_face(position + position_relative, BLOCK_FACE_TOP, add_face_type(type,
-										BLOCK_FACE_TOP, attributes));
+								if(determine_transparent(nomic::terrain::chunk::type(glm::uvec3(x, y + 1, z)))) {
+									add_face(position + position_relative, BLOCK_FACE_TOP,
+										attributes, add_face_type(type, BLOCK_FACE_TOP, attributes));
 									++count;
 								}
 							}

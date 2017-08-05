@@ -29,7 +29,7 @@ namespace nomic {
 
 	namespace entity {
 
-		typedef std::tuple<std::vector<glm::vec2>, std::vector<glm::vec3>, uint32_t, uint32_t> chunk_data;
+		typedef std::tuple<std::vector<glm::vec2>, std::vector<glm::vec3>, std::vector<glm::vec3>, uint32_t, uint32_t> chunk_data;
 
 		class chunk :
 				public nomic::entity::object,
@@ -114,6 +114,7 @@ namespace nomic {
 				void add_face(
 					__in const glm::vec3 &position,
 					__in uint32_t face,
+					__in uint32_t attributes,
 					__in std::map<uint8_t, chunk_data>::iterator entry
 					);
 

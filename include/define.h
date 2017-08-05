@@ -99,7 +99,7 @@ namespace nomic {
 	#define CAMERA_PITCH_MIN -CAMERA_PITCH_MAX
 	#define CAMERA_POSITION_DEFAULT glm::vec3(0.f, 0.f, 0.f)
 	#define CAMERA_ROTATION_DEFAULT glm::vec3(1.f, -0.06f, -0.03f)
-	#define CAMERA_SENSITIVITY 0.55f
+	#define CAMERA_SENSITIVITY 0.35f
 	#define CAMERA_SPEED 0.35f
 	#define CAMERA_STRAFE 0.35f
 	#define CAMERA_UP_DEFAULT glm::vec3(0.f, 1.f, 0.f)
@@ -201,7 +201,7 @@ namespace nomic {
 	#define NOISE_OCTAVES_DEFAULT 10
 	#define NOISE_PERSISTENCE_DEFAULT 1.0
 	#define NOISE_PERSISTENCE_MIN 0.0
-	#define NOISE_SCALE 475.0
+	#define NOISE_SCALE 480.0
 
 	#define NOISE_SEED_DEFAULT 0
 
@@ -210,7 +210,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1731
 
 	#define OBJECT_COUNT 1
@@ -282,7 +282,7 @@ namespace nomic {
 
 	#define SESSION_DEBUG_DEFAULT true
 
-	#define SKYBOX_RADIUS 1.f
+	#define SKYBOX_RADIUS 100.f
 
 	#define SPAWN_RADIUS 6
 	#define SPAWN_RANDOM
@@ -309,10 +309,17 @@ namespace nomic {
 	#define SUN_ANGLE_BEGIN 90.f
 	#define SUN_ANGLE_OFFSET 180.f
 	#define SUN_COLOR_APOGEE glm::vec4(1.f, 1.f, 1.f, 1.f)
+	#define SUN_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define SUN_COLOR_RISE glm::vec4(1.f, 0.95f, 0.53f, 1.f)
 	#define SUN_COLOR_SET glm::vec4(1.f, 0.72f, 0.23f, 1.f)
+	#define SUN_CYCLE_DEFAULT true
+	#define SUN_DELTA_DEFAULT SUN_DELTA_MIN
+	#define SUN_DELTA_MIN 0.f
+	#define SUN_DELTA_MAX 1.f
 	#define SUN_PATH_DEFAULT "./res/texture/sun.bmp"
-	#define SUN_SCALE_DEFAULT 80.f
+	#define SUN_RISE 0.4f
+	#define SUN_SCALE_DEFAULT 160.f
+	#define SUN_SET 0.8f
 
 	#define TEXTURE_FILTER_MAG_DEFAULT GL_NEAREST
 	#define TEXTURE_FILTER_MIN_DEFAULT GL_NEAREST
@@ -366,7 +373,9 @@ namespace nomic {
 
 	#define UNIFORM_MATRIX_DEFAULT glm::mat4(1.f)
 
+	#define UNIFORM_AMBIENT "ambient"
 	#define UNIFORM_COLOR "color"
+	#define UNIFORM_CYCLE "cycle"
 	#define UNIFORM_MODEL "model"
 	#define UNIFORM_POSITION "position"
 	#define UNIFORM_PROJECTION "projection"
@@ -377,7 +386,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 30
+	#define VIEW_WIDTH 38
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -450,13 +459,6 @@ namespace nomic {
 	#define BLOCK_FACE_MAX BLOCK_FACE_FRONT
 	#define BLOCK_FACE_UNDEFINED SCALAR_INVALID(uint8_t)
 
-	static const std::string BLOCK_FACE_STR[] = {
-		"Right", "Left", "Top", "Bottom", "Back", "Front",
-		};
-
-	#define BLOCK_FACE_STRING(_TYPE_) \
-		(((_TYPE_) > BLOCK_FACE_MAX) ? STRING_UNKNOWN : STRING_CHECK(BLOCK_FACE_STR[_TYPE_]))
-
 	static const glm::vec3 BLOCK_FACE_NORMAL[] = {
 		glm::vec3(1.f, 0.f, 0.f),
 		glm::vec3(-1.f, 0.f, 0.f),
@@ -468,6 +470,13 @@ namespace nomic {
 
 	#define BLOCK_FACE_NORMAL(_TYPE_) \
 		(((_TYPE_) > BLOCK_FACE_MAX) ? glm::vec3(0.f) : BLOCK_FACE_NORMAL[_TYPE_])
+
+	static const std::string BLOCK_FACE_STR[] = {
+		"Right", "Left", "Top", "Bottom", "Back", "Front",
+		};
+
+	#define BLOCK_FACE_STRING(_TYPE_) \
+		(((_TYPE_) > BLOCK_FACE_MAX) ? STRING_UNKNOWN : STRING_CHECK(BLOCK_FACE_STR[_TYPE_]))
 
 	enum {
 		BLOCK_ZONE_ALPINE = 0,
@@ -481,8 +490,9 @@ namespace nomic {
 	enum {
 		ENTITY_CAMERA = 0,
 		ENTITY_SKYBOX,
-		ENTITY_PLAIN,
+		ENTITY_SUN,
 		ENTITY_STRING,
+		ENTITY_PLAIN,
 		ENTITY_BLOCK,
 		ENTITY_CHUNK,
 		ENTITY_AXIS,
@@ -544,7 +554,7 @@ namespace nomic {
 	#define RENDERER_MAX RENDERER_SPAWN_MESSAGE
 
 	static const std::string RENDERER_STR[] = {
-		"Background-Skybox", "Chunk", "Debug-Axis", "Debug-Block", "Debug-Diagnostic", "Foreground-Reticle",
+		"Background-Skybox", "Background-Sun", "Chunk", "Debug-Axis", "Debug-Block", "Debug-Diagnostic", "Foreground-Reticle",
 		"Foreground-Selector", "Foreground-Panel", "Spawn-Backdrop", "Spawn-Diagnostic", "Spawn-Message",
 	};
 

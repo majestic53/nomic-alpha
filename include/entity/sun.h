@@ -19,18 +19,23 @@
 #ifndef NOMIC_ENTITY_SUN_H_
 #define NOMIC_ENTITY_SUN_H_
 
-#include "./plain.h"
+#include "../graphic/texture.h"
+#include "./object.h"
 
 namespace nomic {
 
 	namespace entity {
 
 		class sun :
-				public nomic::entity::plain {
+				public nomic::entity::object,
+				protected nomic::graphic::texture {
 
 			public:
 
-				sun(void);
+				sun(
+					__in_opt float delta = SUN_DELTA_DEFAULT,
+					__in_opt bool cycle = SUN_CYCLE_DEFAULT
+					);
 
 				sun(
 					__in const sun &other
@@ -42,9 +47,29 @@ namespace nomic {
 					__in const sun &other
 					);
 
+				virtual void on_render(
+					__in nomic::core::renderer &renderer,
+					__in void *textures,
+					__in float delta
+					);
+
 				virtual void on_update(
 					__in void *runtime,
 					__in void *camera
+					);
+
+				glm::vec4 color(void);
+
+				bool cycling(void) const;
+
+				float delta(void) const;
+
+				void set_cycle(
+					__in bool cycle
+					);
+
+				void set_delta(
+					__in float delta
 					);
 
 				virtual std::string to_string(
@@ -54,6 +79,12 @@ namespace nomic {
 			protected:
 
 				void setup(void);
+
+				glm::vec4 m_color;
+
+				bool m_cycle;
+
+				float m_delta;
 
 				float m_radius;
 		};

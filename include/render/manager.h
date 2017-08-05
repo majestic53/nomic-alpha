@@ -66,8 +66,10 @@ namespace nomic {
 					__in const glm::mat4 &view,
 					__in const glm::uvec2 &view_dimensions,
 					__in nomic::graphic::atlas &textures,
-					__in bool underwater,
-					__in float delta
+					__in float cycle,
+					__in float delta,
+					__in const glm::vec4 &ambient,
+					__in bool underwater
 					);
 
 				std::string to_string(

@@ -32,6 +32,11 @@ Changelog
 
 Version 0.1.1731
 ----------------
+*Updated: 8/5/2017*
+
+* Added sun-rise/-set
+* Code cleanup/bug fixes
+
 *Updated: 8/1-3/2017*
 
 * Added sun entity class <s>(incomplete)</s>

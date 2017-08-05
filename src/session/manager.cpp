@@ -31,6 +31,7 @@
 #include "../../include/entity/skybox.h"
 #include "../../include/entity/sun.h"
 #include "../../include/graphic/vao.h"
+#include "../../include/runtime.h"
 #include "../../include/trace.h"
 #include "./manager_type.h"
 
@@ -111,7 +112,7 @@ namespace nomic {
 				false, RENDERER_DEPTH_MODE_DEFAULT }, // skybox
 			{ "./res/shader/vert_sun.glsl", "./res/shader/frag_sun.glsl", RENDER_PERSPECTIVE, RENDERER_BLEND_DEFAULT,
 				RENDERER_BLEND_DFACTOR_DEFAULT, RENDERER_BLEND_SFACTOR_DEFAULT, RENDERER_CULL_DEFAULT, GL_FRONT,
-				RENDERER_DEPTH_DEFAULT, RENDERER_DEPTH_MODE_DEFAULT }, // sun
+				false, RENDERER_DEPTH_MODE_DEFAULT }, // sun
 			};
 
 		static const std::map<uint32_t, std::string> ENTITY_SKYBOX_FACE = {
@@ -1100,7 +1101,8 @@ namespace nomic {
 
 			m_manager_display.clear();
 			m_manager_render.render(m_camera->position(), m_camera->rotation(), m_camera->projection(), m_camera->view(),
-				m_camera->dimensions(), *m_atlas, m_underwater, delta);
+				m_camera->dimensions(), *m_atlas, ((nomic::runtime *) m_runtime)->tick_cycle(), delta,
+				((nomic::entity::sun *) m_entity_object_background.at(ENTITY_OBJECT_BACKGROUND_SUN))->color(), m_underwater);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);

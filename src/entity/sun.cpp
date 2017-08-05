@@ -26,12 +26,48 @@ namespace nomic {
 
 	namespace entity {
 
-		sun::sun(void) :
-			nomic::entity::plain(SUN_PATH_DEFAULT),
-			m_radius(0)
-		{
-			TRACE_ENTRY(LEVEL_VERBOSE);
+		#define SUN_SEGMENT_COUNT 6
+		#define SUN_SEGMENT_WIDTH_COLOR 4
+		#define SUN_SEGMENT_WIDTH_COORDINATE 2
+		#define SUN_SEGMENT_WIDTH_VERTEX 3
 
+		enum {
+			SUN_INDEX_COLOR = 0,
+			SUN_INDEX_COORDINATE,
+			SUN_INDEX_VERTEX,
+		};
+
+		static const glm::vec2 SUN_COORDINATE[] = {
+			{ 1.f, 1.f, }, // bottom left
+			{ 1.f, 0.f, }, // top left
+			{ 0.f, 0.f, }, // top right
+			{ 1.f, 1.f, }, // bottom left
+			{ 0.f, 0.f, }, // top right
+			{ 0.f, 1.f, }, // bottom right
+			};
+
+		static const glm::vec3 SUN_VERTEX[] = {
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, }, // bottom left corner
+			{ -BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // top left corner
+			{ BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // top right corner
+			{ -BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, }, // bottom left corner
+			{ BLOCK_RADIUS, BLOCK_RADIUS, -BLOCK_RADIUS, }, // top right corner
+			{ BLOCK_RADIUS, -BLOCK_RADIUS, -BLOCK_RADIUS, }, // bottom right corner
+			};
+
+		sun::sun(
+			__in_opt float delta,
+			__in_opt bool cycle
+			) :
+				nomic::entity::object(ENTITY_SUN),
+				m_cycle(SUN_CYCLE_DEFAULT),
+				m_delta(SUN_DELTA_DEFAULT),
+				m_radius((VIEW_RADIUS_RUNTIME * CHUNK_WIDTH) + (2 * CHUNK_WIDTH))
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f, Mode=%s", delta, cycle ? "Cycling" : "Fixed");
+
+			set_cycle(cycle);
+			set_delta(delta);
 			setup();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -40,7 +76,11 @@ namespace nomic {
 		sun::sun(
 			__in const sun &other
 			) :
-				nomic::entity::plain(other),
+				nomic::entity::object(other),
+				nomic::graphic::texture(other),
+				m_color(other.m_color),
+				m_cycle(other.m_cycle),
+				m_delta(other.m_delta),
 				m_radius(other.m_radius)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -61,12 +101,60 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			if(this != &other) {
-				nomic::entity::plain::operator=(other);
+				nomic::entity::object::operator=(other);
+				nomic::graphic::texture::operator=(other);
+				m_color = other.m_color;
+				m_cycle = other.m_cycle;
+				m_delta = other.m_delta;
 				m_radius = other.m_radius;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
 			return *this;
+		}
+
+		glm::vec4 
+		sun::color(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_color);
+			return m_color;
+		}
+
+		bool 
+		sun::cycling(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_cycle);
+			return m_cycle;
+		}
+
+		float 
+		sun::delta(void) const
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%f", m_delta);
+			return m_delta;
+		}
+
+		void 
+		sun::on_render(
+			__in nomic::core::renderer &renderer,
+			__in void *textures,
+			__in float delta
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
+
+			nomic::graphic::texture::bind();
+			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			arr.enable(SUN_INDEX_COLOR);
+			arr.enable(SUN_INDEX_COORDINATE);
+			arr.enable(SUN_INDEX_VERTEX);
+			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, SUN_SEGMENT_COUNT);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -75,34 +163,79 @@ namespace nomic {
 			__in void *camera
 			)
 		{
+			bool shown = true;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
-			if(runtime) {
-				glm::vec4 color;
-				glm::vec3 center, &position = nomic::entity::plain::position();
+			if(m_cycle && runtime && camera) {
+				std::vector<glm::vec4> color;
 				float angle, delta = ((nomic::runtime *) runtime)->tick_cycle();
 
-				if(camera) {
-					position = ((nomic::entity::camera *) camera)->position();
-					position.y = 0.f;
-				}
+				m_color = SUN_COLOR_APOGEE;
+				m_position = ((nomic::entity::camera *) camera)->position();
+				m_position.y = 0.f;
 
 				angle = (SUN_ANGLE_BEGIN - (SUN_ANGLE_OFFSET * delta));
-				position.y += (m_radius * glm::cos(glm::radians(angle)));
-				position.z -= (m_radius * glm::sin(glm::radians(angle)));
+				m_position.y += (m_radius * glm::cos(glm::radians(angle)));
+				m_position.z -= (m_radius * glm::sin(glm::radians(angle)));
 
-				if(delta <= 0.5) {
-					color = SUN_COLOR_RISE;
-					color.y += ((SUN_COLOR_APOGEE.y - SUN_COLOR_RISE.y) * (delta * 2.f));
-					color.z += ((SUN_COLOR_APOGEE.z - SUN_COLOR_RISE.z) * (delta * 2.f));
-				} else {
-					color = SUN_COLOR_APOGEE;
-					color.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET.y) * ((delta - 0.5f) * 2.f));
-					color.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET.z) * ((delta - 0.5f) * 2.f));
+				shown = !((nomic::runtime *) runtime)->session().underwater();
+				if(shown) {
+
+					if(delta <= SUN_RISE) {
+						m_color = SUN_COLOR_RISE;
+						m_color.y += ((SUN_COLOR_APOGEE.y - SUN_COLOR_RISE.y) * (delta / SUN_RISE));
+						m_color.z += ((SUN_COLOR_APOGEE.z - SUN_COLOR_RISE.z) * (delta / SUN_RISE));
+					} else if((delta > SUN_RISE) && (delta <= SUN_SET)) {
+						m_color = SUN_COLOR_APOGEE;
+					} else {
+						m_color = SUN_COLOR_APOGEE;
+						m_color.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET.y) * ((delta - SUN_SET) / (1.f - SUN_SET)));
+						m_color.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET.z) * ((delta - SUN_SET) / (1.f - SUN_SET)));
+					}
+
+					for(uint32_t iter = 0; iter < SUN_SEGMENT_COUNT; ++iter) {
+						color.push_back(m_color);
+					}
+
+					nomic::graphic::vao &arr = vertex_array();
+					arr.bind();
+					arr.set_subdata(SUN_INDEX_COLOR, 0, SUN_SEGMENT_COUNT * SUN_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
+						&color[0]);
+					arr.enable(SUN_INDEX_COLOR);
 				}
-
-				nomic::entity::plain::set_color(color);
 			}
+
+			show(shown);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		sun::set_cycle(
+			__in bool cycle
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Cycle=%x", cycle);
+
+			m_cycle = cycle;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		sun::set_delta(
+			__in float delta
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
+
+			if((delta < SUN_DELTA_MIN) || (delta > SUN_DELTA_MAX)) {
+				THROW_NOMIC_ENTITY_SUN_EXCEPTION_FORMAT(NOMIC_ENTITY_SUN_EXCEPTION_DELTA_INVALID,
+					"Delta=%f (must be within range of %f <= Delta <= %f)", delta, SUN_DELTA_MIN, SUN_DELTA_MAX);
+			}
+
+			m_delta = delta;
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -110,10 +243,29 @@ namespace nomic {
 		void 
 		sun::setup(void)
 		{
+			std::vector<glm::vec3> vertex;
+			glm::vec3 scale = glm::vec3(SUN_SCALE_DEFAULT, SUN_SCALE_DEFAULT, SUN_SCALE_DEFAULT);
+
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			nomic::entity::plain::set_dimensions(glm::vec2(SUN_SCALE_DEFAULT, SUN_SCALE_DEFAULT));
-			m_radius = ((VIEW_RADIUS_RUNTIME * CHUNK_WIDTH) + (2 * CHUNK_WIDTH));
+			for(uint32_t iter = 0; iter < SUN_SEGMENT_COUNT; ++iter) {
+				vertex.push_back(SUN_VERTEX[iter] * scale);
+			}
+
+			nomic::graphic::texture::set(SUN_PATH_DEFAULT);
+			nomic::graphic::vao &arr = vertex_array();
+			arr.bind();
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, SUN_SEGMENT_COUNT * SUN_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
+				GL_DYNAMIC_DRAW), SUN_INDEX_COLOR, SUN_SEGMENT_WIDTH_COLOR, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &SUN_COORDINATE[0],
+				((uint8_t *) &SUN_COORDINATE[0]) + (SUN_SEGMENT_COUNT * SUN_SEGMENT_WIDTH_COORDINATE * sizeof(GLfloat))),
+				GL_STATIC_DRAW), SUN_INDEX_COORDINATE, SUN_SEGMENT_WIDTH_COORDINATE, GL_FLOAT);
+			arr.add(nomic::graphic::vbo(GL_ARRAY_BUFFER, std::vector<uint8_t>((uint8_t *) &vertex[0],
+				((uint8_t *) &vertex[0]) + (SUN_SEGMENT_COUNT * SUN_SEGMENT_WIDTH_VERTEX * sizeof(GLfloat))),
+				GL_STATIC_DRAW), SUN_INDEX_VERTEX, SUN_SEGMENT_WIDTH_VERTEX, GL_FLOAT);
+			arr.enable(SUN_INDEX_COLOR);
+			arr.enable(SUN_INDEX_COORDINATE);
+			arr.enable(SUN_INDEX_VERTEX);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -130,7 +282,11 @@ namespace nomic {
 			result << NOMIC_ENTITY_SUN_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
-				result << " Base=" << nomic::entity::plain::to_string(verbose)
+				result << " Base=" << nomic::entity::object::to_string(verbose)
+					<< ", Texture=" << nomic::graphic::texture::to_string(verbose)
+					<< ", Mode=" << (m_cycle ? "Cycling" : "Fixed")
+					<< ", Color={" << m_color.x << ", " << m_color.y << ", " << m_color.z << ", " << m_color.w << "}"
+					<< ", Delta=" << m_delta
 					<< ", Radius=" << m_radius;
 			}
 
