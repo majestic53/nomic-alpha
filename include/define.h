@@ -57,6 +57,8 @@ namespace nomic {
 	#define ATLAS_PATH_DEFAULT "./res/texture/block.bmp"
 	#define ATLAS_WIDTH_DEFAULT 16
 
+	#define AXIS_LINE_WIDTH 2.f
+
 	#define BACKDROP_HEIGHT_DEFAULT 10
 	#define BACKDROP_OFFSET_DEFAULT 12.f
 	#define BACKDROP_PATH_DEFAULT "./res/texture/load.bmp"
@@ -134,6 +136,7 @@ namespace nomic {
 
 	#define DELTA_FULL 1.f
 
+	#define DIAGNOSTIC_FLOAT_PRECISION 2
 	#define DIAGNOSTIC_FONT_DEFAULT "./res/font/block.otf"
 	#define DIAGNOSTIC_FONT_SIZE_DEFAULT 14
 	#define DIAGNOSTIC_TEXT_DEFAULT STRING_INVALID
@@ -144,12 +147,12 @@ namespace nomic {
 	#define DISPLAY_DEFAULT_BLUE 1.f
 	#define DISPLAY_DEFAULT_FULLSCREEN false
 	#define DISPLAY_DEFAULT_GREEN 0.25f
-	#define DISPLAY_DEFAULT_HEIGHT 1080//768
+	#define DISPLAY_DEFAULT_HEIGHT 1080 //768
 	#define DISPLAY_DEFAULT_ICON "./res/texture/icon.bmp"
 	#define DISPLAY_DEFAULT_RED 0.06f
 	#define DISPLAY_DEFAULT_TITLE NOMIC
 	#define DISPLAY_DEFAULT_VSYNC false
-	#define DISPLAY_DEFAULT_WIDTH 1920//1024
+	#define DISPLAY_DEFAULT_WIDTH 1920 //1024
 	#define DISPLAY_FLAGS_CLEAR (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 	#define DISPLAY_FLAGS_DEFAULT (SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_OPENGL)
 	#define DISPLAY_MOUSE_RELATIVE SDL_TRUE
@@ -204,14 +207,14 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 480.0
 
-	#define NOISE_SEED_DEFAULT 0
+	#define NOISE_SEED_DEFAULT 2710042186 //0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 5
+	#define NOMIC_VERSION_REVISION 6
 	#define NOMIC_VERSION_WEEK 1731
 
 	#define OBJECT_COUNT 1
@@ -250,7 +253,8 @@ namespace nomic {
 	#define RETICLE_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.9f)
 	#define RETICLE_HORIZONTAL_LEFT 2
 	#define RETICLE_HORIZONTAL_RIGHT 3
-	#define RETICLE_WIDTH 0.03f
+	#define RETICLE_LINE_WIDTH 2.f
+	#define RETICLE_WIDTH 0.02f
 
 	#define RUNTIME_PAUSE_DELAY 200
 	#define RUNTIME_TICKS_PER_SECOND 60
@@ -313,7 +317,7 @@ namespace nomic {
 	#define SUN_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define SUN_COLOR_RISE glm::vec4(1.f, 0.95f, 0.53f, 1.f)
 	#define SUN_COLOR_SET glm::vec4(1.f, 0.72f, 0.23f, 1.f)
-	#define SUN_COLOR_SET_SKY glm::vec4(1.f, 0.30f, 0.29, 1.f)
+	#define SUN_COLOR_SET_SKY SUN_COLOR_SET
 	#define SUN_CYCLE_DEFAULT true
 	#define SUN_DELTA_DEFAULT SUN_DELTA_MIN
 	#define SUN_DELTA_MIN 0.f
@@ -335,7 +339,7 @@ namespace nomic {
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
 
-	#define TICKS_PER_CYCLE 2000//32000
+	#define TICKS_PER_CYCLE 32000
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 

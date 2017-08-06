@@ -82,6 +82,8 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
+			result << std::fixed << std::setprecision(DIAGNOSTIC_FLOAT_PRECISION);
+
 			nomic::runtime *runtime_ref = (nomic::runtime *) runtime;
 			if(runtime_ref) {
 				result << NOMIC << " " << runtime_ref->version(true) << std::endl << "Seed=" << runtime_ref->seed();
@@ -92,7 +94,7 @@ namespace nomic {
 
 				if(runtime_ref) {
 					result << "Fps=" << runtime_ref->frame_rate() << ", Tick=" << runtime_ref->tick()
-						<< " (@" << RUNTIME_TICKS_PER_SECOND << "/sec)";
+						<< " (Day " << ((runtime_ref->tick() / TICKS_PER_CYCLE) + runtime_ref->tick_cycle()) << ")";
 				}
 
 				nomic::entity::camera *camera_ref = (nomic::entity::camera *) camera;
@@ -102,11 +104,11 @@ namespace nomic {
 					glm::uvec3 position_block = camera_ref->block();
 					glm::ivec2 position_chunk = camera_ref->chunk();
 
-					result << std::endl << std::endl << "Pos=(" << position.x << "," << position.y << "," << position.z << ")"
-						<< std::endl << "Rot=(" << rotation.x << "," << rotation.y << "," << rotation.z << ")"
+					result << std::endl << std::endl << "Pos=(" << position.x << ", " << position.y << ", " << position.z << ")"
+						<< std::endl << "Rot=(" << rotation.x << ", " << rotation.y << ", " << rotation.z << ")"
 						<< std::endl << "Fov=" << camera_ref->fov()
-						<< std::endl << std::endl << "Chunk=(" << position_chunk.x << "," << position_chunk.y << ")"
-						<< ", Block=(" << position_block.x << "," << position_block.y << "," << position_block.z << ")";
+						<< std::endl << std::endl << "Chunk=(" << position_chunk.x << ", " << position_chunk.y << ")"
+						<< ", Block=(" << position_block.x << ", " << position_block.y << ", " << position_block.z << ")";
 
 					if(runtime_ref) {
 						nomic::session::manager &session_ref = runtime_ref->session();
@@ -118,9 +120,9 @@ namespace nomic {
 							session_ref.selected_block(position_chunk, position_block, face);
 							type = session_ref.terrain().at(position_chunk)->block_type(position_block);
 							result << std::endl << std::endl << "Selected Chunk=(" << position_chunk.x
-									<< "," << position_chunk.y << ")"
-								<< ", Block=(" << position_block.x << "," << position_block.y
-									<< "," << position_block.z << ")"
+									<< ", " << position_chunk.y << ")"
+								<< ", Block=(" << position_block.x << ", " << position_block.y
+									<< ", " << position_block.z << ")"
 								<< ", Type=" << BLOCK_STRING(type)
 								<< ", Face=" << BLOCK_FACE_STRING(face);
 						}

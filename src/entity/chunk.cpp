@@ -563,9 +563,47 @@ namespace nomic {
 					nomic::graphic::atlas *texture_ref = (nomic::graphic::atlas *) textures;
 
 					for(std::map<uint8_t, chunk_data>::iterator iter = m_face.begin(); iter != m_face.end(); ++iter) {
-						texture_ref->enable(iter->first);
-						GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, std::get<VAO_BASE>(iter->second),
-							std::get<VAO_OFFSET>(iter->second));
+
+						if(!determine_transparent(iter->first)) {
+							texture_ref->enable(iter->first);
+							GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, std::get<VAO_BASE>(iter->second),
+								std::get<VAO_OFFSET>(iter->second));
+						}
+					}
+				} else {
+					GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, m_face.size() * BLOCK_FACE_COUNT);
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		chunk::on_render_transparent(
+			__in nomic::core::renderer &renderer,
+			__in void *textures,
+			__in float delta
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
+
+			if(!m_face.empty()) {
+				nomic::graphic::vao &arr = vertex_array();
+				arr.bind();
+				arr.enable(CHUNK_INDEX_COORDINATE);
+				arr.enable(CHUNK_INDEX_NORMAL);
+				arr.enable(CHUNK_INDEX_VERTEX);
+
+				if(textures) {
+					nomic::graphic::atlas *texture_ref = (nomic::graphic::atlas *) textures;
+
+					for(std::map<uint8_t, chunk_data>::iterator iter = m_face.begin(); iter != m_face.end(); ++iter) {
+
+						if(determine_transparent(iter->first)) {
+							texture_ref->enable(iter->first);
+							GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, std::get<VAO_BASE>(iter->second),
+								std::get<VAO_OFFSET>(iter->second));
+						}
 					}
 				} else {
 					GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, 0, m_face.size() * BLOCK_FACE_COUNT);

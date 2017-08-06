@@ -131,6 +131,7 @@ namespace nomic {
 			arr.bind();
 			arr.enable(AXIS_INDEX_COLOR);
 			arr.enable(AXIS_INDEX_VERTEX);
+			GL_CHECK(LEVEL_WARNING, glLineWidth, AXIS_LINE_WIDTH);
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, AXIS_SEGMENT_COUNT);
 
 			TRACE_EXIT(LEVEL_VERBOSE);

@@ -17,6 +17,7 @@
  */
 
 #include "../../include/render/manager.h"
+#include "../../include/entity/chunk.h"
 #include "../../include/trace.h"
 #include "./manager_type.h"
 
@@ -327,6 +328,20 @@ namespace nomic {
 
 					rend->set_model((*iter_entity)->model());
 					(*iter_entity)->on_render(*rend, &textures, delta);
+				}
+
+				if(iter->first == RENDERER_CHUNK) {
+
+					for(std::set<nomic::core::entity *>::iterator iter_entity = entity.begin(); iter_entity != entity.end();
+							++iter_entity) {
+
+						if(!*iter_entity || !(*iter_entity)->shown()) {
+							continue;
+						}
+
+						rend->set_model((*iter_entity)->model());
+						((nomic::entity::chunk *) (*iter_entity))->on_render_transparent(*rend, &textures, delta);
+					}
 				}
 			}
 

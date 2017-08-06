@@ -72,6 +72,12 @@ namespace nomic {
 					__in float delta
 					);
 
+				virtual void on_render_transparent(
+					__in nomic::core::renderer &renderer,
+					__in void *textures,
+					__in float delta
+					);
+
 				virtual void on_update(
 					__in void *runtime,
 					__in void *camera

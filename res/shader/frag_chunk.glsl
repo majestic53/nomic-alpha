@@ -33,6 +33,8 @@ uniform bool underwater;
 
 uniform sampler2D out_texture;
 
+const float ALPHA_LIMIT = 0.2f;
+
 const vec4 AMBIENT_DARK = vec4(0.f, 0.f, 0.f, 1.f);
 const float AMBIENT_DARK_END = 0.1f;
 const float AMBIENT_DARK_MIN = 0.0f;
@@ -124,6 +126,10 @@ void
 main(void)
 {
 	vec4 color = texture(out_texture, out_coordinate);
+
+	if(color.a < ALPHA_LIMIT) {
+		discard;
+	}
 
 	color *= (add_light_ambient(cycle, ambient) + add_light_diffuse(cycle, out_normal, out_normal_position, ambient, ambient_position));
 

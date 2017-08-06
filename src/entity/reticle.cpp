@@ -93,6 +93,7 @@ namespace nomic {
 			arr.bind();
 			arr.enable(RETICLE_INDEX_COLOR);
 			arr.enable(RETICLE_INDEX_VERTEX);
+			GL_CHECK(LEVEL_WARNING, glLineWidth, RETICLE_LINE_WIDTH);
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, RETICLE_SEGMENT_COUNT);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
