@@ -1087,6 +1087,10 @@ namespace nomic {
 			__in_opt float delta
 			)
 		{
+			glm::vec3 position = glm::vec3(0.f);
+			nomic::entity::sun *sun_ref = nullptr;
+			glm::vec4 color = glm::vec4(1.f), color_background = glm::vec4(1.f);
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f", delta);
 
 			if(!m_atlas) {
@@ -1099,10 +1103,17 @@ namespace nomic {
 					"Camera is not allocated, Address=%p", m_camera);
 			}
 
+			sun_ref = (nomic::entity::sun *) m_entity_object_background.at(ENTITY_OBJECT_BACKGROUND_SUN);
+			if(sun_ref) {
+				color = sun_ref->color();
+				color_background = sun_ref->color_background();
+				position = sun_ref->position();
+			}
+
 			m_manager_display.clear();
 			m_manager_render.render(m_camera->position(), m_camera->rotation(), m_camera->projection(), m_camera->view(),
-				m_camera->dimensions(), *m_atlas, ((nomic::runtime *) m_runtime)->tick_cycle(), delta,
-				((nomic::entity::sun *) m_entity_object_background.at(ENTITY_OBJECT_BACKGROUND_SUN))->color(), m_underwater);
+				m_camera->dimensions(), *m_atlas, ((nomic::runtime *) m_runtime)->tick_cycle(), delta, color, color_background,
+				position, m_underwater);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);

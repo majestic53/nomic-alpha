@@ -20,7 +20,7 @@
 
 in vec3 out_vertex;
 
-uniform vec4 ambient;
+uniform vec4 ambient_background;
 uniform float cycle;
 
 uniform samplerCube out_cube;
@@ -32,8 +32,7 @@ const float AMBIENT_DARK_MAX = 0.9f;
 const float AMBIENT_DARK_START = 0.95f;
 
 vec4 
-add_ambient(
-	in vec4 color,
+add_light_ambient(
 	in float cycle,
 	in vec4 ambient
 	)
@@ -48,7 +47,7 @@ add_ambient(
 		scale = ((cycle - AMBIENT_DARK_START) / (1.f - AMBIENT_DARK_START));
 	}
 
-	return mix((color * ambient), AMBIENT_DARK, clamp(scale, AMBIENT_DARK_MIN, AMBIENT_DARK_MAX));
+	return mix(ambient, AMBIENT_DARK, clamp(scale, AMBIENT_DARK_MIN, AMBIENT_DARK_MAX));
 }
 
 void
@@ -57,7 +56,7 @@ main(void)
 	vec4 color;
 
 	color = texture(out_cube, out_vertex);
-	color = add_ambient(color, cycle, ambient);
+	color *= add_light_ambient(cycle, ambient_background);
 
 	gl_FragColor = color;
 }

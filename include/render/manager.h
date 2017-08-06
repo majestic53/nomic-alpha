@@ -69,6 +69,8 @@ namespace nomic {
 					__in float cycle,
 					__in float delta,
 					__in const glm::vec4 &ambient,
+					__in const glm::vec4 &ambient_background,
+					__in const glm::vec3 &ambient_position,
 					__in bool underwater
 					);
 

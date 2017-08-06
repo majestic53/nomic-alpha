@@ -60,6 +60,8 @@ namespace nomic {
 
 				glm::vec4 color(void);
 
+				glm::vec4 color_background(void);
+
 				bool cycling(void) const;
 
 				float delta(void) const;
@@ -81,6 +83,8 @@ namespace nomic {
 				void setup(void);
 
 				glm::vec4 m_color;
+
+				glm::vec4 m_color_background;
 
 				bool m_cycle;
 

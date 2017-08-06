@@ -63,6 +63,14 @@ namespace nomic {
 					__in const glm::vec4 &ambient
 					);
 
+				void set_ambient_background(
+					__in const glm::vec4 &ambient_background
+					);
+
+				void set_ambient_position(
+					__in const glm::vec3 &ambient_position
+					);
+
 				void set_blend(
 					__in bool blend,
 					__in_opt GLenum sfactor = RENDERER_BLEND_SFACTOR_DEFAULT,
@@ -129,6 +137,8 @@ namespace nomic {
 					__in const glm::vec3 &rotation,
 					__in GLfloat cycle,
 					__in const glm::vec4 &ambient,
+					__in const glm::vec4 &ambient_background,
+					__in const glm::vec3 &ambient_position,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection
 					);
@@ -138,6 +148,8 @@ namespace nomic {
 					__in const glm::vec3 &rotation,
 					__in GLfloat cycle,
 					__in const glm::vec4 &ambient,
+					__in const glm::vec4 &ambient_background,
+					__in const glm::vec3 &ambient_position,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view
@@ -148,6 +160,8 @@ namespace nomic {
 					__in const glm::vec3 &rotation,
 					__in GLfloat cycle,
 					__in const glm::vec4 &ambient,
+					__in const glm::vec4 &ambient_background,
+					__in const glm::vec3 &ambient_position,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view,
@@ -181,6 +195,10 @@ namespace nomic {
 				uint32_t m_type;
 
 				GLint m_uniform_ambient;
+
+				GLint m_uniform_ambient_background;
+
+				GLint m_uniform_ambient_position;
 
 				GLint m_uniform_cycle;
 

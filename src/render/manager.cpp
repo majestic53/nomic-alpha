@@ -284,15 +284,18 @@ namespace nomic {
 			__in float cycle,
 			__in float delta,
 			__in const glm::vec4 &ambient,
+			__in const glm::vec4 &ambient_background,
+			__in const glm::vec3 &ambient_position,
 			__in bool underwater
 			)
 		{
 			std::map<uint32_t, std::pair<nomic::core::renderer *, std::set<nomic::core::entity *>>>::iterator iter;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
-"Position=%p, Rotation=%p, Projection=%p, View=%p, Dimensions={%u, %u}, Textures=%p, Cycle=%f, Delta=%f, Ambient={%f, %f, %f, %f}, Underwater=%x",
+"Position=%p, Rotation=%p, Projection=%p, View=%p, Dimensions={%u, %u}, Textures=%p, Cycle=%f, Delta=%f, Ambient={%f, %f, %f, %f} (Background={%f, %f, %f, %f}, Position={%f, %f, %f}), Underwater=%x",
 				&position, &rotation, &projection, &view, view_dimensions.x, view_dimensions.y, &textures, cycle, delta,
-				ambient.x, ambient.y, ambient.z, ambient.w, underwater);
+				ambient.x, ambient.y, ambient.z, ambient.w, ambient_background.x, ambient_background.y, ambient_background.z,
+				ambient_background.w, ambient_position.x, ambient_position.y, ambient_position.z, underwater);
 
 			std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -306,11 +309,12 @@ namespace nomic {
 
 				switch(rend->mode()) {
 					case RENDER_PERSPECTIVE:
-						rend->use(position, rotation, cycle, ambient, underwater, projection, view);
+						rend->use(position, rotation, cycle, ambient, ambient_background, ambient_position, underwater,
+							projection, view);
 						break;
 					default:
-						rend->use(position, rotation, cycle, ambient, underwater, glm::ortho(0.f, (float) view_dimensions.x,
-							0.f, (float) view_dimensions.y, -1.f, 1.f));
+						rend->use(position, rotation, cycle, ambient, ambient_background, ambient_position, underwater,
+							glm::ortho(0.f, (float) view_dimensions.x, 0.f, (float) view_dimensions.y, -1.f, 1.f));
 						break;
 				}
 

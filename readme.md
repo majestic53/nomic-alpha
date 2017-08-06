@@ -34,6 +34,7 @@ Version 0.1.1731
 ----------------
 *Updated: 8/5/2017*
 
+* Added basic lighting
 * Added sun-rise/-set
 * Code cleanup/bug fixes
 

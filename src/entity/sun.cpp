@@ -62,7 +62,7 @@ namespace nomic {
 				nomic::entity::object(ENTITY_SUN),
 				m_cycle(SUN_CYCLE_DEFAULT),
 				m_delta(SUN_DELTA_DEFAULT),
-				m_radius((VIEW_RADIUS_RUNTIME * CHUNK_WIDTH) + (2 * CHUNK_WIDTH))
+				m_radius(SUN_RADIUS_DEFAULT)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Delta=%f, Mode=%s", delta, cycle ? "Cycling" : "Fixed");
 
@@ -79,6 +79,7 @@ namespace nomic {
 				nomic::entity::object(other),
 				nomic::graphic::texture(other),
 				m_color(other.m_color),
+				m_color_background(other.m_color_background),
 				m_cycle(other.m_cycle),
 				m_delta(other.m_delta),
 				m_radius(other.m_radius)
@@ -104,6 +105,7 @@ namespace nomic {
 				nomic::entity::object::operator=(other);
 				nomic::graphic::texture::operator=(other);
 				m_color = other.m_color;
+				m_color_background = other.m_color_background;
 				m_cycle = other.m_cycle;
 				m_delta = other.m_delta;
 				m_radius = other.m_radius;
@@ -117,8 +119,17 @@ namespace nomic {
 		sun::color(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_color);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%f, %f, %f, %f}", m_color.x, m_color.y, m_color.z, m_color.w);
 			return m_color;
+		}
+
+		glm::vec4 
+		sun::color_background(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_color_background.x, m_color_background.y, m_color_background.z,
+				m_color_background.w);
+			return m_color_background;
 		}
 
 		bool 
@@ -172,9 +183,9 @@ namespace nomic {
 				float angle, delta = ((nomic::runtime *) runtime)->tick_cycle();
 
 				m_color = SUN_COLOR_APOGEE;
+				m_color_background = m_color;
 				m_position = ((nomic::entity::camera *) camera)->position();
 				m_position.y = 0.f;
-
 				angle = (SUN_ANGLE_BEGIN - (SUN_ANGLE_OFFSET * delta));
 				m_position.y += (m_radius * glm::cos(glm::radians(angle)));
 				m_position.z -= (m_radius * glm::sin(glm::radians(angle)));
@@ -186,12 +197,19 @@ namespace nomic {
 						m_color = SUN_COLOR_RISE;
 						m_color.y += ((SUN_COLOR_APOGEE.y - SUN_COLOR_RISE.y) * (delta / SUN_RISE));
 						m_color.z += ((SUN_COLOR_APOGEE.z - SUN_COLOR_RISE.z) * (delta / SUN_RISE));
+						m_color_background = m_color;
 					} else if((delta > SUN_RISE) && (delta <= SUN_SET)) {
 						m_color = SUN_COLOR_APOGEE;
+						m_color_background = m_color;
 					} else {
 						m_color = SUN_COLOR_APOGEE;
+						m_color_background = m_color;
 						m_color.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET.y) * ((delta - SUN_SET) / (1.f - SUN_SET)));
 						m_color.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET.z) * ((delta - SUN_SET) / (1.f - SUN_SET)));
+						m_color_background.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET_SKY.y)
+							* ((delta - SUN_SET) / (1.f - SUN_SET)));
+						m_color_background.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET_SKY.z)
+							* ((delta - SUN_SET) / (1.f - SUN_SET)));
 					}
 
 					for(uint32_t iter = 0; iter < SUN_SEGMENT_COUNT; ++iter) {
@@ -286,6 +304,8 @@ namespace nomic {
 					<< ", Texture=" << nomic::graphic::texture::to_string(verbose)
 					<< ", Mode=" << (m_cycle ? "Cycling" : "Fixed")
 					<< ", Color={" << m_color.x << ", " << m_color.y << ", " << m_color.z << ", " << m_color.w << "}"
+					<< " (Background={" << m_color_background.x << ", " << m_color_background.y << ", " << m_color_background.z
+						<< ", " << m_color_background.w << "})"
 					<< ", Delta=" << m_delta
 					<< ", Radius=" << m_radius;
 			}

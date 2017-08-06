@@ -122,6 +122,15 @@ namespace nomic {
 			{ 0.f, 0.f, },
 			};
 
+		static const glm::vec3 CHUNK_NORMAL[] = {
+			{ 1.f, 0.f, 0.f }, // right
+			{ -1.f, 0.f, 0.f }, // left
+			{ 0.f, 1.f, 0.f }, // top
+			{ 0.f, -1.f, 0.f }, // bottom
+			{ 0.f, 0.f, 1.f }, // back
+			{ 0.f, 0.f, -1.f }, // front
+			};
+
 		static const glm::vec3 CHUNK_VERTEX[] = {
 			{ BLOCK_WIDTH, 0.f, 0.f }, // right
 			{ BLOCK_WIDTH, 0.f, BLOCK_WIDTH },
@@ -260,7 +269,7 @@ namespace nomic {
 					coordinate.push_back(CHUNK_COORDINATE[(face * BLOCK_FACE_COUNT) + iter]);
 				}
 
-				normal.push_back(BLOCK_FACE_NORMAL(iter));
+				normal.push_back(CHUNK_NORMAL[face]);
 				vertex.push_back(CHUNK_VERTEX[(face * BLOCK_FACE_COUNT) + iter] + position);
 			}
 
@@ -276,7 +285,7 @@ namespace nomic {
 		{
 			std::map<uint8_t, chunk_data>::iterator result;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Face=%x, Attributes=%x", type, face, rotate, attributes);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Face=%x, Attributes=%x", type, face, attributes);
 
 			switch(type) {
 				case BLOCK_AIR:

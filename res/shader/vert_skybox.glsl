@@ -20,7 +20,7 @@
 
 layout(location = 0) in vec3 in_vertex;
 
-uniform vec4 ambient;
+uniform vec4 ambient_background;
 uniform float cycle;
 uniform mat4 model;
 uniform mat4 projection;

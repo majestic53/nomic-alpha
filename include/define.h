@@ -33,6 +33,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -143,12 +144,12 @@ namespace nomic {
 	#define DISPLAY_DEFAULT_BLUE 1.f
 	#define DISPLAY_DEFAULT_FULLSCREEN false
 	#define DISPLAY_DEFAULT_GREEN 0.25f
-	#define DISPLAY_DEFAULT_HEIGHT 768
+	#define DISPLAY_DEFAULT_HEIGHT 1080//768
 	#define DISPLAY_DEFAULT_ICON "./res/texture/icon.bmp"
 	#define DISPLAY_DEFAULT_RED 0.06f
 	#define DISPLAY_DEFAULT_TITLE NOMIC
 	#define DISPLAY_DEFAULT_VSYNC false
-	#define DISPLAY_DEFAULT_WIDTH 1024
+	#define DISPLAY_DEFAULT_WIDTH 1920//1024
 	#define DISPLAY_FLAGS_CLEAR (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 	#define DISPLAY_FLAGS_DEFAULT (SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_OPENGL)
 	#define DISPLAY_MOUSE_RELATIVE SDL_TRUE
@@ -210,7 +211,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 4
+	#define NOMIC_VERSION_REVISION 5
 	#define NOMIC_VERSION_WEEK 1731
 
 	#define OBJECT_COUNT 1
@@ -312,13 +313,15 @@ namespace nomic {
 	#define SUN_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define SUN_COLOR_RISE glm::vec4(1.f, 0.95f, 0.53f, 1.f)
 	#define SUN_COLOR_SET glm::vec4(1.f, 0.72f, 0.23f, 1.f)
+	#define SUN_COLOR_SET_SKY glm::vec4(1.f, 0.30f, 0.29, 1.f)
 	#define SUN_CYCLE_DEFAULT true
 	#define SUN_DELTA_DEFAULT SUN_DELTA_MIN
 	#define SUN_DELTA_MIN 0.f
 	#define SUN_DELTA_MAX 1.f
 	#define SUN_PATH_DEFAULT "./res/texture/sun.bmp"
-	#define SUN_RISE 0.4f
-	#define SUN_SCALE_DEFAULT 160.f
+	#define SUN_RADIUS_DEFAULT (VIEW_RADIUS_RUNTIME * CHUNK_WIDTH) + (16 * CHUNK_WIDTH)
+	#define SUN_RISE 0.2f
+	#define SUN_SCALE_DEFAULT 240.f
 	#define SUN_SET 0.8f
 
 	#define TEXTURE_FILTER_MAG_DEFAULT GL_NEAREST
@@ -332,7 +335,7 @@ namespace nomic {
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
 
-	#define TICKS_PER_CYCLE 32000
+	#define TICKS_PER_CYCLE 2000//32000
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 
@@ -374,6 +377,8 @@ namespace nomic {
 	#define UNIFORM_MATRIX_DEFAULT glm::mat4(1.f)
 
 	#define UNIFORM_AMBIENT "ambient"
+	#define UNIFORM_AMBIENT_BACKGROUND "ambient_background"
+	#define UNIFORM_AMBIENT_POSITION "ambient_position"
 	#define UNIFORM_COLOR "color"
 	#define UNIFORM_CYCLE "cycle"
 	#define UNIFORM_MODEL "model"
@@ -458,18 +463,6 @@ namespace nomic {
 	#define BLOCK_FACE_MIN BLOCK_FACE_RIGHT
 	#define BLOCK_FACE_MAX BLOCK_FACE_FRONT
 	#define BLOCK_FACE_UNDEFINED SCALAR_INVALID(uint8_t)
-
-	static const glm::vec3 BLOCK_FACE_NORMAL[] = {
-		glm::vec3(1.f, 0.f, 0.f),
-		glm::vec3(-1.f, 0.f, 0.f),
-		glm::vec3(0.f, 1.f, 0.f),
-		glm::vec3(0.f, -1.f, 0.f),
-		glm::vec3(0.f, 0.f, 1.f),
-		glm::vec3(0.f, 0.f, -1.f),
-		};
-
-	#define BLOCK_FACE_NORMAL(_TYPE_) \
-		(((_TYPE_) > BLOCK_FACE_MAX) ? glm::vec3(0.f) : BLOCK_FACE_NORMAL[_TYPE_])
 
 	static const std::string BLOCK_FACE_STR[] = {
 		"Right", "Left", "Top", "Bottom", "Back", "Front",

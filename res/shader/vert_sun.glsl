@@ -32,22 +32,7 @@ out vec2 out_coordinate;
 void
 main(void)
 {
-	mat4 view_model = (view * model);
-
-	// billboard
-	view_model[0][0] = 1;
-	view_model[0][1] = 0;
-	view_model[0][2] = 0;
-
-	view_model[1][0] = 0;
-	view_model[1][1] = 1;
-	view_model[1][2] = 0;
-
-	view_model[2][0] = 0;
-	view_model[2][1] = 0;
-	view_model[2][2] = 1;
-
 	out_color = in_color;
 	out_coordinate = in_coordinate;
-	gl_Position = (projection * view_model * vec4(in_vertex, 1.f));
+	gl_Position = (projection * view * model * vec4(in_vertex, 1.f));
 }
