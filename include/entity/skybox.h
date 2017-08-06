@@ -58,11 +58,6 @@ namespace nomic {
 					__in float delta
 					);
 
-				virtual void on_update(
-					__in void *runtime,
-					__in void *camera
-					);
-
 				void set(
 					__in const std::map<uint32_t, std::string> &path,
 					__in_opt float scale = CUBEMAP_SCALE_DEFAULT,

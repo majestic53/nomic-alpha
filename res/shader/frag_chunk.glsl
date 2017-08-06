@@ -44,7 +44,8 @@ const float AMBIENT_FOG_BLEND = 0.6f;
 
 const float DIFFUSE_SCALE = 0.2f;
 
-const vec4 FOG_COLOR = vec4(0.54f, 0.70f, 1.f, 1.f);
+const vec4 FOG_COLOR_DEFAULT = vec4(0.34f, 0.71f, 0.88f, 1.f);
+const vec4 FOG_COLOR_MC = vec4(0.54f, 0.70f, 1.f, 1.f);
 const float FOG_FALLOFF = 0.004f;
 
 const vec4 WATER_COLOR = vec4(0.06f, 0.25f, 1.f, 1.f);
@@ -136,7 +137,7 @@ main(void)
 	if(underwater) { // underwater
 		color = add_fog_constant(color, add_light_ambient(cycle, WATER_COLOR), WATER_FALLOFF, out_distance);
 	} else { // above water
-		color = add_fog_non_constant(color, add_light_ambient(cycle, FOG_COLOR), FOG_FALLOFF, out_distance,
+		color = add_fog_non_constant(color, add_light_ambient(cycle, FOG_COLOR_DEFAULT), FOG_FALLOFF, out_distance,
 				position, rotation);
 	}
 

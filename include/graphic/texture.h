@@ -50,6 +50,22 @@ namespace nomic {
 					);
 
 				texture(
+					__in GLenum target,
+					__in GLint level,
+					__in GLint internal,
+					__in GLsizei width,
+					__in GLsizei height,
+					__in GLint border,
+					__in GLenum format,
+					__in GLenum type,
+					__in const GLvoid *data,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
+					);
+
+				texture(
 					__in const texture &other
 					);
 
@@ -85,6 +101,22 @@ namespace nomic {
 					__in const std::vector<uint8_t> &data,
 					__in const glm::uvec2 &dimensions,
 					__in uint32_t depth,
+					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
+					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
+					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,
+					__in_opt GLenum filter_mag = TEXTURE_FILTER_MAG_DEFAULT
+					);
+
+				void set(
+					__in GLenum target,
+					__in GLint level,
+					__in GLint internal,
+					__in GLsizei width,
+					__in GLsizei height,
+					__in GLint border,
+					__in GLenum format,
+					__in GLenum type,
+					__in const GLvoid *data,
 					__in_opt GLenum wrap_s = TEXTURE_WRAP_S_DEFAULT,
 					__in_opt GLenum wrap_t = TEXTURE_WRAP_T_DEFAULT,
 					__in_opt GLenum filter_min = TEXTURE_FILTER_MIN_DEFAULT,

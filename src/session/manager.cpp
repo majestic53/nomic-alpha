@@ -88,12 +88,12 @@ namespace nomic {
 			};
 
 		static const std::map<uint32_t, std::string> DEBUG_BLOCK_FACE = {
-			{ BLOCK_FACE_RIGHT, "./res/texture/debug.bmp" },
-			{ BLOCK_FACE_LEFT, "./res/texture/debug.bmp" },
-			{ BLOCK_FACE_TOP, "./res/texture/debug.bmp" },
-			{ BLOCK_FACE_BOTTOM, "./res/texture/debug.bmp" },
-			{ BLOCK_FACE_BACK, "./res/texture/debug.bmp" },
-			{ BLOCK_FACE_FRONT, "./res/texture/debug.bmp" },
+			{ BLOCK_FACE_RIGHT, "./res/texture/default/debug.bmp" },
+			{ BLOCK_FACE_LEFT, "./res/texture/default/debug.bmp" },
+			{ BLOCK_FACE_TOP, "./res/texture/default/debug.bmp" },
+			{ BLOCK_FACE_BOTTOM, "./res/texture/default/debug.bmp" },
+			{ BLOCK_FACE_BACK, "./res/texture/default/debug.bmp" },
+			{ BLOCK_FACE_FRONT, "./res/texture/default/debug.bmp" },
 			};
 
 		#define DEBUG_BLOCK_SCALE 0.2f
@@ -116,12 +116,12 @@ namespace nomic {
 			};
 
 		static const std::map<uint32_t, std::string> ENTITY_SKYBOX_FACE = {
-			{ GL_TEXTURE_CUBE_MAP_POSITIVE_X, "./res/texture/skybox_side.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "./res/texture/skybox_side.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "./res/texture/skybox_top.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "./res/texture/skybox_bottom.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "./res/texture/skybox_side.bmp" },
-			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "./res/texture/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_POSITIVE_X, "./res/texture/default/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "./res/texture/default/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "./res/texture/default/skybox_top.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "./res/texture/default/skybox_bottom.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "./res/texture/default/skybox_side.bmp" },
+			{ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "./res/texture/default/skybox_side.bmp" },
 			};
 
 		// entity foreground objects

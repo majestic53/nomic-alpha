@@ -53,12 +53,12 @@ archive:
 		$(DIR_BUILD)entity_axis.o $(DIR_BUILD)entity_block.o $(DIR_BUILD)entity_camera.o $(DIR_BUILD)entity_chunk.o \
 			$(DIR_BUILD)entity_diagnostic.o $(DIR_BUILD)entity_manager.o $(DIR_BUILD)entity_message.o $(DIR_BUILD)entity_object.o \
 			$(DIR_BUILD)entity_panel.o $(DIR_BUILD)entity_plain.o $(DIR_BUILD)entity_reticle.o $(DIR_BUILD)entity_selector.o \
-			$(DIR_BUILD)entity_skybox.o $(DIR_BUILD)entity_string.o $(DIR_BUILD)entity_sun.o \
+			$(DIR_BUILD)entity_shadowmap.o $(DIR_BUILD)entity_skybox.o $(DIR_BUILD)entity_string.o $(DIR_BUILD)entity_sun.o \
 		$(DIR_BUILD)event_input.o $(DIR_BUILD)event_manager.o $(DIR_BUILD)event_queue.o \
 		$(DIR_BUILD)font_manager.o \
 		$(DIR_BUILD)graphic_atlas.o $(DIR_BUILD)graphic_bitmap.o $(DIR_BUILD)graphic_character.o $(DIR_BUILD)graphic_cubemap.o \
-			$(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o $(DIR_BUILD)graphic_shader.o \
-			$(DIR_BUILD)graphic_texture.o $(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
+			$(DIR_BUILD)graphic_display.o $(DIR_BUILD)graphic_fbo.o $(DIR_BUILD)graphic_manager.o $(DIR_BUILD)graphic_program.o \
+			$(DIR_BUILD)graphic_shader.o $(DIR_BUILD)graphic_texture.o $(DIR_BUILD)graphic_vao.o $(DIR_BUILD)graphic_vbo.o \
 		$(DIR_BUILD)render_manager.o \
 		$(DIR_BUILD)session_manager.o \
 		$(DIR_BUILD)terrain_chunk.o $(DIR_BUILD)terrain_generator.o $(DIR_BUILD)terrain_manager.o \
@@ -128,7 +128,7 @@ core_uniform.o: $(DIR_SRC_CORE)uniform.cpp $(DIR_INC_CORE)uniform.h
 ### ENTITY ###
 
 build_entity: entity_axis.o entity_block.o entity_camera.o entity_chunk.o entity_diagnostic.o entity_manager.o entity_message.o entity_object.o \
-	entity_panel.o entity_plain.o entity_reticle.o entity_selector.o entity_skybox.o entity_string.o entity_sun.o
+	entity_panel.o entity_plain.o entity_reticle.o entity_selector.o entity_shadowmap.o entity_skybox.o entity_string.o entity_sun.o
 
 entity_axis.o: $(DIR_SRC_ENTITY)axis.cpp $(DIR_INC_ENTITY)axis.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)axis.cpp -o $(DIR_BUILD)entity_axis.o
@@ -166,6 +166,9 @@ entity_reticle.o: $(DIR_SRC_ENTITY)reticle.cpp $(DIR_INC_ENTITY)reticle.h
 entity_selector.o: $(DIR_SRC_ENTITY)selector.cpp $(DIR_INC_ENTITY)selector.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)selector.cpp -o $(DIR_BUILD)entity_selector.o
 
+entity_shadowmap.o: $(DIR_SRC_ENTITY)shadowmap.cpp $(DIR_INC_ENTITY)shadowmap.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)shadowmap.cpp -o $(DIR_BUILD)entity_shadowmap.o
+
 entity_skybox.o: $(DIR_SRC_ENTITY)skybox.cpp $(DIR_INC_ENTITY)skybox.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_ENTITY)skybox.cpp -o $(DIR_BUILD)entity_skybox.o
 
@@ -197,8 +200,8 @@ font_manager.o: $(DIR_SRC_FONT)manager.cpp $(DIR_INC_FONT)manager.h
 
 ### GRAPHIC ###
 
-build_graphic: graphic_atlas.o graphic_bitmap.o graphic_character.o graphic_cubemap.o graphic_display.o graphic_manager.o graphic_program.o \
-	graphic_shader.o graphic_texture.o graphic_vao.o graphic_vbo.o
+build_graphic: graphic_atlas.o graphic_bitmap.o graphic_character.o graphic_cubemap.o graphic_display.o graphic_fbo.o graphic_manager.o \
+	graphic_program.o graphic_shader.o graphic_texture.o graphic_vao.o graphic_vbo.o
 
 graphic_atlas.o: $(DIR_SRC_GRAPHIC)atlas.cpp $(DIR_INC_GRAPHIC)atlas.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)atlas.cpp -o $(DIR_BUILD)graphic_atlas.o
@@ -214,6 +217,9 @@ graphic_cubemap.o: $(DIR_SRC_GRAPHIC)cubemap.cpp $(DIR_INC_GRAPHIC)cubemap.h
 
 graphic_display.o: $(DIR_SRC_GRAPHIC)display.cpp $(DIR_INC_GRAPHIC)display.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)display.cpp -o $(DIR_BUILD)graphic_display.o
+
+graphic_fbo.o: $(DIR_SRC_GRAPHIC)fbo.cpp $(DIR_INC_GRAPHIC)fbo.h
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)fbo.cpp -o $(DIR_BUILD)graphic_fbo.o
 
 graphic_manager.o: $(DIR_SRC_GRAPHIC)manager.cpp $(DIR_INC_GRAPHIC)manager.h
 	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_GRAPHIC)manager.cpp -o $(DIR_BUILD)graphic_manager.o

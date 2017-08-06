@@ -47,6 +47,7 @@ namespace nomic {
 				m_uniform_ambient(0),
 				m_uniform_ambient_position(0),
 				m_uniform_cycle(0),
+				m_uniform_depth_matrix(0),
 				m_uniform_model(0),
 				m_uniform_position(0),
 				m_uniform_projection(0),
@@ -78,6 +79,7 @@ namespace nomic {
 				m_uniform_ambient(other.m_uniform_ambient),
 				m_uniform_ambient_position(other.m_uniform_ambient_position),
 				m_uniform_cycle(other.m_uniform_cycle),
+				m_uniform_depth_matrix(other.m_uniform_depth_matrix),
 				m_uniform_model(other.m_uniform_model),
 				m_uniform_position(other.m_uniform_position),
 				m_uniform_projection(other.m_uniform_projection),
@@ -127,6 +129,7 @@ namespace nomic {
 				m_uniform_ambient = other.m_uniform_ambient;
 				m_uniform_ambient_position = other.m_uniform_ambient_position;
 				m_uniform_cycle = other.m_uniform_cycle;
+				m_uniform_depth_matrix = other.m_uniform_depth_matrix;
 				m_uniform_model = other.m_uniform_model;
 				m_uniform_position = other.m_uniform_position;
 				m_uniform_projection = other.m_uniform_projection;
@@ -300,6 +303,18 @@ namespace nomic {
 		}
 
 		void 
+		renderer::set_cycle(
+			__in GLfloat cycle
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Cycle=%f", cycle);
+
+			nomic::graphic::program::set_uniform(m_uniform_cycle, cycle);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		renderer::set_depth(
 			__in bool depth,
 			__in_opt GLenum mode
@@ -314,13 +329,13 @@ namespace nomic {
 		}
 
 		void 
-		renderer::set_cycle(
-			__in GLfloat cycle
+		renderer::set_depth_matrix(
+			__in const glm::mat4 &depth_matrix
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Cycle=%f", cycle);
 
-			nomic::graphic::program::set_uniform(m_uniform_cycle, cycle);
+			nomic::graphic::program::set_uniform(m_uniform_depth_matrix, depth_matrix);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -425,6 +440,7 @@ namespace nomic {
 			m_uniform_ambient_background = nomic::graphic::program::uniform_location(UNIFORM_AMBIENT_BACKGROUND);
 			m_uniform_ambient_position = nomic::graphic::program::uniform_location(UNIFORM_AMBIENT_POSITION);
 			m_uniform_cycle = nomic::graphic::program::uniform_location(UNIFORM_CYCLE);
+			m_uniform_depth_matrix = nomic::graphic::program::uniform_location(UNIFORM_DEPTH_MATRIX);
 			m_uniform_model = nomic::graphic::program::uniform_location(UNIFORM_MODEL);
 			m_uniform_position = nomic::graphic::program::uniform_location(UNIFORM_POSITION);
 			m_uniform_projection = nomic::graphic::program::uniform_location(UNIFORM_PROJECTION);
@@ -457,10 +473,10 @@ namespace nomic {
 						<< "(" << ((m_mode == RENDER_PERSPECTIVE) ? "Perspective" : "Orthogonal") << ")"
 					<< ", Ambient=" << m_uniform_ambient << " (Background=" << m_uniform_ambient_background
 						<< ", Position=" << m_uniform_ambient_position << ")"
-					<< ", Cycle=" << m_uniform_cycle << ", Model=" << m_uniform_model
-					<< ", Position=" << m_uniform_position << ", Rotation=" << m_uniform_rotation
-					<< ", Projection=" << m_uniform_projection << ", Underwater=" << m_uniform_underwater
-					<< ", View=" << m_uniform_view;
+					<< ", Cycle=" << m_uniform_cycle << ", Depth Matrix=" << m_uniform_depth_matrix
+					<< ", Model=" << m_uniform_model << ", Position=" << m_uniform_position
+					<< ", Rotation=" << m_uniform_rotation << ", Projection=" << m_uniform_projection
+					<< ", Underwater=" << m_uniform_underwater << ", View=" << m_uniform_view;
 			}
 
 			return result.str();

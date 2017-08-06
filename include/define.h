@@ -54,14 +54,14 @@ namespace nomic {
 #endif // __inout_opt
 
 	#define ATLAS_DIMENSIONS_DEFAULT glm::uvec2(16, 16)
-	#define ATLAS_PATH_DEFAULT "./res/texture/block.bmp"
+	#define ATLAS_PATH_DEFAULT "./res/texture/default/block.bmp"
 	#define ATLAS_WIDTH_DEFAULT 16
 
 	#define AXIS_LINE_WIDTH 2.f
 
 	#define BACKDROP_HEIGHT_DEFAULT 10
 	#define BACKDROP_OFFSET_DEFAULT 12.f
-	#define BACKDROP_PATH_DEFAULT "./res/texture/load.bmp"
+	#define BACKDROP_PATH_DEFAULT "./res/texture/default/load.bmp"
 	#define BACKDROP_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
@@ -214,12 +214,12 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 6
+	#define NOMIC_VERSION_REVISION 7
 	#define NOMIC_VERSION_WEEK 1731
 
 	#define OBJECT_COUNT 1
 
-	#define PANEL_ATLAS_PATH_DEFAULT "./res/texture/panel.bmp"
+	#define PANEL_ATLAS_PATH_DEFAULT "./res/texture/default/panel.bmp"
 	#define PANEL_ATLAS_DIMENSIONS_DEFAULT glm::uvec2(64, 64)
 	#define PANEL_ATLAS_WIDTH_DEFAULT 6
 	#define PANEL_INDEX_DEFAULT 0
@@ -287,6 +287,9 @@ namespace nomic {
 
 	#define SESSION_DEBUG_DEFAULT true
 
+	#define SHADOWMAP_DEPTH_DEFAULT GL_DEPTH_COMPONENT16
+	#define SHADOWMAP_DIMENSIONS_DEFAULT glm::uvec2(1024, 1024)
+
 	#define SKYBOX_RADIUS 100.f
 
 	#define SPAWN_RADIUS 6
@@ -322,7 +325,7 @@ namespace nomic {
 	#define SUN_DELTA_DEFAULT SUN_DELTA_MIN
 	#define SUN_DELTA_MIN 0.f
 	#define SUN_DELTA_MAX 1.f
-	#define SUN_PATH_DEFAULT "./res/texture/sun.bmp"
+	#define SUN_PATH_DEFAULT "./res/texture/default/sun.bmp"
 	#define SUN_RADIUS_DEFAULT (VIEW_RADIUS_RUNTIME * CHUNK_WIDTH) + (16 * CHUNK_WIDTH)
 	#define SUN_RISE 0.2f
 	#define SUN_SCALE_DEFAULT 240.f
@@ -385,6 +388,7 @@ namespace nomic {
 	#define UNIFORM_AMBIENT_POSITION "ambient_position"
 	#define UNIFORM_COLOR "color"
 	#define UNIFORM_CYCLE "cycle"
+	#define UNIFORM_DEPTH_MATRIX "depth_matrix"
 	#define UNIFORM_MODEL "model"
 	#define UNIFORM_POSITION "position"
 	#define UNIFORM_PROJECTION "projection"
@@ -395,7 +399,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 38
+	#define VIEW_WIDTH 20 //38
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -448,10 +452,11 @@ namespace nomic {
 		BLOCK_ATTRIBUTE_STATIC = 1,
 		BLOCK_ATTRIBUTE_BREAKABLE = 2,
 		BLOCK_ATTRIBUTE_HIDDEN = 4,
-		BLOCK_ATTRIBUTE_ROTATED_RIGHT = 8,
-		BLOCK_ATTRIBUTE_ROTATED_LEFT = 16,
-		BLOCK_ATTRIBUTE_ROTATED_BACK = 32,
-		BLOCK_ATTRIBUTE_ROTATED_FRONT = 64,
+		BLOCK_ATTRIBUTE_ROTATABLE = 8,
+		BLOCK_ATTRIBUTE_ROTATED_RIGHT = 16,
+		BLOCK_ATTRIBUTE_ROTATED_LEFT = 32,
+		BLOCK_ATTRIBUTE_ROTATED_BACK = 64,
+		BLOCK_ATTRIBUTE_ROTATED_FRONT = 128,
 	};
 
 	enum {
@@ -488,6 +493,7 @@ namespace nomic {
 		ENTITY_CAMERA = 0,
 		ENTITY_SKYBOX,
 		ENTITY_SUN,
+		ENTITY_SHADOWMAP,
 		ENTITY_STRING,
 		ENTITY_PLAIN,
 		ENTITY_BLOCK,
@@ -526,6 +532,7 @@ namespace nomic {
 	enum {
 		PRIMITIVE_CHARACTER = 0,
 		PRIMITIVE_CUBEMAP,
+		PRIMITIVE_FBO,
 		PRIMITIVE_PROGRAM,
 		PRIMITIVE_SHADER,
 		PRIMITIVE_TEXTURE,

@@ -174,8 +174,6 @@ namespace nomic {
 			__in void *camera
 			)
 		{
-			bool shown = true;
-
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
 			if(m_cycle && runtime && camera) {
@@ -190,41 +188,35 @@ namespace nomic {
 				m_position.y += (m_radius * glm::cos(glm::radians(angle)));
 				m_position.z -= (m_radius * glm::sin(glm::radians(angle)));
 
-				shown = !((nomic::runtime *) runtime)->session().underwater();
-				if(shown) {
-
-					if(delta <= SUN_RISE) {
-						m_color = SUN_COLOR_RISE;
-						m_color.y += ((SUN_COLOR_APOGEE.y - SUN_COLOR_RISE.y) * (delta / SUN_RISE));
-						m_color.z += ((SUN_COLOR_APOGEE.z - SUN_COLOR_RISE.z) * (delta / SUN_RISE));
-						m_color_background = m_color;
-					} else if((delta > SUN_RISE) && (delta <= SUN_SET)) {
-						m_color = SUN_COLOR_APOGEE;
-						m_color_background = m_color;
-					} else {
-						m_color = SUN_COLOR_APOGEE;
-						m_color_background = m_color;
-						m_color.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET.y) * ((delta - SUN_SET) / (1.f - SUN_SET)));
-						m_color.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET.z) * ((delta - SUN_SET) / (1.f - SUN_SET)));
-						m_color_background.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET_SKY.y)
-							* ((delta - SUN_SET) / (1.f - SUN_SET)));
-						m_color_background.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET_SKY.z)
-							* ((delta - SUN_SET) / (1.f - SUN_SET)));
-					}
-
-					for(uint32_t iter = 0; iter < SUN_SEGMENT_COUNT; ++iter) {
-						color.push_back(m_color);
-					}
-
-					nomic::graphic::vao &arr = vertex_array();
-					arr.bind();
-					arr.set_subdata(SUN_INDEX_COLOR, 0, SUN_SEGMENT_COUNT * SUN_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
-						&color[0]);
-					arr.enable(SUN_INDEX_COLOR);
+				if(delta <= SUN_RISE) {
+					m_color = SUN_COLOR_RISE;
+					m_color.y += ((SUN_COLOR_APOGEE.y - SUN_COLOR_RISE.y) * (delta / SUN_RISE));
+					m_color.z += ((SUN_COLOR_APOGEE.z - SUN_COLOR_RISE.z) * (delta / SUN_RISE));
+					m_color_background = m_color;
+				} else if((delta > SUN_RISE) && (delta <= SUN_SET)) {
+					m_color = SUN_COLOR_APOGEE;
+					m_color_background = m_color;
+				} else {
+					m_color = SUN_COLOR_APOGEE;
+					m_color_background = m_color;
+					m_color.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET.y) * ((delta - SUN_SET) / (1.f - SUN_SET)));
+					m_color.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET.z) * ((delta - SUN_SET) / (1.f - SUN_SET)));
+					m_color_background.y -= ((SUN_COLOR_APOGEE.y - SUN_COLOR_SET_SKY.y)
+						* ((delta - SUN_SET) / (1.f - SUN_SET)));
+					m_color_background.z -= ((SUN_COLOR_APOGEE.z - SUN_COLOR_SET_SKY.z)
+						* ((delta - SUN_SET) / (1.f - SUN_SET)));
 				}
-			}
 
-			show(shown);
+				for(uint32_t iter = 0; iter < SUN_SEGMENT_COUNT; ++iter) {
+					color.push_back(m_color);
+				}
+
+				nomic::graphic::vao &arr = vertex_array();
+				arr.bind();
+				arr.set_subdata(SUN_INDEX_COLOR, 0, SUN_SEGMENT_COUNT * SUN_SEGMENT_WIDTH_COLOR * sizeof(GLfloat),
+					&color[0]);
+				arr.enable(SUN_INDEX_COLOR);
+			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

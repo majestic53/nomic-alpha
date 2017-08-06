@@ -127,7 +127,7 @@ namespace nomic {
 				std::map<uint8_t, chunk_data>::iterator add_face_type(
 					__in uint8_t type,
 					__in uint32_t face,
-					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT
+					__inout uint8_t &attributes
 					);
 
 				uint8_t determine_face_type(

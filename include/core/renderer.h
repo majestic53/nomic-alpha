@@ -91,6 +91,10 @@ namespace nomic {
 					__in_opt GLenum mode = RENDERER_DEPTH_MODE_DEFAULT
 					);
 
+				void set_depth_matrix(
+					__in const glm::mat4 &depth_matrix
+					);
+
 				void set_mode(
 					__in uint32_t mode
 					);
@@ -201,6 +205,8 @@ namespace nomic {
 				GLint m_uniform_ambient_position;
 
 				GLint m_uniform_cycle;
+
+				GLint m_uniform_depth_matrix;
 
 				GLint m_uniform_model;
 

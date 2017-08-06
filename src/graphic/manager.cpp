@@ -118,6 +118,9 @@ namespace nomic {
 				case PRIMITIVE_TEXTURE:
 					GL_CHECK(LEVEL_WARNING, glDeleteTextures, HANDLE_COUNT, &iter->first);
 					break;
+				case PRIMITIVE_FBO:
+					GL_CHECK(LEVEL_WARNING, glDeleteFramebuffers, HANDLE_COUNT, &iter->first);
+					break;
 				case PRIMITIVE_PROGRAM:
 					GL_CHECK(LEVEL_WARNING, glDeleteProgram, iter->first);
 					break;
@@ -183,6 +186,9 @@ namespace nomic {
 				case PRIMITIVE_CUBEMAP:
 				case PRIMITIVE_TEXTURE:
 					GL_CHECK(LEVEL_WARNING, glGenTextures, HANDLE_COUNT, &result);
+					break;
+				case PRIMITIVE_FBO:
+					GL_CHECK(LEVEL_WARNING, glGenFramebuffers, HANDLE_COUNT, &result);
 					break;
 				case PRIMITIVE_PROGRAM:
 					GL_CHECK_RESULT(LEVEL_WARNING, glCreateProgram, result);

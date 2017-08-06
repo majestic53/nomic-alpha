@@ -69,6 +69,34 @@ namespace nomic {
 		}
 
 		texture::texture(
+			__in GLenum target,
+			__in GLint level,
+			__in GLint internal,
+			__in GLsizei width,
+			__in GLsizei height,
+			__in GLint border,
+			__in GLenum format,
+			__in GLenum type,
+			__in const GLvoid *data,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag
+			) :
+				nomic::core::primitive(PRIMITIVE_TEXTURE),
+				m_depth(0),
+				m_mode(0)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
+			"Target=%x, Level=%i, Internal=%i, Dimensions={%i, %i}, Border=%i, Format=%x, Type=%x, Data=%p, Wrap={%x, %x}, Filter={%x, %x}",
+				target, level, internal, width, height, border, format, type, data, wrap_s, wrap_t, filter_min, filter_mag);
+
+			set(target, level, internal, width, height, border, format, type, data, wrap_s, wrap_t, filter_min, filter_mag);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		texture::texture(
 			__in const texture &other
 			) :
 				nomic::core::primitive(other),
@@ -256,6 +284,40 @@ namespace nomic {
 			GL_CHECK(LEVEL_WARNING, glTexImage2D, GL_TEXTURE_2D, 0, m_mode, m_dimensions.x, m_dimensions.y, 0, m_mode, format,
 				&data[0]);
 			GL_CHECK(LEVEL_WARNING, glGenerateMipmap, GL_TEXTURE_2D);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		texture::set(
+			__in GLenum target,
+			__in GLint level,
+			__in GLint internal,
+			__in GLsizei width,
+			__in GLsizei height,
+			__in GLint border,
+			__in GLenum format,
+			__in GLenum type,
+			__in const GLvoid *data,
+			__in_opt GLenum wrap_s,
+			__in_opt GLenum wrap_t,
+			__in_opt GLenum filter_min,
+			__in_opt GLenum filter_mag
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
+			"Target=%x, Level=%i, Internal=%i, Dimensions={%i, %i}, Border=%i, Format=%x, Type=%x, Data=%p, Wrap={%x, %x}, Filter={%x, %x}",
+				target, level, internal, width, height, border, format, type, data, wrap_s, wrap_t, filter_min, filter_mag);
+
+			m_depth = internal;
+			m_dimensions = glm::uvec2(width, height);
+			m_mode = format;
+			GL_CHECK(LEVEL_WARNING, glBindTexture, target, m_handle);
+			GL_CHECK(LEVEL_WARNING, glTexImage2D, target, level, internal, width, height, border, format, type, data);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_min);
+			GL_CHECK(LEVEL_WARNING, glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mag);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
