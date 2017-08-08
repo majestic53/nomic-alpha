@@ -333,7 +333,7 @@ namespace nomic {
 			__in const glm::mat4 &depth_matrix
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Cycle=%f", cycle);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Matrix=%p", &depth_matrix);
 
 			nomic::graphic::program::set_uniform(m_uniform_depth_matrix, depth_matrix);
 

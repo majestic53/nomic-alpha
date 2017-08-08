@@ -214,8 +214,8 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 7
-	#define NOMIC_VERSION_WEEK 1731
+	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_WEEK 1732
 
 	#define OBJECT_COUNT 1
 
@@ -544,6 +544,7 @@ namespace nomic {
 		RENDERER_BACKGROUND_SKYBOX = 0,
 		RENDERER_BACKGROUND_SUN,
 		RENDERER_CHUNK,
+		RENDERER_CHUNK_SHADOWMAP,
 		RENDERER_DEBUG_AXIS,
 		RENDERER_DEBUG_BLOCK,
 		RENDERER_DEBUG_DIAGNOSTIC,
@@ -558,8 +559,9 @@ namespace nomic {
 	#define RENDERER_MAX RENDERER_SPAWN_MESSAGE
 
 	static const std::string RENDERER_STR[] = {
-		"Background-Skybox", "Background-Sun", "Chunk", "Debug-Axis", "Debug-Block", "Debug-Diagnostic", "Foreground-Reticle",
-		"Foreground-Selector", "Foreground-Panel", "Spawn-Backdrop", "Spawn-Diagnostic", "Spawn-Message",
+		"Background-Skybox", "Background-Sun", "Chunk", "Chunk-Shadowmap", "Debug-Axis", "Debug-Block", "Debug-Diagnostic",
+		"Foreground-Reticle", "Foreground-Selector", "Foreground-Panel", "Spawn-Backdrop", "Spawn-Diagnostic",
+		"Spawn-Message",
 	};
 
 	#define RENDERER_STRING(_TYPE_) \

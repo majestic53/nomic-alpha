@@ -87,6 +87,8 @@ namespace nomic {
 					__in const glm::uvec3 &block
 					);
 
+				float pitch(void);
+
 				void set_dimensions(
 					__in const glm::uvec2 &dimensions
 					);
@@ -99,15 +101,17 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
+				void update(void);
+
+				glm::mat4 &view(void);
+
 				void wheel(
 					__in uint32_t direction,
 					__in int32_t x,
 					__in int32_t y
 					);
 
-				void update(void);
-
-				glm::mat4 &view(void);
+				float yaw(void);
 
 			protected:
 

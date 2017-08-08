@@ -17,6 +17,7 @@
  */
 
 #include "../../include/entity/shadowmap.h"
+#include "../../include/runtime.h"
 #include "../../include/trace.h"
 #include "./shadowmap_type.h"
 
@@ -80,8 +81,6 @@ namespace nomic {
 			return m_fbo;
 		}
 
-		// TODO: add vertex/fragment shader
-
 		void 
 		shadowmap::on_render(
 			__in nomic::core::renderer &renderer,
@@ -91,6 +90,8 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Renderer=%p, Textures=%p, Delta=%f", &renderer, textures, delta);
 
+			m_fbo.bind();
+			GL_CHECK(LEVEL_WARNING, glClear, GL_DEPTH_BUFFER_BIT);
 			renderer.set_depth_matrix(m_depth);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -104,7 +105,11 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
-			// TODO: update depth matrix with sun position
+			m_projection = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, -10.f, 20.f);
+			m_view = glm::lookAt(((nomic::runtime *) runtime)->session().ambient_position(), TRANSFORM_ROTATION_DEFAULT,
+				TRANSFORM_UP_DEFAULT);
+			m_model = UNIFORM_MATRIX_DEFAULT;
+			m_depth = (m_projection * m_view * m_model);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

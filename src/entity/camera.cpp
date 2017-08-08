@@ -253,6 +253,19 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		float 
+		camera::pitch(void)
+		{
+			float result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = m_rotation_previous.x;
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%f", result);
+			return result;
+		}
+
 		void 
 		camera::set_dimensions(
 			__in const glm::uvec2 &dimensions
@@ -450,6 +463,19 @@ namespace nomic {
 			m_wheel += y;
 
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		float 
+		camera::yaw(void)
+		{
+			float result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			result = m_rotation_previous.y;
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%f", result);
+			return result;
 		}
 	}
 }

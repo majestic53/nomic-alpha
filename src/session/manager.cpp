@@ -206,6 +206,26 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		glm::vec3 
+		manager::ambient_position(void)
+		{
+			glm::vec3 result;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			nomic::entity::sun *sun = (nomic::entity::sun *) m_entity_object_background.at(ENTITY_OBJECT_BACKGROUND_SUN);
+			if(sun) {
+				result = sun->position();
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result={%f, %f, %f}", result.x, result.y, result.z);
+			return result;
+		}
+
 		bool 
 		manager::block_selected(void)
 		{
@@ -1275,11 +1295,64 @@ namespace nomic {
 
 			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
 			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
+				uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE), type = BLOCK_AIR;
+
 				TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Removing block. Chunk={%i, %i}, Block={%u, %u, %u}",
 					m_block_selected_chunk.x, m_block_selected_chunk.y, m_block_selected_block.x,
 					m_block_selected_block.y, m_block_selected_block.z);
 
-				chunk->remove_block(m_block_selected_block);
+				if(((m_block_selected_block.y + 1) < CHUNK_HEIGHT)
+						&& (chunk->block_type(m_block_selected_block + glm::uvec3(0, 1, 0)) == BLOCK_WATER)) { // top
+					attributes |= BLOCK_ATTRIBUTE_HIDDEN;
+					type = BLOCK_WATER;
+				} else {
+
+					if(((m_block_selected_block.x + 1) < CHUNK_WIDTH)
+						&& (chunk->block_type(m_block_selected_block + glm::uvec3(1, 0, 0)) == BLOCK_WATER)) { // right
+						type = BLOCK_WATER;
+					} else if((m_block_selected_block.x == CHUNK_WIDTH)
+							&& m_manager_terrain.contains(m_block_selected_chunk + glm::ivec2(1, 0))
+							&& (m_manager_terrain.at(m_block_selected_chunk + glm::ivec2(1, 0))->block_type(
+								glm::uvec3(0, m_block_selected_block.y, m_block_selected_block.z))
+							== BLOCK_WATER)) { // right (boundary)
+						type = BLOCK_WATER;
+					} else if(m_block_selected_block.x
+							&& (chunk->block_type(m_block_selected_block - glm::uvec3(1, 0, 0)) == BLOCK_WATER)) { // left
+						type = BLOCK_WATER;
+					} else if(!m_block_selected_block.x
+							&& m_manager_terrain.contains(m_block_selected_chunk - glm::ivec2(1, 0))
+							&& (m_manager_terrain.at(m_block_selected_chunk - glm::ivec2(1, 0))->block_type(
+								glm::uvec3(CHUNK_WIDTH - 1, m_block_selected_block.y, m_block_selected_block.z))
+							== BLOCK_WATER)) { // left (boundary)
+						type = BLOCK_WATER;
+					} else if(((m_block_selected_block.z + 1) < CHUNK_WIDTH)
+							&& (chunk->block_type(m_block_selected_block + glm::uvec3(0, 0, 1)) == BLOCK_WATER)) { // back
+						type = BLOCK_WATER;
+					} else if((m_block_selected_block.z == CHUNK_WIDTH)
+							&& m_manager_terrain.contains(m_block_selected_chunk + glm::ivec2(0, 1))
+							&& (m_manager_terrain.at(m_block_selected_chunk + glm::ivec2(0, 1))->block_type(
+								glm::uvec3(m_block_selected_block.x, m_block_selected_block.y, 0))
+							== BLOCK_WATER)) { // back (boundary)
+						type = BLOCK_WATER;
+					} else if(m_block_selected_block.z
+							&& (chunk->block_type(m_block_selected_block - glm::uvec3(0, 0, 1)) == BLOCK_WATER)) { // front
+						type = BLOCK_WATER;
+					} else if(!m_block_selected_block.z
+							&& m_manager_terrain.contains(m_block_selected_chunk - glm::ivec2(0, 1))
+							&& (m_manager_terrain.at(m_block_selected_chunk - glm::ivec2(0, 1))->block_type(
+								glm::uvec3(m_block_selected_block.x, m_block_selected_block.y, CHUNK_WIDTH - 1))
+							== BLOCK_WATER)) { // front (boundary)
+						type = BLOCK_WATER;
+					}
+
+					if((type == BLOCK_WATER)
+							&& ((m_block_selected_block.y + 1) < CHUNK_HEIGHT)
+							&& (chunk->block_type(m_block_selected_block + glm::uvec3(0, 1, 0)) != BLOCK_AIR)) { // top
+						attributes |= BLOCK_ATTRIBUTE_HIDDEN;
+					}
+				}
+
+				chunk->set_block(m_block_selected_block, type, attributes);
 				m_block_selected = false;
 				m_block_selected_face = BLOCK_FACE_UNDEFINED;
 

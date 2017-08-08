@@ -130,6 +130,7 @@ namespace nomic {
 
 			nomic::graphic::texture *texture_ref = m_texture.at(type);
 			if(texture_ref) {
+				GL_CHECK(LEVEL_WARNING, glActiveTexture, GL_TEXTURE0);
 				texture_ref->bind();
 			}
 

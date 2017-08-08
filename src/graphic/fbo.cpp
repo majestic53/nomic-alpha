@@ -97,6 +97,7 @@ namespace nomic {
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			GL_CHECK(LEVEL_WARNING, glBindFramebuffer, GL_FRAMEBUFFER, m_handle);
+			GL_CHECK(LEVEL_WARNING, glActiveTexture, GL_TEXTURE1);
 			m_texture.bind();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -131,6 +132,7 @@ namespace nomic {
 			m_texture.set(target, level, internal, width, height, border, format, type, data, wrap_s, wrap_t, filter_min, filter_mag);
 			GL_CHECK(LEVEL_WARNING, glFramebufferTexture, GL_FRAMEBUFFER, attachment, m_texture.handle(), 0);
 			GL_CHECK(LEVEL_WARNING, glDrawBuffer, GL_NONE);
+			GL_CHECK(LEVEL_WARNING, glReadBuffer, GL_NONE);
 
 			GL_CHECK_RESULT(LEVEL_WARNING, glCheckFramebufferStatus, result, GL_FRAMEBUFFER);
 			if(result != GL_FRAMEBUFFER_COMPLETE) {

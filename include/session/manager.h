@@ -44,6 +44,8 @@ namespace nomic {
 
 				~manager(void);
 
+				glm::vec3 ambient_position(void);
+
 				bool block_selected(void);
 
 				nomic::entity::camera *camera(void);

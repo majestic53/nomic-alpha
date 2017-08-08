@@ -625,6 +625,8 @@ namespace nomic {
 			__in void *camera
 			)
 		{
+			bool shown = true;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
 
 			nomic::terrain::chunk::update();
@@ -675,14 +677,11 @@ namespace nomic {
 			glm::vec3 camera_position = ((nomic::entity::camera *) camera)->position();
 			glm::ivec2 camera_position_chunk = glm::ivec2(camera_position.x / CHUNK_WIDTH, camera_position.z / CHUNK_WIDTH);
 			glm::ivec2 position_chunk = nomic::entity::chunk::position();
-			int32_t dx = ((position_chunk.x > camera_position_chunk.x) ? (position_chunk.x - camera_position_chunk.x) :
-				(camera_position_chunk.x - position_chunk.x));
-			int32_t dz = ((position_chunk.y > camera_position_chunk.y) ? (position_chunk.y - camera_position_chunk.y) :
-				(camera_position_chunk.y - position_chunk.y));
-			show((std::abs(dx * dx) + std::abs(dz * dz)) <= (VIEW_RADIUS_RUNTIME * VIEW_RADIUS_RUNTIME));
-#else
-			show(true);
+			int32_t dx = (position_chunk.x - camera_position_chunk.x), dz = (position_chunk.y - camera_position_chunk.y);
+			shown = ((std::abs(dx * dx) + std::abs(dz * dz)) <= (VIEW_RADIUS_RUNTIME * VIEW_RADIUS_RUNTIME));
 #endif // VIEW_SELECTIVE_SHOW
+
+			show(shown);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -737,7 +736,7 @@ namespace nomic {
 							std::map<uint8_t, chunk_data>::iterator face_iter;
 							position.y = 0;
 
-							if(type != BLOCK_WATER) {
+							if(type != BLOCK_WATER) { // non-water
 
 								if(right) {
 
@@ -828,6 +827,91 @@ namespace nomic {
 										}
 									}
 								}
+							} else { // water
+
+								if(right) {
+
+									if((x + 1) < CHUNK_WIDTH) { // right
+
+										if(nomic::terrain::chunk::type(glm::uvec3(x + 1, y, z)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_RIGHT, attributes);
+											add_face(position + position_relative, BLOCK_FACE_RIGHT,
+												attributes, face_iter);
+											++count;
+										}
+									} else if((x + 1) == CHUNK_WIDTH) { // right (boundary)
+
+										if(right->block_type(glm::uvec3(0, y, z)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_RIGHT, attributes);
+											add_face(position + position_relative, BLOCK_FACE_RIGHT,
+												attributes, face_iter);
+											++count;
+										}
+									}
+								}
+
+								if(left) {
+
+									if((x - 1) >= 0) { // left
+
+										if(nomic::terrain::chunk::type(glm::uvec3(x - 1, y, z)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_LEFT, attributes);
+											add_face(position + position_relative, BLOCK_FACE_LEFT,
+												attributes, face_iter);
+											++count;
+										}
+									} else if((x - 1) < 0) { // left (boundary)
+
+										if(left->block_type(glm::uvec3(CHUNK_WIDTH - 1, y, z)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_LEFT, attributes);
+											add_face(position + position_relative, BLOCK_FACE_LEFT,
+												attributes, face_iter);
+											++count;
+										}
+									}
+								}
+
+								if(back) {
+
+									if((z + 1) < CHUNK_WIDTH) { // back
+
+										if(nomic::terrain::chunk::type(glm::uvec3(x, y, z + 1)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_BACK, attributes);
+											add_face(position + position_relative, BLOCK_FACE_BACK,
+												attributes, face_iter);
+											++count;
+										}
+									} else if((z + 1) == CHUNK_WIDTH) { // back (boundary)
+
+										if(back->block_type(glm::uvec3(x, y, 0)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_BACK, attributes);
+											add_face(position + position_relative, BLOCK_FACE_BACK,
+												attributes, face_iter);
+											++count;
+										}
+									}
+								}
+
+								if(front) {
+
+									if((z - 1) >= 0) { // front
+
+										if(nomic::terrain::chunk::type(glm::uvec3(x, y, z - 1)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_FRONT, attributes);
+											add_face(position + position_relative, BLOCK_FACE_FRONT,
+												attributes, face_iter);
+											++count;
+										}
+									} else if((z - 1) < 0) { // front (boundary)
+
+										if(front->block_type(glm::uvec3(x, y, CHUNK_WIDTH - 1)) == BLOCK_AIR) {
+											face_iter = add_face_type(type, BLOCK_FACE_FRONT, attributes);
+											add_face(position + position_relative, BLOCK_FACE_FRONT,
+												attributes, face_iter);
+											++count;
+										}
+									}
+								}
 							}
 
 							if((y - 1) >= 0) { // bottom
@@ -859,21 +943,6 @@ namespace nomic {
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		uint8_t 
-		chunk::remove_block(
-			__in const glm::uvec3 &position
-			)
-		{
-			uint8_t result;
-
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}", position.x, position.y, position.z);
-
-			result = set_block(position, BLOCK_AIR, BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE);
-
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x(%u)", (uint16_t) result, (uint16_t) result);
-			return result;
 		}
 
 		uint8_t 
