@@ -243,8 +243,26 @@ namespace nomic {
 		manager::camera(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", m_camera);
 			return m_camera;
+		}
+
+		bool 
+		manager::debug(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			if(!m_initialized) {
+				THROW_NOMIC_SESSION_MANAGER_EXCEPTION(NOMIC_SESSION_MANAGER_EXCEPTION_UNINITIALIZED);
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_debug);
+			return m_debug;
 		}
 
 		void 
@@ -1177,9 +1195,10 @@ namespace nomic {
 				block.x, block.y, block.z, face, BLOCK_FACE_STRING(face));
 		}
 
-		void 
+		bool 
 		manager::selected_block_add(void)
 		{
+			bool result = false;
 			uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -1272,20 +1291,33 @@ namespace nomic {
 						break;
 				}
 
-				if(place) {
-					uint8_t type = ((nomic::entity::panel *) m_entity_object_foreground.at(
-						ENTITY_OBJECT_FOREGROUND_PANEL))->selected();
+				result = (place && m_camera);
+				if(result) {
 
-					TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Adding block. Type=%x Chunk={%i, %i}, Block={%u, %u, %u}",
-						type, chunk.x, chunk.y, block.x, block.y, block.z);
+					for(uint32_t iter = 0; iter < CAMERA_HEIGHT_OFFSET; ++iter) {
 
-					m_manager_terrain.at(chunk)->set_block(block, type, attribute);
-					m_block_selected = false;
-					m_block_selected_face = BLOCK_FACE_UNDEFINED;
+						result = (block != (m_camera->block() - glm::uvec3(0, iter, 0)));
+						if(!result) {
+							break;
+						}
+					}
+
+					if(result) {
+						uint8_t type = ((nomic::entity::panel *) m_entity_object_foreground.at(
+							ENTITY_OBJECT_FOREGROUND_PANEL))->selected();
+
+						TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Adding block. Type=%x Chunk={%i, %i}, Block={%u, %u, %u}",
+							type, chunk.x, chunk.y, block.x, block.y, block.z);
+
+						m_manager_terrain.at(chunk)->set_block(block, type, attribute);
+						m_block_selected = false;
+						m_block_selected_face = BLOCK_FACE_UNDEFINED;
+					}
 				}
 			}
 
-			TRACE_EXIT(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 
 		void 
@@ -1712,33 +1744,10 @@ namespace nomic {
 				nomic::core::thread::notify();
 			}
 
-			update_position();
 			update_underwater();
 			update_selector();
 			nomic::event::input::poll_input();
 			m_manager_entity.update(m_runtime, m_camera);
-
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
-		void 
-		manager::update_position(void)
-		{
-			uint8_t type;
-			glm::uvec3 block;
-			glm::ivec2 chunk;
-
-			TRACE_ENTRY(LEVEL_VERBOSE);
-
-			block = m_camera->block();
-			chunk = m_camera->chunk();
-
-			type = m_manager_terrain.at(chunk)->block_type(block);
-			if((type != BLOCK_AIR) && (type != BLOCK_WATER)) {
-
-				// TODO: move camera out of block
-
-			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

@@ -50,6 +50,8 @@ namespace nomic {
 
 				nomic::entity::camera *camera(void);
 
+				bool debug(void);
+
 				void pause(void);
 
 				void render(
@@ -179,13 +181,11 @@ namespace nomic {
 
 				void panel_move_right(void);
 
-				void selected_block_add(void);
+				bool selected_block_add(void);
 
 				void selected_block_remove(void);
 
 				void uninitialize_entities(void);
-
-				void update_position(void);
 
 				void update_selector(void);
 

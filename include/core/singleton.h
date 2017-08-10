@@ -80,8 +80,6 @@ namespace nomic {
 				{
 					size_t result = 0;
 
-					std::lock_guard<std::mutex> lock(m_mutex_singleton);
-
 					if(m_references > 0) {
 
 						result = --m_references;

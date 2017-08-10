@@ -34,8 +34,12 @@ namespace nomic {
 			) :
 				nomic::entity::object(ENTITY_CAMERA, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_dimensions(dimensions),
+				m_falling(false),
 				m_fov(fov),
+				m_jump_timeout(CAMERA_JUMP_TIMEOUT),
 				m_rotation_previous(rotation.x, rotation.y),
+				m_sprint(false),
+				m_velocity(0.f, 0.f, 0.f),
 				m_wheel(0)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimensions={%u, %u}, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}, fov=%f",
@@ -52,7 +56,9 @@ namespace nomic {
 			) :
 				nomic::entity::object(other),
 				m_dimensions(other.m_dimensions),
+				m_falling(other.m_falling),
 				m_fov(other.m_fov),
+				m_jump_timeout(other.m_jump_timeout),
 				m_key(other.m_key),
 				m_motion(other.m_motion),
 				m_position_block(other.m_position_block),
@@ -60,6 +66,8 @@ namespace nomic {
 				m_position_chunk(other.m_position_chunk),
 				m_position_chunk_previous(other.m_position_chunk_previous),
 				m_rotation_previous(other.m_rotation_previous),
+				m_sprint(other.m_sprint),
+				m_velocity(other.m_velocity),
 				m_wheel(other.m_wheel)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Dimensions={%u, %u}, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}, fov=%f",
@@ -88,7 +96,9 @@ namespace nomic {
 			if(this != &other) {
 				nomic::entity::object::operator=(other);
 				m_dimensions = other.m_dimensions;
+				m_falling = other.m_falling;
 				m_fov = other.m_fov;
+				m_jump_timeout = other.m_jump_timeout;
 				m_key = other.m_key;
 				m_motion = other.m_motion;
 				m_position_block = other.m_position_block;
@@ -96,6 +106,8 @@ namespace nomic {
 				m_position_chunk = other.m_position_chunk;
 				m_position_chunk_previous = other.m_position_chunk_previous;
 				m_rotation_previous = other.m_rotation_previous;
+				m_sprint = other.m_sprint;
+				m_velocity = other.m_velocity;
 				m_wheel = other.m_wheel;
 			}
 
@@ -306,6 +318,8 @@ namespace nomic {
 			if(verbose) {
 				result << " Base=" << nomic::entity::object::to_string(verbose)
 					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
+					<< ", Velocity={" << m_velocity.x << ", " << m_velocity.y << ", " << m_velocity.z << "}"
+					<< ", State=" << (m_falling ? "Falling" : "Not-Falling") << ", " << (m_sprint ? "Sprinting" : "Walking")
 					<< ", FOV=" << m_fov;
 			}
 
@@ -316,105 +330,200 @@ namespace nomic {
 		void 
 		camera::update(void)
 		{
-			float sensitivity = CAMERA_SENSITIVITY, speed = CAMERA_SPEED, strafe = CAMERA_STRAFE;
+			bool debug, underwater;
+			glm::uvec3 position_block;
+			glm::ivec2 position_chunk;
+			glm::vec3 position, position_relative = glm::vec3(0.f);
+			float sensitivity = CAMERA_SENSITIVITY, speed, strafe;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
-			for(std::map<std::pair<uint16_t, uint16_t>, bool>::iterator iter = m_key.begin(); iter != m_key.end(); ++iter) {
+			nomic::session::manager &instance = nomic::session::manager::acquire();
+			if(instance.initialized()) {
+				debug = instance.debug();
+				underwater = instance.underwater();
 
-				if(!iter->second) {
-					continue;
-				}
+				speed = (debug ? CAMERA_SPEED_DEBUG : (!underwater ? (!m_sprint ? CAMERA_SPEED_NORMAL : CAMERA_SPEED_NORMAL_SPRINT)
+					: CAMERA_SPEED_UNDERWATER));
+				strafe = (debug ? CAMERA_STRAFE_DEBUG : (!underwater ? (!m_sprint ? CAMERA_STRAFE_NORMAL : CAMERA_STRAFE_NORMAL_SPRINT)
+					: CAMERA_STRAFE_UNDERWATER));
 
-				switch(iter->first.first) {
-					case KEY_BACKWARD: // backward
-						m_position -= (m_rotation * speed);
-						break;
-					case KEY_DEBUG: { // enable/disable debug mode
+				for(std::map<std::pair<uint16_t, uint16_t>, bool>::iterator iter = m_key.begin(); iter != m_key.end(); ++iter) {
 
-							nomic::session::manager &instance = nomic::session::manager::acquire();
-							if(instance.initialized()) {
+					if(iter->second) {
+
+						switch(iter->first.first) {
+							case KEY_BACKWARD: // backward
+								position_relative -= (m_rotation * speed);
+								break;
+							case KEY_DEBUG: // enable/disable debug mode
 								instance.toggle_debug();
-							}
+								iter->second = false;
+								break;
+							case KEY_DESCEND: // down
 
-							instance.release();
-							iter->second = false;
-						} break;
-					case KEY_DESCEND: // up
-						m_position.y -= speed;
-						break;
-					case KEY_ELEVATE: // down
-						m_position.y += speed;
-						break;
-					case KEY_FORWARD: // forward
-						m_position += (m_rotation * speed);
-						break;
-					case KEY_LEFT: // left
-					case KEY_LEFT_STRAFE:
-						m_position -= (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
-						break;
-					case KEY_RESET: { // reset camera to spawn
+								if(debug) {
+									position_relative.y -= speed;
+								}
+								break;
+							case KEY_ELEVATE: // up
 
-							nomic::session::manager &instance = nomic::session::manager::acquire();
-							if(instance.initialized()) {
-								position() = instance.spawn();
-							}
+								if(!debug) {
 
-							instance.release();
-							iter->second = false;
-						} break;
-					case KEY_RIGHT: // right
-					case KEY_RIGHT_STRAFE:
-						m_position += (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
-						break;
-					default:
-						break;
+									if(!underwater) {
+
+										if(!m_falling && (m_jump_timeout >= CAMERA_JUMP_TIMEOUT)
+												&& !m_velocity.y) {
+											m_falling = true;
+											m_jump_timeout = 0;
+											m_velocity.y = CAMERA_JUMP_MAX;
+										}
+									} else {
+										m_velocity.y = CAMERA_SWIM_MAX;
+									}
+								} else {
+									position_relative.y += speed;
+								}
+								break;
+							case KEY_FORWARD: // forward
+								position_relative += (m_rotation * speed);
+								break;
+							case KEY_LEFT: // left
+							case KEY_LEFT_STRAFE:
+								position_relative -= (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
+								break;
+							case KEY_RESET: // reset camera to spawn
+								position_relative = instance.spawn();
+								iter->second = false;
+								break;
+							case KEY_RIGHT: // right
+							case KEY_RIGHT_STRAFE:
+								position_relative += (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
+								break;
+							case KEY_SPRINT: // sprint (enable)
+
+								if(!debug) {
+									m_sprint = true;
+								}
+								break;
+							default:
+								break;
+						}
+					} else {
+
+						switch(iter->first.first) {
+							case KEY_SPRINT: // sprint (disable)
+
+								if(!debug) {
+									m_sprint = false;
+								}
+								break;
+							default:
+								break;
+						}
+					}
+				}
+
+				if(!debug) {
+					position_relative.y = 0.f;
+				}
+
+				position = (m_position + position_relative);
+				if(position.y < CAMERA_HEIGHT_OFFSET) {
+					position.y = CAMERA_HEIGHT_OFFSET;
+				} else if(position.y > CHUNK_HEIGHT) {
+					position.y = CHUNK_HEIGHT;
+				}
+
+				nomic::utility::position_as_block(position, position_chunk, position_block);
+
+				if(!debug) {
+					uint8_t type;
+					nomic::terrain::manager &terrain = instance.terrain();
+					float gravity = (!underwater ? CAMERA_GRAVITY_NORMAL : CAMERA_GRAVITY_UNDERWATER),
+						gravity_step = (!underwater ? CAMERA_GRAVITY_STEP_NORMAL : CAMERA_GRAVITY_STEP_UNDERWATER);
+
+					if(m_jump_timeout < CAMERA_JUMP_TIMEOUT) {
+						++m_jump_timeout;
+					}
+
+					if(underwater && (m_velocity.y < (CAMERA_GRAVITY_UNDERWATER + CAMERA_GRAVITY_STEP_UNDERWATER))) {
+						m_velocity.y = 0;
+					}
+
+					if(m_velocity.y > gravity) {
+						m_velocity.y += gravity_step;
+					}
+
+					type = terrain.at(position_chunk)->block_type(position_block);
+					if((type != BLOCK_AIR) && (type != BLOCK_WATER)) { // top
+
+						if(m_velocity.y > 0.f) {
+							m_velocity.y = 0.f;
+						}
+					}
+
+					type = terrain.at(position_chunk)->block_type(position_block + glm::uvec3(0.f, -CAMERA_HEIGHT_OFFSET, 0.f));
+					if((type != BLOCK_AIR) && (type != BLOCK_WATER)) { // bottom
+
+						if(m_velocity.y < 0.f) {
+							m_falling = false;
+							m_velocity.y = 0.f;
+						}
+					}
+
+					// TODO: collision detect block sides
+
+					position += m_velocity;
+					if(position.y < CAMERA_HEIGHT_OFFSET) {
+						position.y = CAMERA_HEIGHT_OFFSET;
+					} else if(position.y > CHUNK_HEIGHT) {
+						position.y = CHUNK_HEIGHT;
+					}
+				}
+
+				m_position = position;
+				m_position_block = position_block;
+				m_position_chunk = position_chunk;
+
+				if(m_motion != glm::vec2()) {
+
+					m_rotation_previous.x -= (m_motion.y * sensitivity);
+					if(m_rotation_previous.x < CAMERA_PITCH_MIN) {
+						m_rotation_previous.x = CAMERA_PITCH_MIN;
+					} else if(m_rotation_previous.x > CAMERA_PITCH_MAX) {
+						m_rotation_previous.x = CAMERA_PITCH_MAX;
+					}
+
+					m_rotation_previous.y -= (m_motion.x * sensitivity);
+					if(m_rotation_previous.y < CAMERA_YAW_MIN) {
+						m_rotation_previous.y = CAMERA_YAW_MAX;
+					} else if(m_rotation_previous.y > CAMERA_YAW_MAX) {
+						m_rotation_previous.y = CAMERA_YAW_MIN;
+					}
+
+					m_rotation = glm::normalize(glm::vec3(
+						std::cos(glm::radians(m_rotation_previous.x)) * std::sin(glm::radians(m_rotation_previous.y)),
+						std::sin(glm::radians(m_rotation_previous.x)),
+						std::cos(glm::radians(m_rotation_previous.x)) * std::cos(glm::radians(m_rotation_previous.y))));
+					m_motion = glm::vec2();
+				}
+
+				if(m_wheel) {
+
+					m_fov -= m_wheel;
+					if(m_fov < CAMERA_FOV_MIN) {
+						m_fov = CAMERA_FOV_MIN;
+					} else if(m_fov > CAMERA_FOV_MAX) {
+						m_fov = CAMERA_FOV_MAX;
+					}
+
+					update_perspective();
+					m_wheel = 0.f;
 				}
 			}
 
-			if(m_position.y < 0) {
-				m_position.y = 0;
-			} else if(m_position.y > CHUNK_HEIGHT) {
-				m_position.y = CHUNK_HEIGHT;
-			}
-
-			nomic::utility::position_as_block(m_position, m_position_chunk, m_position_block);
-
-			if(m_motion != glm::vec2()) {
-
-				m_rotation_previous.x -= (m_motion.y * sensitivity);
-				if(m_rotation_previous.x < CAMERA_PITCH_MIN) {
-					m_rotation_previous.x = CAMERA_PITCH_MIN;
-				} else if(m_rotation_previous.x > CAMERA_PITCH_MAX) {
-					m_rotation_previous.x = CAMERA_PITCH_MAX;
-				}
-
-				m_rotation_previous.y -= (m_motion.x * sensitivity);
-				if(m_rotation_previous.y < CAMERA_YAW_MIN) {
-					m_rotation_previous.y = CAMERA_YAW_MAX;
-				} else if(m_rotation_previous.y > CAMERA_YAW_MAX) {
-					m_rotation_previous.y = CAMERA_YAW_MIN;
-				}
-
-				m_rotation = glm::normalize(glm::vec3(
-					std::cos(glm::radians(m_rotation_previous.x)) * std::sin(glm::radians(m_rotation_previous.y)),
-					std::sin(glm::radians(m_rotation_previous.x)),
-					std::cos(glm::radians(m_rotation_previous.x)) * std::cos(glm::radians(m_rotation_previous.y))));
-				m_motion = glm::vec2();
-			}
-
-			if(m_wheel) {
-
-				m_fov -= m_wheel;
-				if(m_fov < CAMERA_FOV_MIN) {
-					m_fov = CAMERA_FOV_MIN;
-				} else if(m_fov > CAMERA_FOV_MAX) {
-					m_fov = CAMERA_FOV_MAX;
-				}
-
-				update_perspective();
-				m_wheel = 0.f;
-			}
+			instance.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

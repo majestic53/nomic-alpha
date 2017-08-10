@@ -30,6 +30,12 @@ make release
 Changelog
 =========
 
+Version 0.1.1732
+----------------
+*Updated: 8/10/2017*
+
+* Added basic player physics
+
 Version 0.1.1731
 ----------------
 *Updated: 8/6/2017*
@@ -49,27 +55,6 @@ Version 0.1.1731
 *Updated: 7/31/2017*
 
 * Added textured blocks to block gui
-
-Version 0.1.1730
-----------------
-*Updated: 7/30/2017*
-
-* Added block gui <s>(incomplete)</s>
-* Added additional block types
-
-*Updated: 7/29/2017*
-
-* Dynamic spawn location
-* Code cleanup/bug fixes
-
-*Updated: 7/27/2017*
-
-* Refactored render manager to guarentee render order
-* General code cleanup
-
-*Updated: 7/25/2017*
-
-* Added block face selection
 
 *Changelog truncated (see file history for full log)*
 

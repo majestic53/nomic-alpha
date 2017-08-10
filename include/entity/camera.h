@@ -22,6 +22,7 @@
 #include <map>
 #include "./object.h"
 #include "../event/input.h"
+#include "../terrain/manager.h"
 
 namespace nomic {
 
@@ -119,7 +120,11 @@ namespace nomic {
 
 				glm::uvec2 m_dimensions;
 
+				bool m_falling;
+
 				float m_fov;
+
+				uint8_t m_jump_timeout;
 
 				std::map<std::pair<uint16_t, uint16_t>, bool> m_key;
 
@@ -134,6 +139,10 @@ namespace nomic {
 				glm::ivec2 m_position_chunk_previous;
 
 				glm::vec2 m_rotation_previous;
+
+				bool m_sprint;
+
+				glm::vec3 m_velocity;
 
 				int32_t m_wheel;
 		};
