@@ -38,7 +38,7 @@ namespace nomic {
 				m_fov(fov),
 				m_jump_timeout(CAMERA_JUMP_TIMEOUT),
 				m_rotation_previous(rotation.x, rotation.y),
-				m_sprint(false),
+				m_sprinting(false),
 				m_velocity(0.f, 0.f, 0.f),
 				m_wheel(0)
 		{
@@ -66,7 +66,7 @@ namespace nomic {
 				m_position_chunk(other.m_position_chunk),
 				m_position_chunk_previous(other.m_position_chunk_previous),
 				m_rotation_previous(other.m_rotation_previous),
-				m_sprint(other.m_sprint),
+				m_sprinting(other.m_sprinting),
 				m_velocity(other.m_velocity),
 				m_wheel(other.m_wheel)
 		{
@@ -106,7 +106,7 @@ namespace nomic {
 				m_position_chunk = other.m_position_chunk;
 				m_position_chunk_previous = other.m_position_chunk_previous;
 				m_rotation_previous = other.m_rotation_previous;
-				m_sprint = other.m_sprint;
+				m_sprinting = other.m_sprinting;
 				m_velocity = other.m_velocity;
 				m_wheel = other.m_wheel;
 			}
@@ -319,7 +319,7 @@ namespace nomic {
 				result << " Base=" << nomic::entity::object::to_string(verbose)
 					<< ", Dimension={" << m_dimensions.x << ", " << m_dimensions.y << "}"
 					<< ", Velocity={" << m_velocity.x << ", " << m_velocity.y << ", " << m_velocity.z << "}"
-					<< ", State=" << (m_falling ? "Falling" : "Not-Falling") << ", " << (m_sprint ? "Sprinting" : "Walking")
+					<< ", State=" << (m_falling ? "Falling" : "Not-Falling") << ", " << (m_sprinting ? "Sprinting" : "Walking")
 					<< ", FOV=" << m_fov;
 			}
 
@@ -343,9 +343,9 @@ namespace nomic {
 				debug = instance.debug();
 				underwater = instance.underwater();
 
-				speed = (debug ? CAMERA_SPEED_DEBUG : (!underwater ? (!m_sprint ? CAMERA_SPEED_NORMAL : CAMERA_SPEED_NORMAL_SPRINT)
+				speed = (debug ? CAMERA_SPEED_DEBUG : (!underwater ? (!m_sprinting ? CAMERA_SPEED_NORMAL : CAMERA_SPEED_NORMAL_SPRINT)
 					: CAMERA_SPEED_UNDERWATER));
-				strafe = (debug ? CAMERA_STRAFE_DEBUG : (!underwater ? (!m_sprint ? CAMERA_STRAFE_NORMAL : CAMERA_STRAFE_NORMAL_SPRINT)
+				strafe = (debug ? CAMERA_STRAFE_DEBUG : (!underwater ? (!m_sprinting ? CAMERA_STRAFE_NORMAL : CAMERA_STRAFE_NORMAL_SPRINT)
 					: CAMERA_STRAFE_UNDERWATER));
 
 				for(std::map<std::pair<uint16_t, uint16_t>, bool>::iterator iter = m_key.begin(); iter != m_key.end(); ++iter) {
@@ -403,7 +403,7 @@ namespace nomic {
 							case KEY_SPRINT: // sprint (enable)
 
 								if(!debug) {
-									m_sprint = true;
+									m_sprinting = true;
 								}
 								break;
 							default:
@@ -415,7 +415,7 @@ namespace nomic {
 							case KEY_SPRINT: // sprint (disable)
 
 								if(!debug) {
-									m_sprint = false;
+									m_sprinting = false;
 								}
 								break;
 							default:

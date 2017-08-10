@@ -140,7 +140,7 @@ namespace nomic {
 
 				glm::vec2 m_rotation_previous;
 
-				bool m_sprint;
+				bool m_sprinting;
 
 				glm::vec3 m_velocity;
 
