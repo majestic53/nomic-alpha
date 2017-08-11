@@ -66,6 +66,10 @@ namespace nomic {
 					__in float scale
 					);
 
+				void show_bounds(
+					__in bool show
+					);
+
 				virtual std::string to_string(
 					__in_opt bool verbose = false
 					) const;
@@ -81,6 +85,8 @@ namespace nomic {
 				uint8_t m_face;
 
 				float m_scale;
+
+				bool m_show_bounds;
 		};
 	}
 }

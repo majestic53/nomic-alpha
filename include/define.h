@@ -54,14 +54,14 @@ namespace nomic {
 #endif // __inout_opt
 
 	#define ATLAS_DIMENSIONS_DEFAULT glm::uvec2(16, 16)
-	#define ATLAS_PATH_DEFAULT "./res/texture/default/block.bmp"
+	#define ATLAS_PATH_DEFAULT "./asset/texture/default/block.bmp"
 	#define ATLAS_WIDTH_DEFAULT 16
 
 	#define AXIS_LINE_WIDTH 2.f
 
 	#define BACKDROP_HEIGHT_DEFAULT 10
 	#define BACKDROP_OFFSET_DEFAULT 12.f
-	#define BACKDROP_PATH_DEFAULT "./res/texture/default/load.bmp"
+	#define BACKDROP_PATH_DEFAULT "./asset/texture/default/load.bmp"
 	#define BACKDROP_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
@@ -94,6 +94,8 @@ namespace nomic {
 
 	#define CAMERA_CLIP_MAX 1000.f
 	#define CAMERA_CLIP_MIN 0.1f
+	#define CAMERA_DRAG_NORMAL 0.02f
+	#define CAMERA_DRAG_UNDERWATER 0.04f
 	//#define CAMERA_FOV_CONFIGURABLE
 	#define CAMERA_FOV_DEFAULT 75.f
 	#define CAMERA_FOV_MAX 90.f
@@ -151,7 +153,7 @@ namespace nomic {
 	#define DELTA_FULL 1.f
 
 	#define DIAGNOSTIC_FLOAT_PRECISION 2
-	#define DIAGNOSTIC_FONT_DEFAULT "./res/font/block.otf"
+	#define DIAGNOSTIC_FONT_DEFAULT "./asset/font/block.otf"
 	#define DIAGNOSTIC_FONT_SIZE_DEFAULT 14
 	#define DIAGNOSTIC_TEXT_DEFAULT STRING_INVALID
 	#define DIAGNOSTIC_TEXT_LEFT_DEFAULT 10.f
@@ -159,10 +161,10 @@ namespace nomic {
 
 	#define DISPLAY_DEFAULT_ALPHA CHANNEL_MAX
 	#define DISPLAY_DEFAULT_BLUE 1.f
-	#define DISPLAY_DEFAULT_FULLSCREEN false
+	#define DISPLAY_DEFAULT_FULLSCREEN true //false
 	#define DISPLAY_DEFAULT_GREEN 0.25f
 	#define DISPLAY_DEFAULT_HEIGHT 1080 //768
-	#define DISPLAY_DEFAULT_ICON "./res/texture/icon.bmp"
+	#define DISPLAY_DEFAULT_ICON "./asset/texture/icon.bmp"
 	#define DISPLAY_DEFAULT_RED 0.06f
 	#define DISPLAY_DEFAULT_TITLE NOMIC
 	#define DISPLAY_DEFAULT_VSYNC false
@@ -228,12 +230,12 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1732
 
 	#define OBJECT_COUNT 1
 
-	#define PANEL_ATLAS_PATH_DEFAULT "./res/texture/default/panel.bmp"
+	#define PANEL_ATLAS_PATH_DEFAULT "./asset/texture/default/panel.bmp"
 	#define PANEL_ATLAS_DIMENSIONS_DEFAULT glm::uvec2(64, 64)
 	#define PANEL_ATLAS_WIDTH_DEFAULT 6
 	#define PANEL_INDEX_DEFAULT 0
@@ -265,6 +267,7 @@ namespace nomic {
 	#define RENDERER_DEPTH_MODE_DEFAULT GL_LESS
 
 	#define RETICLE_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.9f)
+	//#define RETICLE_DEBUG_CONTROL
 	#define RETICLE_HORIZONTAL_LEFT 2
 	#define RETICLE_HORIZONTAL_RIGHT 3
 	#define RETICLE_LINE_WIDTH 2.f
@@ -284,12 +287,14 @@ namespace nomic {
 
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
+	//#define SELECTOR_BOUNDS_DEBUG_CONTROL
 	#define SELECTOR_COLOR_ALPHA 0.08f
 	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.9f)
 	#define SELECTOR_DISTANCE_MAX 60.f
 	#define SELECTOR_DISTANCE_STEP 0.1f
 	#define SELECTOR_DISTANCE_SCALE glm::vec3(SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP)
 	#define SELECTOR_SCALE_DEFAULT 1.f
+	#define SELECTOR_SHOW_BOUNDS
 
 	#define SEND_EVENT(_EVENT_) { \
 		nomic::event::manager &instance = nomic::event::manager::acquire(); \
@@ -315,7 +320,7 @@ namespace nomic {
 
 	#define STRING_ADVANCE_SHIFT 6
 	#define STRING_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 1.f)
-	#define STRING_FONT_DEFAULT "./res/font/block.otf"
+	#define STRING_FONT_DEFAULT "./asset/font/block.otf"
 	#define STRING_FONT_SIZE_DEFAULT 14
 	#define STRING_POSITION_DEFAULT glm::uvec2(10, 10)
 	#define STRING_SCALE_DEFAULT 1.f
@@ -339,7 +344,7 @@ namespace nomic {
 	#define SUN_DELTA_DEFAULT SUN_DELTA_MIN
 	#define SUN_DELTA_MIN 0.f
 	#define SUN_DELTA_MAX 1.f
-	#define SUN_PATH_DEFAULT "./res/texture/default/sun.bmp"
+	#define SUN_PATH_DEFAULT "./asset/texture/default/sun.bmp"
 	#define SUN_RADIUS_DEFAULT (VIEW_RADIUS_RUNTIME * CHUNK_WIDTH) + (16 * CHUNK_WIDTH)
 	#define SUN_RISE 0.2f
 	#define SUN_SCALE_DEFAULT 240.f
@@ -413,7 +418,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 20 //38
+	#define VIEW_WIDTH 38 //20
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -525,7 +530,7 @@ namespace nomic {
 
 	enum {
 		KEY_BACKWARD = SDL_SCANCODE_S,
-		KEY_DEBUG = SDL_SCANCODE_V,
+		KEY_DEBUG = SDL_SCANCODE_GRAVE,
 		KEY_DESCEND = SDL_SCANCODE_X,
 		KEY_ELEVATE = SDL_SCANCODE_SPACE,
 		KEY_FORWARD = SDL_SCANCODE_W,

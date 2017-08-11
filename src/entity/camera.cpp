@@ -223,13 +223,19 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Scancode=%x, Modifier=%x, State=%x(%s)", scancode, modifier, state,
 				(state == SDL_PRESSED) ? "Press" : "Release");
 
-			std::pair<uint16_t, uint16_t> key_pair = std::make_pair(scancode, modifier);
-
-			std::map<std::pair<uint16_t, uint16_t>, bool>::iterator iter = m_key.find(key_pair);
+			std::map<uint16_t, std::pair<uint16_t, bool>>::iterator iter = m_key.find(scancode);
 			if(iter == m_key.end()) {
-				m_key.insert(std::make_pair(key_pair, state == SDL_PRESSED));
+				m_key.insert(std::make_pair(scancode, std::make_pair(modifier, state == SDL_PRESSED)));
 			} else {
-				iter->second = (state == SDL_PRESSED);
+
+				if(iter->second.first != modifier) {
+					iter->second.first = modifier;
+				}
+
+				bool pressed = (state == SDL_PRESSED);
+				if(iter->second.second != pressed) {
+					iter->second.second = pressed;
+				}
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -343,22 +349,26 @@ namespace nomic {
 				debug = instance.debug();
 				underwater = instance.underwater();
 
-				speed = (debug ? CAMERA_SPEED_DEBUG : (!underwater ? (!m_sprinting ? CAMERA_SPEED_NORMAL : CAMERA_SPEED_NORMAL_SPRINT)
-					: CAMERA_SPEED_UNDERWATER));
-				strafe = (debug ? CAMERA_STRAFE_DEBUG : (!underwater ? (!m_sprinting ? CAMERA_STRAFE_NORMAL : CAMERA_STRAFE_NORMAL_SPRINT)
-					: CAMERA_STRAFE_UNDERWATER));
+				speed = (debug ? CAMERA_SPEED_DEBUG : (!underwater ? (!m_sprinting ? CAMERA_SPEED_NORMAL
+					: CAMERA_SPEED_NORMAL_SPRINT) : CAMERA_SPEED_UNDERWATER));
+				strafe = (debug ? CAMERA_STRAFE_DEBUG : (!underwater ? (!m_sprinting ? CAMERA_STRAFE_NORMAL
+					: CAMERA_STRAFE_NORMAL_SPRINT) : CAMERA_STRAFE_UNDERWATER));
 
-				for(std::map<std::pair<uint16_t, uint16_t>, bool>::iterator iter = m_key.begin(); iter != m_key.end(); ++iter) {
+				for(std::map<uint16_t, std::pair<uint16_t, bool>>::iterator iter = m_key.begin(); iter != m_key.end(); ++iter) {
 
-					if(iter->second) {
+					if(iter->second.second) {
 
-						switch(iter->first.first) {
+						switch(iter->first) {
 							case KEY_BACKWARD: // backward
 								position_relative -= (m_rotation * speed);
 								break;
 							case KEY_DEBUG: // enable/disable debug mode
-								instance.toggle_debug();
-								iter->second = false;
+
+								if(instance.toggle_debug()) {
+									m_velocity = glm::vec3(0.f);
+								}
+
+								iter->second.second = false;
 								break;
 							case KEY_DESCEND: // down
 
@@ -394,7 +404,7 @@ namespace nomic {
 								break;
 							case KEY_RESET: // reset camera to spawn
 								position_relative = instance.spawn();
-								iter->second = false;
+								iter->second.second = false;
 								break;
 							case KEY_RIGHT: // right
 							case KEY_RIGHT_STRAFE:
@@ -402,7 +412,7 @@ namespace nomic {
 								break;
 							case KEY_SPRINT: // sprint (enable)
 
-								if(!debug) {
+								if(!debug && !m_sprinting) {
 									m_sprinting = true;
 								}
 								break;
@@ -411,10 +421,10 @@ namespace nomic {
 						}
 					} else {
 
-						switch(iter->first.first) {
+						switch(iter->first) {
 							case KEY_SPRINT: // sprint (disable)
 
-								if(!debug) {
+								if(!debug && m_sprinting) {
 									m_sprinting = false;
 								}
 								break;
@@ -440,7 +450,8 @@ namespace nomic {
 				if(!debug) {
 					uint8_t type;
 					nomic::terrain::manager &terrain = instance.terrain();
-					float gravity = (!underwater ? CAMERA_GRAVITY_NORMAL : CAMERA_GRAVITY_UNDERWATER),
+					float drag = (!underwater ? CAMERA_DRAG_NORMAL : CAMERA_DRAG_UNDERWATER),
+						gravity = (!underwater ? CAMERA_GRAVITY_NORMAL : CAMERA_GRAVITY_UNDERWATER),
 						gravity_step = (!underwater ? CAMERA_GRAVITY_STEP_NORMAL : CAMERA_GRAVITY_STEP_UNDERWATER);
 
 					if(m_jump_timeout < CAMERA_JUMP_TIMEOUT) {
@@ -448,7 +459,7 @@ namespace nomic {
 					}
 
 					if(underwater && (m_velocity.y < (CAMERA_GRAVITY_UNDERWATER + CAMERA_GRAVITY_STEP_UNDERWATER))) {
-						m_velocity.y = 0;
+						m_velocity.y = 0.f;
 					}
 
 					if(m_velocity.y > gravity) {
@@ -475,6 +486,23 @@ namespace nomic {
 					// TODO: collision detect block sides
 
 					position += m_velocity;
+
+					if(m_velocity.x > drag) {
+						m_velocity.x -= drag;
+					} else if(m_velocity.x < -drag) {
+						m_velocity.x += drag;
+					} else {
+						m_velocity.x = 0.f;
+					}
+
+					if(m_velocity.z > drag) {
+						m_velocity.z -= drag;
+					} else if(m_velocity.z < -drag) {
+						m_velocity.z += drag;
+					} else {
+						m_velocity.z = 0.f;
+					}
+
 					if(position.y < CAMERA_HEIGHT_OFFSET) {
 						position.y = CAMERA_HEIGHT_OFFSET;
 					} else if(position.y > CHUNK_HEIGHT) {

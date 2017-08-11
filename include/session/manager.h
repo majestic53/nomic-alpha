@@ -113,7 +113,7 @@ namespace nomic {
 					__in_opt bool verbose = false
 					) const;
 
-				void toggle_debug(void);
+				bool toggle_debug(void);
 
 				bool underwater(void);
 

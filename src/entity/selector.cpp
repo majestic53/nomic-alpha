@@ -134,7 +134,8 @@ namespace nomic {
 				nomic::entity::object(ENTITY_SELECTOR, SUBTYPE_UNDEFINED, position, rotation, up),
 				m_color(color),
 				m_face(BLOCK_FACE_TOP),
-				m_scale(scale)
+				m_scale(scale),
+				m_show_bounds(true)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
 				"Color={%f, %f, %f, %f}, Scale=%u, Position={%f, %f, %f}, Rotation={%f, %f, %f}, Up={%f, %f, %f}",
@@ -152,7 +153,8 @@ namespace nomic {
 				nomic::entity::object(other),
 				m_color(other.m_color),
 				m_face(other.m_face),
-				m_scale(other.m_scale)
+				m_scale(other.m_scale),
+				m_show_bounds(other.m_show_bounds)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
@@ -179,6 +181,7 @@ namespace nomic {
 				m_color = other.m_color;
 				m_face = other.m_face;
 				m_scale = other.m_scale;
+				m_show_bounds = other.m_show_bounds;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
@@ -197,7 +200,12 @@ namespace nomic {
 			nomic::graphic::vao &arr = vertex_array();
 			arr.bind();
 			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_TRIANGLES, SELECTOR_SEGMENT_COUNT, SELECTOR_SEGMENT_COUNT_COLOR);
-			GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, SELECTOR_SEGMENT_COUNT);
+
+#ifdef SELECTOR_SHOW_BOUNDS
+			if(m_show_bounds) {
+				GL_CHECK(LEVEL_WARNING, glDrawArrays, GL_LINES, 0, SELECTOR_SEGMENT_COUNT);
+			}
+#endif // SELECTOR_SHOW_BOUNDS
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -301,6 +309,18 @@ namespace nomic {
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
+		void 
+		selector::show_bounds(
+			__in bool show
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Show=%x" show);
+
+			m_show_bounds = show;
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		std::string 
 		selector::to_string(
 			__in_opt bool verbose
@@ -316,7 +336,8 @@ namespace nomic {
 				result << " Base=" << nomic::entity::object::to_string(verbose)
 					<< ", Color={" << m_color.x << ", " << m_color.y << ", " << m_color.z << ", " << m_color.w << "}"
 					<< ", Face=" << SCALAR_AS_HEX(uint8_t, m_face) << "(" << BLOCK_FACE_STRING(m_face) << ")"
-					<< ", Scale=" << m_scale;
+					<< ", Scale=" << m_scale
+					<< ", State=" << (m_show_bounds ? "Bounds" : "No-Bounds");
 			}
 
 			TRACE_EXIT(LEVEL_VERBOSE);

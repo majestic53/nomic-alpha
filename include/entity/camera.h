@@ -126,7 +126,7 @@ namespace nomic {
 
 				uint8_t m_jump_timeout;
 
-				std::map<std::pair<uint16_t, uint16_t>, bool> m_key;
+				std::map<uint16_t, std::pair<uint16_t, bool>> m_key;
 
 				glm::vec2 m_motion;
 
