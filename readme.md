@@ -32,6 +32,10 @@ Changelog
 
 Version 0.1.1732
 ----------------
+*Updated: 8/12/2017*
+
+* Added basic collision detection
+
 *Updated: 8/10/2017*
 
 * Added basic player physics

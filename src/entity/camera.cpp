@@ -449,6 +449,8 @@ namespace nomic {
 
 				if(!debug) {
 					uint8_t type;
+					glm::uvec3 position_block_adjacent;
+					glm::ivec2 position_chunk_adjacent;
 					nomic::terrain::manager &terrain = instance.terrain();
 					float drag = (!underwater ? CAMERA_DRAG_NORMAL : CAMERA_DRAG_UNDERWATER),
 						gravity = (!underwater ? CAMERA_GRAVITY_NORMAL : CAMERA_GRAVITY_UNDERWATER),
@@ -483,7 +485,77 @@ namespace nomic {
 						}
 					}
 
-					// TODO: collision detect block sides
+					if(position_block.x < (CHUNK_WIDTH - 1)) { // right
+						position_chunk_adjacent = position_chunk;
+					} else if(terrain.contains(position_chunk + glm::ivec2(1, 0))) { // right (boundary)
+						position_chunk_adjacent = (position_chunk + glm::ivec2(1, 0));
+					}
+
+					for(uint32_t iter = 0; iter < CAMERA_HEIGHT_OFFSET; ++iter) {
+						position_block_adjacent = position_block;
+						position_block_adjacent.x += 1;
+						position_block_adjacent.y -= iter;
+
+						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.x > 0)) {
+							position.x -= position_relative.x;
+							break;
+						}
+					}
+
+					if(position_block.x) { // left
+						position_chunk_adjacent = position_chunk;
+					} else if(terrain.contains(position_chunk - glm::ivec2(1, 0))) { // left (boundary)
+						position_chunk_adjacent = (position_chunk - glm::ivec2(1, 0));
+					}
+
+					for(uint32_t iter = 0; iter < CAMERA_HEIGHT_OFFSET; ++iter) {
+						position_block_adjacent = position_block;
+						position_block_adjacent.x -= 1;
+						position_block_adjacent.y -= iter;
+
+						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.x < 0)) {
+							position.x += -position_relative.x;
+							break;
+						}
+					}
+
+					if(position_block.z < (CHUNK_WIDTH - 1)) { // back
+						position_chunk_adjacent = position_chunk;
+					} else if(terrain.contains(position_chunk + glm::ivec2(0, 1))) { // back (boundary)
+						position_chunk_adjacent = (position_chunk + glm::ivec2(0, 1));
+					}
+
+					for(uint32_t iter = 0; iter < CAMERA_HEIGHT_OFFSET; ++iter) {
+						position_block_adjacent = position_block;
+						position_block_adjacent.y -= iter;
+						position_block_adjacent.z += 1;
+
+						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.z > 0)) {
+							position.z -= position_relative.z;
+							break;
+						}
+					}
+
+					if(position_block.z) { // front
+						position_chunk_adjacent = position_chunk;;
+					} else if(terrain.contains(position_chunk - glm::ivec2(0, 1))) { // front (boundary)
+						position_chunk_adjacent = (position_chunk - glm::ivec2(0, 1));
+					}
+
+					for(uint32_t iter = 0; iter < CAMERA_HEIGHT_OFFSET; ++iter) {
+						position_block_adjacent = position_block;
+						position_block_adjacent.y -= iter;
+						position_block_adjacent.z -= 1;
+
+						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.z < 0)) {
+							position.z += -position_relative.z;
+							break;
+						}
+					}
 
 					position += m_velocity;
 
@@ -510,6 +582,7 @@ namespace nomic {
 					}
 				}
 
+				nomic::utility::position_as_block(position, position_chunk, position_block);
 				m_position = position;
 				m_position_block = position_block;
 				m_position_chunk = position_chunk;
