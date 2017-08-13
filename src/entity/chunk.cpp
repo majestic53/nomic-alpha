@@ -274,7 +274,12 @@ namespace nomic {
 					coordinate.push_back(CHUNK_COORDINATE[(face * BLOCK_FACE_COUNT) + iter]);
 				}
 
-				normal.push_back(CHUNK_NORMAL[face]);
+				if((entry->first == BLOCK_CLOUD) && (face == BLOCK_FACE_BOTTOM)) {
+					normal.push_back(CHUNK_NORMAL[BLOCK_FACE_TOP]);
+				} else {
+					normal.push_back(CHUNK_NORMAL[face]);
+				}
+
 				vertex.push_back(CHUNK_VERTEX[(face * BLOCK_FACE_COUNT) + iter] + position);
 			}
 
@@ -295,6 +300,7 @@ namespace nomic {
 			switch(type) {
 				case BLOCK_AIR:
 				case BLOCK_BOUNDARY:
+				case BLOCK_CLOUD:
 				case BLOCK_COBBLESTONE:
 				case BLOCK_COBBLESTONE_MOSSY:
 				case BLOCK_DIRT:
@@ -537,7 +543,10 @@ namespace nomic {
 
 			switch(type) {
 				case BLOCK_AIR:
+				case BLOCK_CLOUD:
 				case BLOCK_GLASS:
+				case BLOCK_GRASS_TALL:
+				case BLOCK_LEAVES:
 				case BLOCK_WATER:
 					result = true;
 					break;
@@ -722,7 +731,6 @@ namespace nomic {
 			for(int32_t z = 0; z < CHUNK_WIDTH; ++z) {
 
 				for(int32_t x = 0; x < CHUNK_WIDTH; ++x) {
-					position.y = nomic::terrain::chunk::height(glm::uvec2(x, z));
 
 					for(int32_t y = (CHUNK_HEIGHT - 1); y >= 0; --y) {
 						uint8_t attributes;
@@ -734,9 +742,8 @@ namespace nomic {
 
 						if((type != BLOCK_AIR) && !(attributes & BLOCK_ATTRIBUTE_HIDDEN)) {
 							std::map<uint8_t, chunk_data>::iterator face_iter;
-							position.y = 0;
 
-							if(type != BLOCK_WATER) { // non-water
+							if((type != BLOCK_CLOUD) && (type != BLOCK_WATER)) { // non-cloud/water
 
 								if(right) {
 
@@ -827,7 +834,7 @@ namespace nomic {
 										}
 									}
 								}
-							} else { // water
+							} else { // cloud/water
 
 								if(right) {
 
@@ -924,7 +931,7 @@ namespace nomic {
 								}
 							}
 
-							if((y + 1) < CHUNK_HEIGHT) { // top
+							if((type != BLOCK_CLOUD) && ((y + 1) < CHUNK_HEIGHT)) { // top
 
 								if(determine_transparent(nomic::terrain::chunk::type(glm::uvec3(x, y + 1, z)))) {
 									face_iter = add_face_type(type, BLOCK_FACE_TOP, attributes);

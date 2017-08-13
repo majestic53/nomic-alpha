@@ -71,6 +71,7 @@ namespace nomic {
 					__in const glm::vec4 &ambient,
 					__in const glm::vec4 &ambient_background,
 					__in const glm::vec3 &ambient_position,
+					__in bool clouds,
 					__in bool underwater
 					);
 

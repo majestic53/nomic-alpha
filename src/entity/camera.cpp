@@ -339,8 +339,8 @@ namespace nomic {
 			bool debug, underwater;
 			glm::uvec3 position_block;
 			glm::ivec2 position_chunk;
-			glm::vec3 position, position_relative = glm::vec3(0.f);
 			float sensitivity = CAMERA_SENSITIVITY, speed, strafe;
+			glm::vec3 position, position_relative = glm::vec3(0.f), rotation;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
@@ -360,7 +360,13 @@ namespace nomic {
 
 						switch(iter->first) {
 							case KEY_BACKWARD: // backward
-								position_relative -= (m_rotation * speed);
+								rotation = m_rotation;
+
+								if(!debug) {
+									rotation.y = 0.f;
+								}
+
+								position_relative -= (glm::normalize(rotation) * speed);
 								break;
 							case KEY_DEBUG: // enable/disable debug mode
 
@@ -396,7 +402,13 @@ namespace nomic {
 								}
 								break;
 							case KEY_FORWARD: // forward
-								position_relative += (m_rotation * speed);
+								rotation = m_rotation;
+
+								if(!debug) {
+									rotation.y = 0.f;
+								}
+
+								position_relative += (glm::normalize(rotation) * speed);
 								break;
 							case KEY_LEFT: // left
 							case KEY_LEFT_STRAFE:
@@ -454,7 +466,8 @@ namespace nomic {
 					nomic::terrain::manager &terrain = instance.terrain();
 					float drag = (!underwater ? CAMERA_DRAG_NORMAL : CAMERA_DRAG_UNDERWATER),
 						gravity = (!underwater ? CAMERA_GRAVITY_NORMAL : CAMERA_GRAVITY_UNDERWATER),
-						gravity_step = (!underwater ? CAMERA_GRAVITY_STEP_NORMAL : CAMERA_GRAVITY_STEP_UNDERWATER);
+						gravity_step = (!underwater ? CAMERA_GRAVITY_STEP_NORMAL : CAMERA_GRAVITY_STEP_UNDERWATER),
+						position_int;
 
 					if(m_jump_timeout < CAMERA_JUMP_TIMEOUT) {
 						++m_jump_timeout;
@@ -497,8 +510,8 @@ namespace nomic {
 						position_block_adjacent.y -= iter;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.x > 0)) {
-							position.x -= position_relative.x;
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.x > 0.f)) {
+							position.x -= std::modf(position_relative.x, &position_int);
 							break;
 						}
 					}
@@ -515,8 +528,8 @@ namespace nomic {
 						position_block_adjacent.y -= iter;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.x < 0)) {
-							position.x += -position_relative.x;
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.x < 0.f)) {
+							position.x += -std::modf(position_relative.x, &position_int);
 							break;
 						}
 					}
@@ -533,8 +546,8 @@ namespace nomic {
 						position_block_adjacent.z += 1;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.z > 0)) {
-							position.z -= position_relative.z;
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.z > 0.f)) {
+							position.z -= std::modf(position_relative.z, &position_int);
 							break;
 						}
 					}
@@ -551,8 +564,8 @@ namespace nomic {
 						position_block_adjacent.z -= 1;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.z < 0)) {
-							position.z += -position_relative.z;
+						if((type != BLOCK_AIR) && (type != BLOCK_WATER) && (position_relative.z < 0.f)) {
+							position.z += -std::modf(position_relative.z, &position_int);
 							break;
 						}
 					}

@@ -24,6 +24,7 @@ layout(location = 2) in vec3 in_vertex;
 
 uniform vec4 ambient;
 uniform vec3 ambient_position;
+uniform bool clouds;
 uniform float cycle;
 uniform mat4 model;
 uniform vec3 position;

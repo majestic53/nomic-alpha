@@ -113,7 +113,8 @@ namespace nomic {
 					if(runtime_ref) {
 						nomic::session::manager &session_ref = runtime_ref->session();
 						uint8_t type = session_ref.terrain().at(position_chunk)->block_type(position_block);
-						result << ", Type=" << BLOCK_STRING(type) << (session_ref.underwater() ? " (Underwater)" : "");
+						result << ", Type=" << BLOCK_STRING(type) << (session_ref.underwater() ? " (Underwater)" : "")
+							<< (session_ref.clouds() ? " (Clouds)" : "");
 
 						if(session_ref.block_selected()) {
 							uint8_t face;

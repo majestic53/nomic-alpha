@@ -27,8 +27,7 @@ namespace nomic {
 
 	namespace terrain {
 
-		class generator :
-				protected nomic::core::noise {
+		class generator {
 
 			public:
 
@@ -101,6 +100,10 @@ namespace nomic {
 					);
 
 				uint32_t m_max;
+
+				nomic::core::noise m_noise_cloud;
+
+				nomic::core::noise m_noise_terrain;
 
 				nomic::core::random<double> m_random;
 		};

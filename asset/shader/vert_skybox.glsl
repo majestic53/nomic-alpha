@@ -21,9 +21,11 @@
 layout(location = 0) in vec3 in_vertex;
 
 uniform vec4 ambient_background;
+uniform bool clouds;
 uniform float cycle;
 uniform mat4 model;
 uniform mat4 projection;
+uniform bool underwater;
 uniform mat4 view;
 
 out vec3 out_vertex;

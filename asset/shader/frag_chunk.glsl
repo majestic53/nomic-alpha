@@ -26,6 +26,7 @@ in vec3 out_vertex;
 
 uniform vec4 ambient;
 uniform vec3 ambient_position;
+uniform bool clouds;
 uniform float cycle;
 uniform vec3 position;
 uniform vec3 rotation;
@@ -41,6 +42,9 @@ const float AMBIENT_DARK_MIN = 0.0f;
 const float AMBIENT_DARK_MAX = 1.f;
 const float AMBIENT_DARK_START = 0.9f;
 const float AMBIENT_FOG_BLEND = 0.6f;
+
+const vec4 CLOUD_COLOR = vec4(0.8f, 0.83f, 0.84f, 1.f);
+const float CLOUD_FALLOFF = 0.08f;
 
 const float DIFFUSE_SCALE = 0.2f;
 
@@ -134,7 +138,9 @@ main(void)
 
 	color *= (add_light_ambient(cycle, ambient) + add_light_diffuse(cycle, out_normal, out_normal_position, ambient, ambient_position));
 
-	if(underwater) { // underwater
+	if(clouds) { // clouds
+		color = add_fog_constant(color, add_light_ambient(cycle, CLOUD_COLOR), CLOUD_FALLOFF, out_distance);
+	} else if(underwater) { // underwater
 		color = add_fog_constant(color, add_light_ambient(cycle, WATER_COLOR), WATER_FALLOFF, out_distance);
 	} else { // above water
 		color = add_fog_non_constant(color, add_light_ambient(cycle, FOG_COLOR_DEFAULT), FOG_FALLOFF, out_distance,

@@ -191,7 +191,9 @@ namespace nomic {
 			m_block_attributes[position.x][position.y][position.z] = attributes;
 
 			result = (CHUNK_HEIGHT - 1);
-			while(m_block[position.x][result][position.z] == BLOCK_AIR) {
+			while((m_block[position.x][result][position.z] == BLOCK_AIR)
+					|| (m_block[position.x][result][position.z] == BLOCK_CLOUD)
+					|| (m_block[position.x][result][position.z] == BLOCK_WATER)) {
 				--result;
 			}
 

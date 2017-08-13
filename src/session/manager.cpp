@@ -178,6 +178,7 @@ namespace nomic {
 			m_block_selected_face(BLOCK_FACE_UNDEFINED),
 			m_camera(nullptr),
 			m_chunk_renderer(nullptr),
+			m_clouds(false),
 			m_debug(SESSION_DEBUG_DEFAULT),
 			m_manager_display(nomic::graphic::display::acquire()),
 			m_manager_entity(nomic::entity::manager::acquire()),
@@ -253,6 +254,14 @@ namespace nomic {
 		}
 
 		bool 
+		manager::clouds(void)
+		{
+			TRACE_ENTRY(LEVEL_VERBOSE);
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_clouds);
+			return m_clouds;
+		}
+
+		bool 
 		manager::debug(void)
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
@@ -263,6 +272,29 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", m_debug);
 			return m_debug;
+		}
+
+		bool 
+		manager::determine_block_selectable(
+			__in uint8_t type
+			)
+		{
+			bool result = true;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
+
+			switch(type) {
+				case BLOCK_AIR:
+				case BLOCK_CLOUD:
+				case BLOCK_WATER:
+					result = false;
+					break;
+				default:
+					break;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
 		}
 
 		void 
@@ -604,7 +636,7 @@ namespace nomic {
 			for(; block.y > BLOCK_HEIGHT_BOUNDARY; --block.y) {
 
 				type = m_manager_terrain.at(chunk)->block_type(block);
-				if(type != BLOCK_AIR) {
+				if((type != BLOCK_AIR) && (type != BLOCK_CLOUD)) {
 					break;
 				}
 			}
@@ -968,6 +1000,7 @@ namespace nomic {
 
 			m_camera->enable(false);
 			m_camera->show(false);
+			m_clouds = false;
 			m_manager_display.set_icon(DISPLAY_DEFAULT_ICON);
 			m_random_float.setup(m_manager_terrain.generator().seed());
 			m_random_integer.setup(m_manager_terrain.generator().seed());
@@ -1151,7 +1184,7 @@ namespace nomic {
 			m_manager_display.clear();
 			m_manager_render.render(m_camera->position(), m_camera->rotation(), m_camera->projection(), m_camera->view(),
 				m_camera->dimensions(), *m_atlas, ((nomic::runtime *) m_runtime)->tick_cycle(), delta, color, color_background,
-				position, m_underwater);
+				position, m_clouds, m_underwater);
 			m_manager_display.show();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -1626,7 +1659,8 @@ namespace nomic {
 
 			if(verbose) {
 				result << " Base=" << SINGLETON_CLASS(nomic::session::manager)::to_string(verbose)
-					<< ", Mode=" << (m_debug ? "Non-debug" : "Debug") << ", " << (m_underwater ? "Underwater" : "Above-water")
+					<< ", Mode=" << (m_debug ? "Non-debug" : "Debug") << ", " << (m_clouds ? "Clouds" : "Below-clouds")
+					<< ", " << (m_underwater ? "Underwater" : "Above-water")
 					<< ", Spawn={" << m_spawn.x << ", " << m_spawn.y << ", " << m_spawn.z << "}"
 					<< ", " << (m_block_selected ? "Selected" : "Not Selected");
 
@@ -1769,9 +1803,25 @@ namespace nomic {
 				nomic::core::thread::notify();
 			}
 
+			update_clouds();
 			update_underwater();
 			update_selector();
 			m_manager_entity.update(m_runtime, m_camera);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		manager::update_clouds(void)
+		{
+			glm::uvec3 block;
+			glm::ivec2 chunk;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			block = m_camera->block();
+			chunk = m_camera->chunk();
+			m_clouds = ((block.y <= (CHUNK_HEIGHT - 1)) && (m_manager_terrain.at(chunk)->block_type(block) == BLOCK_CLOUD));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -1795,13 +1845,13 @@ namespace nomic {
 				nomic::utility::position_as_block(position, m_block_selected_chunk, m_block_selected_block);
 
 				type = m_manager_terrain.at(m_block_selected_chunk)->block_type(m_block_selected_block);
-				if((type != BLOCK_AIR) && (type != BLOCK_WATER)) {
+				if(determine_block_selectable(type)) {
 					int32_t x = m_block_selected_block.x, y = m_block_selected_block.y, z = m_block_selected_block.z;
 
 					if((x + 1) < CHUNK_WIDTH) { // right
 
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x + 1, y, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							right = true;
 						}
@@ -1810,7 +1860,7 @@ namespace nomic {
 
 						type = m_manager_terrain.at(glm::ivec2(
 							m_block_selected_chunk.x + 1, m_block_selected_chunk.y))->block_type(glm::uvec3(0, y, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							right = true;
 						}
@@ -1819,7 +1869,7 @@ namespace nomic {
 					if((x - 1) >= 0) { // left
 
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x - 1, y, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							left = true;
 						}
@@ -1829,7 +1879,7 @@ namespace nomic {
 						type = m_manager_terrain.at(glm::ivec2(
 							m_block_selected_chunk.x - 1, m_block_selected_chunk.y))->block_type(glm::uvec3(
 							CHUNK_WIDTH - 1, y, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							left = true;
 						}
@@ -1838,7 +1888,7 @@ namespace nomic {
 					if((y - 1) > 0) { // bottom
 
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y - 1, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							bottom = true;
 						}
@@ -1847,7 +1897,7 @@ namespace nomic {
 					if((y + 1) < CHUNK_HEIGHT) { // top
 
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y + 1, z));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							top = true;
 						}
@@ -1856,7 +1906,7 @@ namespace nomic {
 					if((z + 1) < CHUNK_WIDTH) { // back
 
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y, z + 1));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							back = true;
 						}
@@ -1865,7 +1915,7 @@ namespace nomic {
 
 						type = m_manager_terrain.at(glm::ivec2(
 							m_block_selected_chunk.x, m_block_selected_chunk.y + 1))->block_type(glm::uvec3(x, y, 0));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							back = true;
 						}
@@ -1874,7 +1924,7 @@ namespace nomic {
 					if((z - 1) >= 0) { // front
 
 						type = m_manager_terrain.at(m_block_selected_chunk)->block_type(glm::uvec3(x, y, z - 1));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							front = true;
 						}
@@ -1884,7 +1934,7 @@ namespace nomic {
 						type = m_manager_terrain.at(glm::ivec2(
 							m_block_selected_chunk.x, m_block_selected_chunk.y - 1))->block_type(glm::uvec3(
 							x, y, CHUNK_WIDTH - 1));
-						if((type == BLOCK_AIR) || (type == BLOCK_WATER)) {
+						if(!determine_block_selectable(type)) {
 							m_block_selected = true;
 							front = true;
 						}
@@ -1949,14 +1999,12 @@ namespace nomic {
 		{
 			glm::uvec3 block;
 			glm::ivec2 chunk;
-			bool underwater = false;
 
 			TRACE_ENTRY(LEVEL_VERBOSE);
 
 			block = m_camera->block();
 			chunk = m_camera->chunk();
-			underwater = ((block.y < (CHUNK_HEIGHT - 1)) && (m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER));
-			m_underwater = underwater;
+			m_underwater = ((block.y < (CHUNK_HEIGHT - 1)) && (m_manager_terrain.at(chunk)->block_type(block) == BLOCK_WATER));
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}

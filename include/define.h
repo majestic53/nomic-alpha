@@ -65,6 +65,9 @@ namespace nomic {
 	#define BACKDROP_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
+	#define BLOCK_CLOUD_THICKNESS 1
+	#define BLOCK_CLOUD_THRESHOLD 0.48f
+	#define BLOCK_CLOUD_THRESHOLD_STEP 0.04f
 	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
 	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
 	#define BLOCK_DEPTH_BOUNDARY_MAX 3
@@ -75,6 +78,7 @@ namespace nomic {
 	#define BLOCK_FILTER_MAG_DEFAULT GL_NEAREST
 	#define BLOCK_FILTER_MIN_DEFAULT GL_NEAREST
 	#define BLOCK_HEIGHT_BOUNDARY 1
+	#define BLOCK_HEIGHT_CLOUD (CHUNK_HEIGHT - 1)
 	#define BLOCK_HEIGHT_MAX 120
 	#define BLOCK_HEIGHT_MIN 20
 	#define BLOCK_HEIGHT_WATER (BLOCK_LEVEL_BEACH_SAND - 1)
@@ -100,7 +104,7 @@ namespace nomic {
 	#define CAMERA_FOV_DEFAULT 75.f
 	#define CAMERA_FOV_MAX 90.f
 	#define CAMERA_FOV_MIN 10.f
-	#define CAMERA_GRAVITY_NORMAL -0.4f
+	#define CAMERA_GRAVITY_NORMAL -0.55f
 	#define CAMERA_GRAVITY_UNDERWATER -0.1f
 	#define CAMERA_GRAVITY_STEP_NORMAL -0.02f
 	#define CAMERA_GRAVITY_STEP_UNDERWATER -0.005f
@@ -161,7 +165,7 @@ namespace nomic {
 
 	#define DISPLAY_DEFAULT_ALPHA CHANNEL_MAX
 	#define DISPLAY_DEFAULT_BLUE 1.f
-	#define DISPLAY_DEFAULT_FULLSCREEN true //false
+	#define DISPLAY_DEFAULT_FULLSCREEN false
 	#define DISPLAY_DEFAULT_GREEN 0.25f
 	#define DISPLAY_DEFAULT_HEIGHT 1080 //768
 	#define DISPLAY_DEFAULT_ICON "./asset/texture/icon.bmp"
@@ -222,15 +226,16 @@ namespace nomic {
 	#define NOISE_PERSISTENCE_DEFAULT 1.0
 	#define NOISE_PERSISTENCE_MIN 0.0
 	#define NOISE_SCALE 480.0
+	#define NOISE_SCALE_CLOUD 180.0
 
-	#define NOISE_SEED_DEFAULT 2710042186 //0
+	#define NOISE_SEED_DEFAULT 2626494913 //0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 5
+	#define NOMIC_VERSION_REVISION 6
 	#define NOMIC_VERSION_WEEK 1732
 
 	#define OBJECT_COUNT 1
@@ -405,6 +410,7 @@ namespace nomic {
 	#define UNIFORM_AMBIENT "ambient"
 	#define UNIFORM_AMBIENT_BACKGROUND "ambient_background"
 	#define UNIFORM_AMBIENT_POSITION "ambient_position"
+	#define UNIFORM_CLOUDS "clouds"
 	#define UNIFORM_COLOR "color"
 	#define UNIFORM_CYCLE "cycle"
 	#define UNIFORM_DEPTH_MATRIX "depth_matrix"
@@ -418,7 +424,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 38 //20
+	#define VIEW_WIDTH 38
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -429,6 +435,8 @@ namespace nomic {
 
 	enum {
 		BLOCK_AIR = 0,
+		BLOCK_CLOUD,
+		BLOCK_WATER,
 		BLOCK_BOUNDARY,
 		BLOCK_DIRT,
 		BLOCK_DIRT_GRASS_SIDE,
@@ -440,10 +448,9 @@ namespace nomic {
 		BLOCK_SAND,
 		BLOCK_SANDSTONE,
 		BLOCK_SANDSTONE_SIDE,
-		BLOCK_WATER,
-		BLOCK_PLANK,
 		BLOCK_WOOD,
 		BLOCK_WOOD_SIDE,
+		BLOCK_PLANK,
 		BLOCK_COBBLESTONE,
 		BLOCK_COBBLESTONE_MOSSY,
 		BLOCK_OBSIDIAN,
@@ -453,15 +460,16 @@ namespace nomic {
 		BLOCK_ORE_DIAMOND,
 		BLOCK_GLASS,
 		BLOCK_LEAVES,
+		BLOCK_GRASS_TALL,
 	};
 
-	#define BLOCK_MAX BLOCK_LEAVES
+	#define BLOCK_MAX BLOCK_GRASS_TALL
 
 	static const std::string BLOCK_STR[] = {
-		"Air", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone", "Stone/Snow", "Snow",
-		"Gravel", "Sand", "Sandstone", "Sandstone/Side", "Water", "Plank", "Wood",
-		"Wood-side", "Cobblestone", "Mossy-Cobblestone", "Obsidian", "Gold-Ore", "Iron-Ore",
-		"Coal-Ore", "Diamond-Ore", "Glass", "Leaves",
+		"Air", "Cloud", "Water", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone",
+		"Stone/Snow", "Snow", "Gravel", "Sand", "Sandstone", "Sandstone/Side", "Wood",
+		"Wood-side", "Plank", "Cobblestone", "Mossy-Cobblestone", "Obsidian", "Gold-Ore",
+		"Iron-Ore", "Coal-Ore", "Diamond-Ore", "Glass", "Leaves", "Grass-Tall",
 		};
 
 	#define BLOCK_STRING(_TYPE_) \

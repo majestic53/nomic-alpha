@@ -50,6 +50,8 @@ namespace nomic {
 
 				nomic::entity::camera *camera(void);
 
+				bool clouds(void);
+
 				bool debug(void);
 
 				void pause(void);
@@ -135,6 +137,10 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
+				bool determine_block_selectable(
+					__in uint8_t type
+					);
+
 				void generate_chunks_runtime(void);
 
 				void generate_chunks_spawn(void);
@@ -187,6 +193,8 @@ namespace nomic {
 
 				void uninitialize_entities(void);
 
+				void update_clouds(void);
+
 				void update_selector(void);
 
 				void update_underwater(void);
@@ -204,6 +212,8 @@ namespace nomic {
 				nomic::entity::camera *m_camera;
 
 				nomic::core::renderer *m_chunk_renderer;
+
+				bool m_clouds;
 
 				bool m_debug;
 

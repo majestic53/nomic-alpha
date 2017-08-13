@@ -46,6 +46,7 @@ namespace nomic {
 				m_type(type),
 				m_uniform_ambient(0),
 				m_uniform_ambient_position(0),
+				m_uniform_clouds(0),
 				m_uniform_cycle(0),
 				m_uniform_depth_matrix(0),
 				m_uniform_model(0),
@@ -78,6 +79,7 @@ namespace nomic {
 				m_type(other.m_type),
 				m_uniform_ambient(other.m_uniform_ambient),
 				m_uniform_ambient_position(other.m_uniform_ambient_position),
+				m_uniform_clouds(other.m_uniform_clouds),
 				m_uniform_cycle(other.m_uniform_cycle),
 				m_uniform_depth_matrix(other.m_uniform_depth_matrix),
 				m_uniform_model(other.m_uniform_model),
@@ -128,6 +130,7 @@ namespace nomic {
 				m_type = other.m_type;
 				m_uniform_ambient = other.m_uniform_ambient;
 				m_uniform_ambient_position = other.m_uniform_ambient_position;
+				m_uniform_clouds = other.m_uniform_clouds;
 				m_uniform_cycle = other.m_uniform_cycle;
 				m_uniform_depth_matrix = other.m_uniform_depth_matrix;
 				m_uniform_model = other.m_uniform_model;
@@ -289,6 +292,18 @@ namespace nomic {
 		}
 
 		void 
+		renderer::set_clouds(
+			__in const GLboolean clouds
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Clouds=%x", clouds);
+
+			nomic::graphic::program::set_uniform(m_uniform_clouds, clouds);
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
 		renderer::set_cull(
 			__in bool cull,
 			__in_opt GLenum mode
@@ -439,6 +454,7 @@ namespace nomic {
 			m_uniform_ambient = nomic::graphic::program::uniform_location(UNIFORM_AMBIENT);
 			m_uniform_ambient_background = nomic::graphic::program::uniform_location(UNIFORM_AMBIENT_BACKGROUND);
 			m_uniform_ambient_position = nomic::graphic::program::uniform_location(UNIFORM_AMBIENT_POSITION);
+			m_uniform_clouds = nomic::graphic::program::uniform_location(UNIFORM_CLOUDS);
 			m_uniform_cycle = nomic::graphic::program::uniform_location(UNIFORM_CYCLE);
 			m_uniform_depth_matrix = nomic::graphic::program::uniform_location(UNIFORM_DEPTH_MATRIX);
 			m_uniform_model = nomic::graphic::program::uniform_location(UNIFORM_MODEL);
@@ -473,10 +489,11 @@ namespace nomic {
 						<< "(" << ((m_mode == RENDER_PERSPECTIVE) ? "Perspective" : "Orthogonal") << ")"
 					<< ", Ambient=" << m_uniform_ambient << " (Background=" << m_uniform_ambient_background
 						<< ", Position=" << m_uniform_ambient_position << ")"
-					<< ", Cycle=" << m_uniform_cycle << ", Depth Matrix=" << m_uniform_depth_matrix
-					<< ", Model=" << m_uniform_model << ", Position=" << m_uniform_position
-					<< ", Rotation=" << m_uniform_rotation << ", Projection=" << m_uniform_projection
-					<< ", Underwater=" << m_uniform_underwater << ", View=" << m_uniform_view;
+					<< ", Clouds=" << m_uniform_clouds << ", Cycle=" << m_uniform_cycle
+					<< ", Depth Matrix=" << m_uniform_depth_matrix << ", Model=" << m_uniform_model
+					<< ", Position=" << m_uniform_position << ", Rotation=" << m_uniform_rotation
+					<< ", Projection=" << m_uniform_projection << ", Underwater=" << m_uniform_underwater
+					<< ", View=" << m_uniform_view;
 			}
 
 			return result.str();
@@ -509,20 +526,22 @@ namespace nomic {
 			__in const glm::vec4 &ambient,
 			__in const glm::vec4 &ambient_background,
 			__in const glm::vec3 &ambient_position,
+			__in GLboolean clouds,
 			__in GLboolean underwater,
 			__in const glm::mat4 &projection
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
-"Position={%f, %f, %f}, Rotation={%f, %f, %f}, Cycle=%f, Ambient={%f, %f, %f, %f} (Background={%f, %f, %f, %f}, Position={%f, %f, %f}), Underwater=%x, Projection=%p",
+"Position={%f, %f, %f}, Rotation={%f, %f, %f}, Cycle=%f, Ambient={%f, %f, %f, %f} (Background={%f, %f, %f, %f}, Position={%f, %f, %f}), Clouds=%x, Underwater=%x, Projection=%p",
 				position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, cycle, ambient.x, ambient.y, ambient.z,
 				ambient.w, ambient_background.x, ambient_background.y, ambient_background.z, ambient_background.w,
-				ambient_position.x, ambient_position.y, ambient_position.z, underwater, &projection);
+				ambient_position.x, ambient_position.y, ambient_position.z, clouds, underwater, &projection);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_ambient, ambient);
 			nomic::graphic::program::set_uniform(m_uniform_ambient_background, ambient_background);
 			nomic::graphic::program::set_uniform(m_uniform_ambient_position, ambient_position);
+			nomic::graphic::program::set_uniform(m_uniform_clouds, clouds);
 			nomic::graphic::program::set_uniform(m_uniform_cycle, cycle);
 			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
@@ -541,21 +560,23 @@ namespace nomic {
 			__in const glm::vec4 &ambient,
 			__in const glm::vec4 &ambient_background,
 			__in const glm::vec3 &ambient_position,
+			__in GLboolean clouds,
 			__in GLboolean underwater,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
-"Position={%f, %f, %f}, Rotation={%f, %f, %f}, Cycle=%f, Ambient={%f, %f, %f, %f} (Background={%f, %f, %f, %f}, Position={%f, %f, %f}), Underwater=%x, Projection=%p, View=%p",
+"Position={%f, %f, %f}, Rotation={%f, %f, %f}, Cycle=%f, Ambient={%f, %f, %f, %f} (Background={%f, %f, %f, %f}, Position={%f, %f, %f}), Clouds=%x, Underwater=%x, Projection=%p, View=%p",
 				position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, cycle, ambient.x, ambient.y, ambient.z,
 				ambient.w, ambient_background.x, ambient_background.y, ambient_background.z, ambient_background.w,
-				ambient_position.x, ambient_position.y, ambient_position.z, underwater, &projection, &view);
+				ambient_position.x, ambient_position.y, ambient_position.z, clouds, underwater, &projection, &view);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_ambient, ambient);
 			nomic::graphic::program::set_uniform(m_uniform_ambient_background, ambient_background);
 			nomic::graphic::program::set_uniform(m_uniform_ambient_position, ambient_position);
+			nomic::graphic::program::set_uniform(m_uniform_clouds, clouds);
 			nomic::graphic::program::set_uniform(m_uniform_cycle, cycle);
 			nomic::graphic::program::set_uniform(m_uniform_position, position);
 			nomic::graphic::program::set_uniform(m_uniform_projection, projection);
@@ -575,6 +596,7 @@ namespace nomic {
 			__in const glm::vec4 &ambient,
 			__in const glm::vec4 &ambient_background,
 			__in const glm::vec3 &ambient_position,
+			__in GLboolean clouds,
 			__in GLboolean underwater,
 			__in const glm::mat4 &projection,
 			__in const glm::mat4 &view,
@@ -582,15 +604,16 @@ namespace nomic {
 			)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE,
-"Position={%f, %f, %f}, Rotation={%f, %f, %f}, Cycle=%f, Ambient={%f, %f, %f, %f} (Background={%f, %f, %f, %f}, Position={%f, %f, %f}), Underwater=%x, Projection=%p, View=%p, Model=%p",
+"Position={%f, %f, %f}, Rotation={%f, %f, %f}, Cycle=%f, Ambient={%f, %f, %f, %f} (Background={%f, %f, %f, %f}, Position={%f, %f, %f}), Clouds=%x, Underwater=%x, Projection=%p, View=%p, Model=%p",
 				position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, cycle, ambient.x, ambient.y, ambient.z,
 				ambient.w, ambient_background.x, ambient_background.y, ambient_background.z, ambient_background.w,
-				ambient_position.x, ambient_position.y, ambient_position.z, underwater, &projection, &view, &model);
+				ambient_position.x, ambient_position.y, ambient_position.z, clouds, underwater, &projection, &view, &model);
 
 			nomic::graphic::program::use();
 			nomic::graphic::program::set_uniform(m_uniform_ambient, ambient);
 			nomic::graphic::program::set_uniform(m_uniform_ambient_background, ambient_background);
 			nomic::graphic::program::set_uniform(m_uniform_ambient_position, ambient_position);
+			nomic::graphic::program::set_uniform(m_uniform_clouds, clouds);
 			nomic::graphic::program::set_uniform(m_uniform_cycle, cycle);
 			nomic::graphic::program::set_uniform(m_uniform_model, model);
 			nomic::graphic::program::set_uniform(m_uniform_position, position);

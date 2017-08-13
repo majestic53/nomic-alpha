@@ -77,6 +77,10 @@ namespace nomic {
 					__in_opt GLenum dfactor = RENDERER_BLEND_DFACTOR_DEFAULT
 					);
 
+				void set_clouds(
+					__in const GLboolean clouds
+					);
+
 				void set_cull(
 					__in bool cull,
 					__in_opt GLenum mode = RENDERER_CULL_MODE_DEFAULT
@@ -143,6 +147,7 @@ namespace nomic {
 					__in const glm::vec4 &ambient,
 					__in const glm::vec4 &ambient_background,
 					__in const glm::vec3 &ambient_position,
+					__in GLboolean clouds,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection
 					);
@@ -154,6 +159,7 @@ namespace nomic {
 					__in const glm::vec4 &ambient,
 					__in const glm::vec4 &ambient_background,
 					__in const glm::vec3 &ambient_position,
+					__in GLboolean clouds,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view
@@ -166,6 +172,7 @@ namespace nomic {
 					__in const glm::vec4 &ambient,
 					__in const glm::vec4 &ambient_background,
 					__in const glm::vec3 &ambient_position,
+					__in GLboolean clouds,
 					__in GLboolean underwater,
 					__in const glm::mat4 &projection,
 					__in const glm::mat4 &view,
@@ -203,6 +210,8 @@ namespace nomic {
 				GLint m_uniform_ambient_background;
 
 				GLint m_uniform_ambient_position;
+
+				GLint m_uniform_clouds;
 
 				GLint m_uniform_cycle;
 

@@ -32,6 +32,10 @@ Changelog
 
 Version 0.1.1732
 ----------------
+*Updated: 8/13/2017*
+
+& Added cloud generation
+
 *Updated: 8/12/2017*
 
 * Added basic collision detection

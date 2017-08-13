@@ -30,8 +30,9 @@ namespace nomic {
 			__in_opt double amplitude,
 			__in_opt uint32_t max
 			) :
-				nomic::core::noise(seed, octaves, amplitude),
 				m_max(max),
+				m_noise_cloud(seed + seed, octaves, amplitude),
+				m_noise_terrain(seed, octaves, amplitude),
 				m_random(seed)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Seed=%u(%x), Octaves=%u, Amplitude=%g, Max=%u", seed, seed, octaves, amplitude, max);
@@ -41,8 +42,9 @@ namespace nomic {
 		generator::generator(
 			__in const generator &other
 			) :
-				nomic::core::noise(other),
-				m_max(other.m_max)
+				m_max(other.m_max),
+				m_noise_cloud(other.m_noise_cloud),
+				m_noise_terrain(other.m_noise_terrain)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Seed=%u(%x), Octaves=%u, Amplitude=%g, Max=%u", other.m_seed, other.m_seed,
 				other.m_octaves, other.m_amplitude, other.m_max);
@@ -64,8 +66,9 @@ namespace nomic {
 				other.m_octaves, other.m_amplitude, other.m_max);
 
 			if(this != &other) {
-				nomic::core::noise::operator=(other);
 				m_max = other.m_max;
+				m_noise_cloud = other.m_noise_cloud;
+				m_noise_terrain = other.m_noise_terrain;
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%p", this);
@@ -78,8 +81,9 @@ namespace nomic {
 			__inout nomic::terrain::chunk &chunk
 			)
 		{
-			double scale;
 			uint32_t height;
+			double scale, scale_cloud;
+			uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE)
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}, Chunk=%p", position.x, position.y, &chunk);
 
@@ -88,7 +92,7 @@ namespace nomic {
 			for(int32_t z = (CHUNK_WIDTH - 1); z >= 0; --z) {
 
 				for(int32_t x = 0; x < CHUNK_WIDTH; ++x) {
-					scale = std::abs(nomic::core::noise::generate(((position.x * CHUNK_WIDTH) + x) / NOISE_SCALE,
+					scale = std::abs(m_noise_terrain.generate(((position.x * CHUNK_WIDTH) + x) / NOISE_SCALE,
 						((position.y * CHUNK_WIDTH) + z) / NOISE_SCALE));
 
 					height = (((BLOCK_HEIGHT_MAX - BLOCK_HEIGHT_MIN) * scale) + BLOCK_HEIGHT_MIN);
@@ -102,13 +106,39 @@ namespace nomic {
 
 					for(int32_t y = (CHUNK_HEIGHT - 1); y >= 0; --y) {
 
-						if(!y) {
-							chunk.set_block(glm::uvec3(x, y, z), BLOCK_BOUNDARY,
-								BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE);
-						} else if(y > height) {
-							chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR,
-								BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE);
-						} else {
+						if(!y) { // boundary
+							chunk.set_block(glm::uvec3(x, y, z), BLOCK_BOUNDARY, attributes);
+						} else if(y == BLOCK_HEIGHT_CLOUD) { // cloud
+							uint32_t iter = 0;
+							float threshold = BLOCK_CLOUD_THRESHOLD;
+							scale_cloud = std::abs(m_noise_cloud.generate(((position.x * CHUNK_WIDTH) + x)
+									/ NOISE_SCALE_CLOUD, ((position.y * CHUNK_WIDTH) + z) / NOISE_SCALE_CLOUD));
+
+							for(; iter < BLOCK_CLOUD_THICKNESS;
+									++iter, threshold -= BLOCK_CLOUD_THRESHOLD_STEP) {
+
+								if(scale_cloud >= threshold) {
+									uint32_t iter_layer = 0;
+
+									for(; iter_layer < (BLOCK_CLOUD_THICKNESS - iter - 1);
+											++iter_layer) {
+										chunk.set_block(glm::uvec3(x, y - iter_layer, z), BLOCK_CLOUD,
+											attributes | BLOCK_ATTRIBUTE_HIDDEN);
+									}
+
+									chunk.set_block(glm::uvec3(x, y - iter_layer, z),
+										BLOCK_CLOUD, attributes & ~BLOCK_ATTRIBUTE_HIDDEN);
+									y -= iter_layer;
+									break;
+								}
+							}
+
+							if(iter == BLOCK_CLOUD_THICKNESS) {
+								chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes);
+							}
+						} else if(y > height) { // air
+							chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes);
+						} else { // other
 							chunk_column(glm::vec3(x, y, z), chunk);
 							break;
 						}
@@ -469,7 +499,7 @@ namespace nomic {
 		{
 			TRACE_ENTRY(LEVEL_VERBOSE);
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u(%x)", m_seed, m_seed);
-			return m_seed;
+			return m_noise_terrain.seed();
 		}
 
 		void 
@@ -482,8 +512,9 @@ namespace nomic {
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Seed=%u(%x), Octaves=%u, Amplitude=%g, Max=%u", seed, seed, octaves, amplitude, max);
 
-			nomic::core::noise::setup(seed, octaves, amplitude);
 			m_max = max;
+			m_noise_cloud.setup(seed + seed, octaves, amplitude);
+			m_noise_terrain.setup(seed, octaves, amplitude);
 			m_random.setup(seed);
 
 			TRACE_EXIT(LEVEL_VERBOSE);
@@ -501,7 +532,8 @@ namespace nomic {
 			result << NOMIC_TERRAIN_GENERATOR_HEADER << "(" << SCALAR_AS_HEX(uintptr_t, this) << ")";
 
 			if(verbose) {
-				result << " Base=" << nomic::core::noise::to_string(verbose)
+				result << " Terrain=" << m_noise_terrain.to_string(verbose)
+					<< ", Cloud=" << m_noise_cloud.to_string(verbose)
 					<< ", Max=" << m_max;
 			}
 

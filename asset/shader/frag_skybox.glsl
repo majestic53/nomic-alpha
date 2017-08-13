@@ -21,7 +21,9 @@
 in vec3 out_vertex;
 
 uniform vec4 ambient_background;
+uniform bool clouds;
 uniform float cycle;
+uniform bool underwater;
 
 uniform samplerCube out_cube;
 
@@ -30,6 +32,18 @@ const float AMBIENT_DARK_END = 0.05f;
 const float AMBIENT_DARK_MIN = 0.1f;
 const float AMBIENT_DARK_MAX = 0.9f;
 const float AMBIENT_DARK_START = 0.95f;
+
+const vec4 CLOUD_COLOR = vec4(0.8f, 0.83f, 0.84f, 1.f);
+const float CLOUD_FALLOFF = 0.08f;
+
+const vec4 FOG_COLOR_DEFAULT = vec4(0.34f, 0.71f, 0.88f, 1.f);
+const vec4 FOG_COLOR_MC = vec4(0.54f, 0.70f, 1.f, 1.f);
+const float FOG_FALLOFF = 0.004f;
+
+const float SKYBOX_DISTANCE = 1000.f;
+
+const vec4 WATER_COLOR = vec4(0.25f, 0.56f, 0.86f, 1.f);
+const float WATER_FALLOFF = 0.08f;
 
 vec4 
 add_light_ambient(
@@ -50,13 +64,31 @@ add_light_ambient(
 	return mix(ambient, AMBIENT_DARK, clamp(scale, AMBIENT_DARK_MIN, AMBIENT_DARK_MAX));
 }
 
+vec4 
+add_fog_constant(
+	in vec4 color,
+	in vec4 color_fog,
+	in float falloff,
+	in float distance
+	)
+{
+	float density = (1.f - exp(-distance * falloff));
+
+	return mix(color, color_fog, density);
+}
+
 void
 main(void)
 {
-	vec4 color;
+	vec4 color = texture(out_cube, out_vertex);
 
-	color = texture(out_cube, out_vertex);
 	color *= add_light_ambient(cycle, ambient_background);
+
+	if(clouds) { // clouds
+		color = add_fog_constant(color, add_light_ambient(cycle, CLOUD_COLOR), CLOUD_FALLOFF, SKYBOX_DISTANCE);
+	} else if(underwater) { // underwater
+		color = add_fog_constant(color, add_light_ambient(cycle, WATER_COLOR), WATER_FALLOFF, SKYBOX_DISTANCE);
+	}
 
 	gl_FragColor = color;
 }
