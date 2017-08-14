@@ -275,6 +275,30 @@ namespace nomic {
 		}
 
 		bool 
+		manager::determine_block_decoration(
+			__in uint8_t type
+			)
+		{
+			bool result = false;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
+
+			switch(type) {
+				case BLOCK_FLOWER_RED:
+				case BLOCK_FLOWER_YELLOW:
+				case BLOCK_GRASS_SHORT:
+				case BLOCK_GRASS_TALL:
+					result = true;
+					break;
+				default:
+					break;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
+			return result;
+		}
+
+		bool 
 		manager::determine_block_selectable(
 			__in uint8_t type
 			)
@@ -286,6 +310,10 @@ namespace nomic {
 			switch(type) {
 				case BLOCK_AIR:
 				case BLOCK_CLOUD:
+				case BLOCK_FLOWER_RED:
+				case BLOCK_FLOWER_YELLOW:
+				case BLOCK_GRASS_SHORT:
+				case BLOCK_GRASS_TALL:
 				case BLOCK_WATER:
 					result = false;
 					break;
@@ -1360,6 +1388,7 @@ namespace nomic {
 
 			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
 			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
+				glm::uvec3 position_above;
 				uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE), type = BLOCK_AIR;
 
 				TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Removing block. Chunk={%i, %i}, Block={%u, %u, %u}",
@@ -1415,6 +1444,11 @@ namespace nomic {
 							&& (chunk->block_type(m_block_selected_block + glm::uvec3(0, 1, 0)) != BLOCK_AIR)) { // top
 						attributes |= BLOCK_ATTRIBUTE_HIDDEN;
 					}
+				}
+
+				position_above = glm::uvec3(m_block_selected_block.x, m_block_selected_block.y + 1, m_block_selected_block.z);
+				if(determine_block_decoration(chunk->block_type(position_above))) { // remove decoration
+					chunk->set_block(position_above, BLOCK_AIR, attributes);
 				}
 
 				chunk->set_block(m_block_selected_block, type, attributes);

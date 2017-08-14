@@ -30,11 +30,17 @@ make release
 Changelog
 =========
 
+Version 0.1.1733
+----------------
+*Updated: 8/14/2017*
+
+* Added block decorations (grass/flowers/etc.)
+
 Version 0.1.1732
 ----------------
 *Updated: 8/13/2017*
 
-& Added cloud generation
+* Added cloud generation
 
 *Updated: 8/12/2017*
 
@@ -43,26 +49,6 @@ Version 0.1.1732
 *Updated: 8/10/2017*
 
 * Added basic player physics
-
-Version 0.1.1731
-----------------
-*Updated: 8/6/2017*
-
-* Added shadowmap class (incomplete)
-
-*Updated: 8/5/2017*
-
-* Added basic lighting
-* Added sun-rise/-set
-* Code cleanup/bug fixes
-
-*Updated: 8/1-3/2017*
-
-* Added sun entity class <s>(incomplete)</s>
-
-*Updated: 7/31/2017*
-
-* Added textured blocks to block gui
 
 *Changelog truncated (see file history for full log)*
 

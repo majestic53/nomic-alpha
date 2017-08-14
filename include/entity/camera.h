@@ -116,6 +116,10 @@ namespace nomic {
 
 			protected:
 
+				bool determine_block_passable(
+					__in uint8_t type
+					);
+
 				void update_perspective(void);
 
 				glm::uvec2 m_dimensions;

@@ -235,8 +235,8 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 6
-	#define NOMIC_VERSION_WEEK 1732
+	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_WEEK 1733
 
 	#define OBJECT_COUNT 1
 
@@ -366,7 +366,7 @@ namespace nomic {
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
 
-	#define TICKS_PER_CYCLE 32000
+	#define TICKS_PER_CYCLE 2000 //32000
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 
@@ -424,7 +424,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 38
+	#define VIEW_WIDTH 20 //38
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -460,16 +460,20 @@ namespace nomic {
 		BLOCK_ORE_DIAMOND,
 		BLOCK_GLASS,
 		BLOCK_LEAVES,
+		BLOCK_GRASS_SHORT,
 		BLOCK_GRASS_TALL,
+		BLOCK_FLOWER_RED,
+		BLOCK_FLOWER_YELLOW,
 	};
 
-	#define BLOCK_MAX BLOCK_GRASS_TALL
+	#define BLOCK_MAX BLOCK_FLOWER_YELLOW
 
 	static const std::string BLOCK_STR[] = {
 		"Air", "Cloud", "Water", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone",
 		"Stone/Snow", "Snow", "Gravel", "Sand", "Sandstone", "Sandstone/Side", "Wood",
 		"Wood-side", "Plank", "Cobblestone", "Mossy-Cobblestone", "Obsidian", "Gold-Ore",
-		"Iron-Ore", "Coal-Ore", "Diamond-Ore", "Glass", "Leaves", "Grass-Tall",
+		"Iron-Ore", "Coal-Ore", "Diamond-Ore", "Glass", "Leaves", "Grass-Short",
+		"Grass-Tall", "Flower-Red", "Flower-Yellow",
 		};
 
 	#define BLOCK_STRING(_TYPE_) \

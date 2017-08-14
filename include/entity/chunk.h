@@ -120,6 +120,13 @@ namespace nomic {
 					__in std::map<uint8_t, chunk_data>::iterator entry
 					);
 
+				void add_face_decoration(
+					__in const glm::vec3 &position,
+					__in uint32_t face,
+					__in uint32_t attributes,
+					__in std::map<uint8_t, chunk_data>::iterator entry
+					);
+
 				std::map<uint8_t, chunk_data>::iterator add_face_type(
 					__in uint8_t type,
 					__in uint32_t face,
@@ -132,6 +139,10 @@ namespace nomic {
 					__in uint8_t type_top,
 					__in uint8_t type_bottom,
 					__in uint8_t type_side
+					);
+
+				bool determine_decoration(
+					__in uint8_t type
 					);
 
 				bool determine_transparent(

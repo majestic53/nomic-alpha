@@ -40,7 +40,7 @@ const vec4 FOG_COLOR_DEFAULT = vec4(0.34f, 0.71f, 0.88f, 1.f);
 const vec4 FOG_COLOR_MC = vec4(0.54f, 0.70f, 1.f, 1.f);
 const float FOG_FALLOFF = 0.004f;
 
-const float SKYBOX_DISTANCE = 1000.f;
+const float SKYBOX_DISTANCE = 100.f;
 
 const vec4 WATER_COLOR = vec4(0.25f, 0.56f, 0.86f, 1.f);
 const float WATER_FALLOFF = 0.08f;

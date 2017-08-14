@@ -137,6 +137,10 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
+				bool determine_block_decoration(
+					__in uint8_t type
+					);
+
 				bool determine_block_selectable(
 					__in uint8_t type
 					);

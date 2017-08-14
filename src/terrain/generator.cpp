@@ -332,6 +332,13 @@ namespace nomic {
 				if(top) { // grass
 					top = false;
 					type = BLOCK_GRASS;
+
+// TODO: DEBUG
+					if(chunk.type(glm::uvec3(position.x, y + 1, position.z)) == BLOCK_AIR) { // decoration
+						chunk.set_block(glm::uvec3(position.x, y + 1, position.z), BLOCK_FLOWER_YELLOW,
+							attribute & ~BLOCK_ATTRIBUTE_BREAKABLE);
+					}
+// ---
 				}
 			} else if((y < BLOCK_LEVEL_GRASS) && (y >= BLOCK_LEVEL_BEACH_ROCKS)) { // dirt/stone
 				zone = BLOCK_ZONE_GRASS;
