@@ -351,6 +351,11 @@ namespace nomic {
 				case BLOCK_CLOUD:
 				case BLOCK_COBBLESTONE:
 				case BLOCK_COBBLESTONE_MOSSY:
+				case BLOCK_CORAL_BLUE:
+				case BLOCK_CORAL_BROWN:
+				case BLOCK_CORAL_ORANGE:
+				case BLOCK_CORAL_PINK:
+				case BLOCK_CORAL_PURPLE:
 				case BLOCK_DIRT:
 				case BLOCK_FLOWER_RED:
 				case BLOCK_FLOWER_YELLOW:
@@ -366,6 +371,9 @@ namespace nomic {
 				case BLOCK_ORE_DIAMOND:
 				case BLOCK_PLANK:
 				case BLOCK_SAND:
+				case BLOCK_SEAGRASS_GREEN:
+				case BLOCK_SEAGRASS_BROWN:
+				case BLOCK_SHRUB:
 				case BLOCK_STONE:
 				case BLOCK_WATER:
 					break;
@@ -506,10 +514,18 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
 
 			switch(type) {
+				case BLOCK_CORAL_BLUE:
+				case BLOCK_CORAL_BROWN:
+				case BLOCK_CORAL_ORANGE:
+				case BLOCK_CORAL_PINK:
+				case BLOCK_CORAL_PURPLE:
 				case BLOCK_FLOWER_RED:
 				case BLOCK_FLOWER_YELLOW:
 				case BLOCK_GRASS_SHORT:
 				case BLOCK_GRASS_TALL:
+				case BLOCK_SEAGRASS_GREEN:
+				case BLOCK_SEAGRASS_BROWN:
+				case BLOCK_SHRUB:
 					result = true;
 					break;
 				default:
@@ -620,12 +636,20 @@ namespace nomic {
 			switch(type) {
 				case BLOCK_AIR:
 				case BLOCK_CLOUD:
+				case BLOCK_CORAL_BLUE:
+				case BLOCK_CORAL_BROWN:
+				case BLOCK_CORAL_ORANGE:
+				case BLOCK_CORAL_PINK:
+				case BLOCK_CORAL_PURPLE:
 				case BLOCK_FLOWER_RED:
 				case BLOCK_FLOWER_YELLOW:
 				case BLOCK_GLASS:
 				case BLOCK_GRASS_SHORT:
 				case BLOCK_GRASS_TALL:
 				case BLOCK_LEAVES:
+				case BLOCK_SEAGRASS_GREEN:
+				case BLOCK_SEAGRASS_BROWN:
+				case BLOCK_SHRUB:
 				case BLOCK_WATER:
 					result = true;
 					break;

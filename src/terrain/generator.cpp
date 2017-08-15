@@ -83,7 +83,7 @@ namespace nomic {
 		{
 			uint32_t height;
 			double scale, scale_cloud;
-			uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC | ~BLOCK_ATTRIBUTE_BREAKABLE)
+			uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE)
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}, Chunk=%p", position.x, position.y, &chunk);
 
@@ -121,25 +121,24 @@ namespace nomic {
 									uint32_t iter_layer = 0;
 
 									for(; iter_layer < (BLOCK_CLOUD_THICKNESS - iter - 1);
-											++iter_layer) {
+											++iter_layer) { // cloud
 										chunk.set_block(glm::uvec3(x, y - iter_layer, z), BLOCK_CLOUD,
 											attributes | BLOCK_ATTRIBUTE_HIDDEN);
 									}
 
-									chunk.set_block(glm::uvec3(x, y - iter_layer, z),
-										BLOCK_CLOUD, attributes & ~BLOCK_ATTRIBUTE_HIDDEN);
+									chunk.set_block(glm::uvec3(x, y - iter_layer, z), BLOCK_CLOUD, attributes);
 									y -= iter_layer;
 									break;
 								}
 							}
 
-							if(iter == BLOCK_CLOUD_THICKNESS) {
-								chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes);
+							if(iter == BLOCK_CLOUD_THICKNESS) { // air
+								chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes | BLOCK_ATTRIBUTE_HIDDEN);
 							}
 						} else if(y > height) { // air
-							chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes);
+							chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes | BLOCK_ATTRIBUTE_HIDDEN);
 						} else { // other
-							chunk_column(glm::vec3(x, y, z), chunk);
+							chunk_column(glm::vec3(x, y, z), chunk, scale);
 							break;
 						}
 					}
@@ -295,14 +294,16 @@ namespace nomic {
 		void 
 		generator::chunk_column(
 			__in const glm::uvec3 &position,
-			__in nomic::terrain::chunk &chunk
+			__in nomic::terrain::chunk &chunk,
+			__in double scale
 			)
 		{
 			uint32_t depth = 0, zone;
 			bool bottom = false, top = true;
 			uint8_t attribute = BLOCK_ATTRIBUTES_DEFAULT, type;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p, Scale=%f", position.x, position.y, position.z,
+				&chunk, scale);
 
 			int32_t y = position.y;
 			if(!y) { // boundary
@@ -316,14 +317,23 @@ namespace nomic {
 				zone = BLOCK_ZONE_ALPINE;
 				type = chunk_block_blend(y, ((BLOCK_LEVEL_ALPINE_PEAK - 1) - ((BLOCK_LEVEL_ALPINE_PEAK - 1) - BLOCK_LEVEL_ALPINE)),
 					BLOCK_LEVEL_ALPINE_PEAK - 1, BLOCK_STONE, BLOCK_GRAVEL);
+
+				if(top) {
+					top = false;
+					chunk_decoration_alpine(glm::uvec3(position.x, y + 1, position.z), chunk, scale); // alpine decoration
+				}
 			} else if((y < BLOCK_LEVEL_ALPINE) && (y >= BLOCK_LEVEL_GRASS_STEP)) { // gravel/dirt
 				zone = BLOCK_ZONE_ALPINE;
 				type = chunk_block_blend(y, ((BLOCK_LEVEL_ALPINE - 1) - ((BLOCK_LEVEL_ALPINE - 1) - BLOCK_LEVEL_GRASS_STEP)),
 					BLOCK_LEVEL_ALPINE - 1, BLOCK_GRAVEL, BLOCK_DIRT);
 
-				if(top && (type == BLOCK_DIRT)) { // grass
+				if(top) { 
 					top = false;
-					type = BLOCK_GRASS;
+					chunk_decoration_alpine(glm::uvec3(position.x, y + 1, position.z), chunk, scale); // alpine decoration
+
+					if(type == BLOCK_DIRT) { // grass
+						type = BLOCK_GRASS;
+					}
 				}
 			} else if((y < BLOCK_LEVEL_GRASS_STEP) && (y >= BLOCK_LEVEL_GRASS)) { // dirt
 				zone = BLOCK_ZONE_GRASS;
@@ -332,13 +342,7 @@ namespace nomic {
 				if(top) { // grass
 					top = false;
 					type = BLOCK_GRASS;
-
-// TODO: DEBUG
-					if(chunk.type(glm::uvec3(position.x, y + 1, position.z)) == BLOCK_AIR) { // decoration
-						chunk.set_block(glm::uvec3(position.x, y + 1, position.z), BLOCK_FLOWER_YELLOW,
-							attribute & ~BLOCK_ATTRIBUTE_BREAKABLE);
-					}
-// ---
+					chunk_decoration_grassland(glm::uvec3(position.x, y + 1, position.z), chunk, scale); // grass decoration
 				}
 			} else if((y < BLOCK_LEVEL_GRASS) && (y >= BLOCK_LEVEL_BEACH_ROCKS)) { // dirt/stone
 				zone = BLOCK_ZONE_GRASS;
@@ -348,6 +352,7 @@ namespace nomic {
 				if(top && (type == BLOCK_DIRT)) { // grass
 					top = false;
 					type = BLOCK_GRASS;
+					chunk_decoration_grassland(glm::uvec3(position.x, y + 1, position.z), chunk, scale); // grass decoration
 				}
 			} else if((y < BLOCK_LEVEL_BEACH_ROCKS) && (y >= BLOCK_LEVEL_BEACH_GRAVEL)) { // stone/gravel
 				zone = BLOCK_ZONE_BEACH;
@@ -486,6 +491,104 @@ namespace nomic {
 					for(y = BLOCK_HEIGHT_WATER; y > position.y; --y) {
 						chunk.set_block(glm::uvec3(position.x, y, position.z), BLOCK_WATER,
 							(y == BLOCK_HEIGHT_WATER) ? attributes : (attributes | BLOCK_ATTRIBUTE_HIDDEN));
+					}
+
+					chunk_decoration_underwater(glm::uvec3(position.x, y + 1, position.z), chunk, scale); // sea decoration
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		generator::chunk_decoration_alpine(
+			__in const glm::uvec3 &position,
+			__in nomic::terrain::chunk &chunk,
+			__in double scale
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p, Scale=%f", position.x, position.y, position.z,
+				&chunk, scale);
+
+			if(chunk.type(position) == BLOCK_AIR) {
+
+				uint8_t type = chunk_block_pick(BLOCK_AIR, BLOCK_SHRUB); // shrub
+				if(type == BLOCK_SHRUB) {
+					chunk.set_block(position, BLOCK_SHRUB, BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		generator::chunk_decoration_grassland(
+			__in const glm::uvec3 &position,
+			__in nomic::terrain::chunk &chunk,
+			__in double scale
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p, Scale=%f", position.x, position.y, position.z,
+				&chunk, scale);
+
+			if(chunk.type(position) == BLOCK_AIR) { 
+
+				uint8_t type = chunk_block_pick(BLOCK_AIR, BLOCK_GRASS_TALL);
+				if(type == BLOCK_GRASS_TALL) { // grass
+					type = chunk_block_pick_uniform(BLOCK_GRASS_TALL, BLOCK_GRASS_SHORT);
+				}
+
+				if((type != BLOCK_AIR) && (scale >= BLOCK_DECORATION_FLOWER_MIN) && (scale < BLOCK_DECORATION_FLOWER_MAX)) { // flower
+
+					type = chunk_block_pick(type, BLOCK_FLOWER_RED);
+					if(type == BLOCK_FLOWER_RED) {
+						type = chunk_block_pick_uniform(BLOCK_FLOWER_RED, BLOCK_FLOWER_YELLOW);
+					}
+				}
+
+				if(type != BLOCK_AIR) {
+					chunk.set_block(position, type, BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		void 
+		generator::chunk_decoration_underwater(
+			__in const glm::uvec3 &position,
+			__in nomic::terrain::chunk &chunk,
+			__in double scale
+			)
+		{
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p, Scale=%f", position.x, position.y, position.z,
+				&chunk, scale);
+
+			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
+
+				uint8_t type = chunk_block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN);
+				if(type == BLOCK_SEAGRASS_GREEN) {
+
+					type = chunk_block_pick_uniform(BLOCK_SEAGRASS_GREEN, BLOCK_CORAL_ORANGE);
+					if(type == BLOCK_SEAGRASS_GREEN) { // sea-grass
+						type = chunk_block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
+
+						for(uint32_t iter = 0; iter < BLOCK_DECORATION_SEAGRASS_MAX; ++iter) {
+
+							if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD + iter + 1,
+									position.z)) != BLOCK_WATER) {
+								break;
+							}
+
+							chunk.set_block(glm::uvec3(position.x, position.y + iter, position.z), type,
+								BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+						}
+
+					} else { // coral
+						type = chunk_block_pick(chunk_block_pick(chunk_block_pick_uniform(BLOCK_CORAL_ORANGE, BLOCK_CORAL_PINK),
+							chunk_block_pick_uniform(BLOCK_CORAL_PURPLE, BLOCK_CORAL_BLUE)), BLOCK_CORAL_BROWN);
+						chunk.set_block(position, type, BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
 					}
 				}
 			}

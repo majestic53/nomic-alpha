@@ -96,7 +96,26 @@ namespace nomic {
 
 				void chunk_column(
 					__in const glm::uvec3 &position,
-					__in nomic::terrain::chunk &chunk
+					__in nomic::terrain::chunk &chunk,
+					__in double scale
+					);
+
+				void chunk_decoration_alpine(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk,
+					__in double scale
+					);
+
+				void chunk_decoration_grassland(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk,
+					__in double scale
+					);
+
+				void chunk_decoration_underwater(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk,
+					__in double scale
 					);
 
 				uint32_t m_max;

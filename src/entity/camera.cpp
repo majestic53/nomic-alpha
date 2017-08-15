@@ -209,10 +209,18 @@ namespace nomic {
 			switch(type) {
 				case BLOCK_AIR:
 				case BLOCK_CLOUD:
+				case BLOCK_CORAL_BLUE:
+				case BLOCK_CORAL_BROWN:
+				case BLOCK_CORAL_ORANGE:
+				case BLOCK_CORAL_PINK:
+				case BLOCK_CORAL_PURPLE:
 				case BLOCK_FLOWER_RED:
 				case BLOCK_FLOWER_YELLOW:
 				case BLOCK_GRASS_SHORT:
 				case BLOCK_GRASS_TALL:
+				case BLOCK_SEAGRASS_GREEN:
+				case BLOCK_SEAGRASS_BROWN:
+				case BLOCK_SHRUB:
 				case BLOCK_WATER:
 					result = true;
 					break;

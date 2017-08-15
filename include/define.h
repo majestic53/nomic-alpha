@@ -70,6 +70,10 @@ namespace nomic {
 	#define BLOCK_CLOUD_THRESHOLD_STEP 0.04f
 	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
 	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
+	#define BLOCK_DECORATION_FLOWER_MAX 0.6f
+	#define BLOCK_DECORATION_FLOWER_MIN 0.3f
+	#define BLOCK_DECORATION_SEAGRASS_MAX 4
+	#define BLOCK_DECORATION_UNDERWATER_PAD 1
 	#define BLOCK_DEPTH_BOUNDARY_MAX 3
 	#define BLOCK_DEPTH_DIRT_MAX 4
 	#define BLOCK_DEPTH_GRAVEL_MAX 3
@@ -228,14 +232,14 @@ namespace nomic {
 	#define NOISE_SCALE 480.0
 	#define NOISE_SCALE_CLOUD 180.0
 
-	#define NOISE_SEED_DEFAULT 2626494913 //0
+	#define NOISE_SEED_DEFAULT 0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 1
+	#define NOMIC_VERSION_REVISION 2
 	#define NOMIC_VERSION_WEEK 1733
 
 	#define OBJECT_COUNT 1
@@ -366,7 +370,7 @@ namespace nomic {
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
 
-	#define TICKS_PER_CYCLE 2000 //32000
+	#define TICKS_PER_CYCLE 32000
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 
@@ -424,7 +428,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 20 //38
+	#define VIEW_WIDTH 38
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -436,7 +440,6 @@ namespace nomic {
 	enum {
 		BLOCK_AIR = 0,
 		BLOCK_CLOUD,
-		BLOCK_WATER,
 		BLOCK_BOUNDARY,
 		BLOCK_DIRT,
 		BLOCK_DIRT_GRASS_SIDE,
@@ -464,16 +467,26 @@ namespace nomic {
 		BLOCK_GRASS_TALL,
 		BLOCK_FLOWER_RED,
 		BLOCK_FLOWER_YELLOW,
+		BLOCK_SHRUB,
+		BLOCK_SEAGRASS_GREEN,
+		BLOCK_SEAGRASS_BROWN,
+		BLOCK_CORAL_ORANGE,
+		BLOCK_CORAL_PINK,
+		BLOCK_CORAL_PURPLE,
+		BLOCK_CORAL_BLUE,
+		BLOCK_CORAL_BROWN,
+		BLOCK_WATER,
 	};
 
-	#define BLOCK_MAX BLOCK_FLOWER_YELLOW
+	#define BLOCK_MAX BLOCK_WATER
 
 	static const std::string BLOCK_STR[] = {
-		"Air", "Cloud", "Water", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone",
+		"Air", "Cloud", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone",
 		"Stone/Snow", "Snow", "Gravel", "Sand", "Sandstone", "Sandstone/Side", "Wood",
 		"Wood-side", "Plank", "Cobblestone", "Mossy-Cobblestone", "Obsidian", "Gold-Ore",
 		"Iron-Ore", "Coal-Ore", "Diamond-Ore", "Glass", "Leaves", "Grass-Short",
-		"Grass-Tall", "Flower-Red", "Flower-Yellow",
+		"Grass-Tall", "Flower-Red", "Flower-Yellow", "Shrub", "Seagrass-Green", "Seagrass-Brown",
+		"Coral-Orange", "Coral-Pink", "Coral-Purple", "Coral-Blue", "Coral-Brown", "Water",
 		};
 
 	#define BLOCK_STRING(_TYPE_) \
