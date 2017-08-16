@@ -348,6 +348,9 @@ namespace nomic {
 			switch(type) {
 				case BLOCK_AIR:
 				case BLOCK_BOUNDARY:
+				case BLOCK_BRICK:
+				case BLOCK_CACTUS:
+				case BLOCK_CLAY:
 				case BLOCK_CLOUD:
 				case BLOCK_COBBLESTONE:
 				case BLOCK_COBBLESTONE_MOSSY:
@@ -364,17 +367,20 @@ namespace nomic {
 				case BLOCK_GRASS_TALL:
 				case BLOCK_GRAVEL:
 				case BLOCK_LEAVES:
+				case BLOCK_LEAVES_PINE:
 				case BLOCK_OBSIDIAN:
 				case BLOCK_ORE_GOLD:
 				case BLOCK_ORE_IRON:
 				case BLOCK_ORE_COAL:
 				case BLOCK_ORE_DIAMOND:
 				case BLOCK_PLANK:
+				case BLOCK_PLANK_PINE:
 				case BLOCK_SAND:
 				case BLOCK_SEAGRASS_GREEN:
 				case BLOCK_SEAGRASS_BROWN:
 				case BLOCK_SHRUB:
 				case BLOCK_STONE:
+				case BLOCK_SUGAR_CANE:
 				case BLOCK_WATER:
 					break;
 				case BLOCK_GRASS:
@@ -438,6 +444,10 @@ namespace nomic {
 				case BLOCK_WOOD:
 					attributes |= BLOCK_ATTRIBUTE_ROTATABLE;
 					type = determine_face_type(face, attributes, BLOCK_WOOD, BLOCK_WOOD, BLOCK_WOOD_SIDE);
+					break;
+				case BLOCK_WOOD_PINE:
+					attributes |= BLOCK_ATTRIBUTE_ROTATABLE;
+					type = determine_face_type(face, attributes, BLOCK_WOOD_PINE, BLOCK_WOOD_PINE, BLOCK_WOOD_PINE_SIDE);
 					break;
 				default:
 					THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_TYPE_INVALID,
@@ -514,6 +524,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
 
 			switch(type) {
+				case BLOCK_CACTUS:
 				case BLOCK_CORAL_BLUE:
 				case BLOCK_CORAL_BROWN:
 				case BLOCK_CORAL_ORANGE:
@@ -526,6 +537,7 @@ namespace nomic {
 				case BLOCK_SEAGRASS_GREEN:
 				case BLOCK_SEAGRASS_BROWN:
 				case BLOCK_SHRUB:
+				case BLOCK_SUGAR_CANE:
 					result = true;
 					break;
 				default:
@@ -635,6 +647,7 @@ namespace nomic {
 
 			switch(type) {
 				case BLOCK_AIR:
+				case BLOCK_CACTUS:
 				case BLOCK_CLOUD:
 				case BLOCK_CORAL_BLUE:
 				case BLOCK_CORAL_BROWN:
@@ -647,9 +660,11 @@ namespace nomic {
 				case BLOCK_GRASS_SHORT:
 				case BLOCK_GRASS_TALL:
 				case BLOCK_LEAVES:
+				case BLOCK_LEAVES_PINE:
 				case BLOCK_SEAGRASS_GREEN:
 				case BLOCK_SEAGRASS_BROWN:
 				case BLOCK_SHRUB:
+				case BLOCK_SUGAR_CANE:
 				case BLOCK_WATER:
 					result = true;
 					break;

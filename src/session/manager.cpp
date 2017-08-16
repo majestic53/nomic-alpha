@@ -284,6 +284,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
 
 			switch(type) {
+				case BLOCK_CACTUS:
 				case BLOCK_CORAL_BLUE:
 				case BLOCK_CORAL_BROWN:
 				case BLOCK_CORAL_ORANGE:
@@ -296,6 +297,7 @@ namespace nomic {
 				case BLOCK_SEAGRASS_GREEN:
 				case BLOCK_SEAGRASS_BROWN:
 				case BLOCK_SHRUB:
+				case BLOCK_SUGAR_CANE:
 					result = true;
 					break;
 				default:
@@ -317,6 +319,7 @@ namespace nomic {
 
 			switch(type) {
 				case BLOCK_AIR:
+				case BLOCK_CACTUS:
 				case BLOCK_CLOUD:
 				case BLOCK_CORAL_BLUE:
 				case BLOCK_CORAL_BROWN:
@@ -330,6 +333,7 @@ namespace nomic {
 				case BLOCK_SEAGRASS_GREEN:
 				case BLOCK_SEAGRASS_BROWN:
 				case BLOCK_SHRUB:
+				case BLOCK_SUGAR_CANE:
 				case BLOCK_WATER:
 					result = false;
 					break;
@@ -1405,7 +1409,7 @@ namespace nomic {
 			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
 			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
 				glm::uvec3 position_above;
-				uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE), type = BLOCK_AIR;
+				uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE), offset = 1, type = BLOCK_AIR;
 
 				TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Removing block. Chunk={%i, %i}, Block={%u, %u, %u}",
 					m_block_selected_chunk.x, m_block_selected_chunk.y, m_block_selected_block.x,
@@ -1462,10 +1466,19 @@ namespace nomic {
 					}
 				}
 
-				position_above = glm::uvec3(m_block_selected_block.x, m_block_selected_block.y + 1, m_block_selected_block.z);
-				if(determine_block_decoration(chunk->block_type(position_above))) { // remove decoration
-					chunk->set_block(position_above, BLOCK_AIR, attributes);
+				while((m_block_selected_block.y + offset) < CHUNK_HEIGHT) {
+					position_above = glm::uvec3(m_block_selected_block.x, m_block_selected_block.y + offset,
+						m_block_selected_block.z);
+
+					if(!determine_block_decoration(chunk->block_type(position_above))) { // remove decoration
+						break;
+					}
+
+					chunk->set_block(position_above, m_underwater ? BLOCK_WATER : BLOCK_AIR, attributes);
+					++offset;
 				}
+
+
 
 				chunk->set_block(m_block_selected_block, type, attributes);
 				m_block_selected = false;

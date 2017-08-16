@@ -65,14 +65,20 @@ namespace nomic {
 	#define BACKDROP_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
+	#define BLOCK_DECORATION_CACTUS_MAX 4
+	#define BLOCK_DECORATION_CACTUS_AVERAGE 1
 	#define BLOCK_CLOUD_THICKNESS 1
 	#define BLOCK_CLOUD_THRESHOLD 0.48f
 	#define BLOCK_CLOUD_THRESHOLD_STEP 0.04f
 	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
 	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
-	#define BLOCK_DECORATION_FLOWER_MAX 0.6f
-	#define BLOCK_DECORATION_FLOWER_MIN 0.3f
-	#define BLOCK_DECORATION_SEAGRASS_MAX 4
+	#define BLOCK_DECORATION_CORAL_REEF_PAD 2
+	#define BLOCK_DECORATION_FLOWER_HEIGHT_MAX BLOCK_LEVEL_GRASS_STEP
+	#define BLOCK_DECORATION_FLOWER_HEIGHT_MIN BLOCK_LEVEL_GRASS
+	#define BLOCK_DECORATION_SEAGRASS_AVERAGE 4
+	#define BLOCK_DECORATION_SEAGRASS_MAX 6
+	#define BLOCK_DECORATION_SUGAR_CANE_MAX 4
+	#define BLOCK_DECORATION_SUGAR_CANE_AVERAGE 3
 	#define BLOCK_DECORATION_UNDERWATER_PAD 1
 	#define BLOCK_DEPTH_BOUNDARY_MAX 3
 	#define BLOCK_DEPTH_DIRT_MAX 4
@@ -239,7 +245,7 @@ namespace nomic {
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 2
+	#define NOMIC_VERSION_REVISION 3
 	#define NOMIC_VERSION_WEEK 1733
 
 	#define OBJECT_COUNT 1
@@ -370,7 +376,7 @@ namespace nomic {
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
 
-	#define TICKS_PER_CYCLE 32000
+	#define TICKS_PER_CYCLE 2000 //32000
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 
@@ -428,7 +434,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 38
+	#define VIEW_WIDTH 20 //38
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
@@ -451,9 +457,6 @@ namespace nomic {
 		BLOCK_SAND,
 		BLOCK_SANDSTONE,
 		BLOCK_SANDSTONE_SIDE,
-		BLOCK_WOOD,
-		BLOCK_WOOD_SIDE,
-		BLOCK_PLANK,
 		BLOCK_COBBLESTONE,
 		BLOCK_COBBLESTONE_MOSSY,
 		BLOCK_OBSIDIAN,
@@ -461,13 +464,24 @@ namespace nomic {
 		BLOCK_ORE_IRON,
 		BLOCK_ORE_COAL,
 		BLOCK_ORE_DIAMOND,
+		BLOCK_CLAY,
+		BLOCK_BRICK,
 		BLOCK_GLASS,
+		BLOCK_WOOD,
+		BLOCK_WOOD_SIDE,
+		BLOCK_PLANK,
+		BLOCK_WOOD_PINE,
+		BLOCK_WOOD_PINE_SIDE,
+		BLOCK_PLANK_PINE,
 		BLOCK_LEAVES,
+		BLOCK_LEAVES_PINE,
 		BLOCK_GRASS_SHORT,
 		BLOCK_GRASS_TALL,
 		BLOCK_FLOWER_RED,
 		BLOCK_FLOWER_YELLOW,
 		BLOCK_SHRUB,
+		BLOCK_CACTUS,
+		BLOCK_SUGAR_CANE,
 		BLOCK_SEAGRASS_GREEN,
 		BLOCK_SEAGRASS_BROWN,
 		BLOCK_CORAL_ORANGE,
@@ -481,12 +495,12 @@ namespace nomic {
 	#define BLOCK_MAX BLOCK_WATER
 
 	static const std::string BLOCK_STR[] = {
-		"Air", "Cloud", "Boundary", "Dirt", "Dirt/Grass", "Grass", "Stone",
-		"Stone/Snow", "Snow", "Gravel", "Sand", "Sandstone", "Sandstone/Side", "Wood",
-		"Wood-side", "Plank", "Cobblestone", "Mossy-Cobblestone", "Obsidian", "Gold-Ore",
-		"Iron-Ore", "Coal-Ore", "Diamond-Ore", "Glass", "Leaves", "Grass-Short",
-		"Grass-Tall", "Flower-Red", "Flower-Yellow", "Shrub", "Seagrass-Green", "Seagrass-Brown",
-		"Coral-Orange", "Coral-Pink", "Coral-Purple", "Coral-Blue", "Coral-Brown", "Water",
+		"Air", "Cloud", "Boundary", "Dirt", "Dirt-Grass-Side", "Grass", "Stone", "Stone-Snow-Side", "Snow",
+		"Gravel", "Sand", "Sandstone", "Sandstone-Side", "Cobblestone", "Cobblestone-Mossy", "Obsidian",
+		"Ore-Gold", "Ore-Iron", "Ore-Coal", "Ore-Diamond", "Clay", "Brick", "Glass", "Wood", "Wood-Side",
+		"Plank", "Wood-Pine", "Wood-Side-Pine", "Plank-Pine", "Leaves", "Leaves-Pine", "Grass-Short",
+		"Grass-Tall", "Flower-Red", "Flower-Yellow", "Shrub", "Cactus", "Sugar-Cane", "Seagrass-Green",
+		"Seagrass-Brown", "Coral-Orange", "Coral-Pink", "Coral-Purple", "Coral-Blue", "Coral-Brown", "Water",
 		};
 
 	#define BLOCK_STRING(_TYPE_) \
@@ -561,7 +575,6 @@ namespace nomic {
 		KEY_FORWARD = SDL_SCANCODE_W,
 		KEY_LEFT = SDL_SCANCODE_A,
 		KEY_LEFT_STRAFE = SDL_SCANCODE_Q,
-		KEY_RESET = SDL_SCANCODE_R,
 		KEY_RIGHT = SDL_SCANCODE_D,
 		KEY_RIGHT_STRAFE = SDL_SCANCODE_E,
 		KEY_SPRINT = SDL_SCANCODE_LSHIFT,

@@ -208,6 +208,7 @@ namespace nomic {
 
 			switch(type) {
 				case BLOCK_AIR:
+				case BLOCK_CACTUS:
 				case BLOCK_CLOUD:
 				case BLOCK_CORAL_BLUE:
 				case BLOCK_CORAL_BROWN:
@@ -221,6 +222,7 @@ namespace nomic {
 				case BLOCK_SEAGRASS_GREEN:
 				case BLOCK_SEAGRASS_BROWN:
 				case BLOCK_SHRUB:
+				case BLOCK_SUGAR_CANE:
 				case BLOCK_WATER:
 					result = true;
 					break;
@@ -448,10 +450,6 @@ namespace nomic {
 							case KEY_LEFT: // left
 							case KEY_LEFT_STRAFE:
 								position_relative -= (glm::normalize(glm::cross(m_rotation, m_up)) * strafe);
-								break;
-							case KEY_RESET: // reset camera to spawn
-								position_relative = instance.spawn();
-								iter->second.second = false;
 								break;
 							case KEY_RIGHT: // right
 							case KEY_RIGHT_STRAFE:

@@ -32,9 +32,9 @@ Changelog
 
 Version 0.1.1733
 ----------------
-*Updated: 8/14/2017*
+*Updated: 8/14-16/2017*
 
-* Added block decorations (grass/flowers/etc.)
+* Added additional block types & block decorations (grass/flowers/etc.)
 
 Version 0.1.1732
 ----------------

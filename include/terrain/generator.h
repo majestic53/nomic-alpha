@@ -96,26 +96,42 @@ namespace nomic {
 
 				void chunk_column(
 					__in const glm::uvec3 &position,
-					__in nomic::terrain::chunk &chunk,
-					__in double scale
+					__in nomic::terrain::chunk &chunk
 					);
 
-				void chunk_decoration_alpine(
+				bool chunk_decoration_alpine(
 					__in const glm::uvec3 &position,
-					__in nomic::terrain::chunk &chunk,
-					__in double scale
+					__in nomic::terrain::chunk &chunk
 					);
 
-				void chunk_decoration_grassland(
+				bool chunk_decoration_beach(
 					__in const glm::uvec3 &position,
-					__in nomic::terrain::chunk &chunk,
-					__in double scale
+					__in nomic::terrain::chunk &chunk
 					);
 
-				void chunk_decoration_underwater(
+				bool chunk_decoration_grassland(
 					__in const glm::uvec3 &position,
-					__in nomic::terrain::chunk &chunk,
-					__in double scale
+					__in nomic::terrain::chunk &chunk
+					);
+
+				bool chunk_decoration_tree(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk
+					);
+
+				bool chunk_decoration_tree_alpine(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk
+					);
+
+				bool chunk_decoration_underwater(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk
+					);
+
+				bool chunk_decoration_underwater_reef(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk
 					);
 
 				uint32_t m_max;

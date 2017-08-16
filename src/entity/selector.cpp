@@ -314,7 +314,7 @@ namespace nomic {
 			__in bool show
 			)
 		{
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Show=%x" show);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Show=%x", show);
 
 			m_show_bounds = show;
 
