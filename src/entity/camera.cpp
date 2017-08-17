@@ -197,43 +197,6 @@ namespace nomic {
 			return m_position_chunk_previous;
 		}
 
-		bool 
-		camera::determine_block_passable(
-			__in uint8_t type
-			)
-		{
-			bool result = false;
-
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
-
-			switch(type) {
-				case BLOCK_AIR:
-				case BLOCK_CACTUS:
-				case BLOCK_CLOUD:
-				case BLOCK_CORAL_BLUE:
-				case BLOCK_CORAL_BROWN:
-				case BLOCK_CORAL_ORANGE:
-				case BLOCK_CORAL_PINK:
-				case BLOCK_CORAL_PURPLE:
-				case BLOCK_FLOWER_RED:
-				case BLOCK_FLOWER_YELLOW:
-				case BLOCK_GRASS_SHORT:
-				case BLOCK_GRASS_TALL:
-				case BLOCK_SEAGRASS_GREEN:
-				case BLOCK_SEAGRASS_BROWN:
-				case BLOCK_SHRUB:
-				case BLOCK_SUGAR_CANE:
-				case BLOCK_WATER:
-					result = true;
-					break;
-				default:
-					break;
-			}
-
-			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
-			return result;
-		}
-
 		glm::uvec2 
 		camera::dimensions(void) const
 		{
@@ -515,7 +478,7 @@ namespace nomic {
 					}
 
 					type = terrain.at(position_chunk)->block_type(position_block);
-					if(!determine_block_passable(type)) { // top
+					if(!nomic::utility::block_passable(type)) { // top
 
 						if(m_velocity.y > 0.f) {
 							m_velocity.y = 0.f;
@@ -523,7 +486,7 @@ namespace nomic {
 					}
 
 					type = terrain.at(position_chunk)->block_type(position_block + glm::uvec3(0.f, -CAMERA_HEIGHT_OFFSET, 0.f));
-					if(!determine_block_passable(type)) { // bottom
+					if(!nomic::utility::block_passable(type)) { // bottom
 
 						if(m_velocity.y < 0.f) {
 							m_falling = false;
@@ -543,7 +506,7 @@ namespace nomic {
 						position_block_adjacent.y -= iter;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if(!determine_block_passable(type) && (position_relative.x > 0.f)) {
+						if(!nomic::utility::block_passable(type) && (position_relative.x > 0.f)) {
 							position.x -= std::modf(position_relative.x, &position_int);
 							break;
 						}
@@ -561,7 +524,7 @@ namespace nomic {
 						position_block_adjacent.y -= iter;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if(!determine_block_passable(type) && (position_relative.x < 0.f)) {
+						if(!nomic::utility::block_passable(type) && (position_relative.x < 0.f)) {
 							position.x += -std::modf(position_relative.x, &position_int);
 							break;
 						}
@@ -579,7 +542,7 @@ namespace nomic {
 						position_block_adjacent.z += 1;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if(!determine_block_passable(type) && (position_relative.z > 0.f)) {
+						if(!nomic::utility::block_passable(type) && (position_relative.z > 0.f)) {
 							position.z -= std::modf(position_relative.z, &position_int);
 							break;
 						}
@@ -597,7 +560,7 @@ namespace nomic {
 						position_block_adjacent.z -= 1;
 
 						type = terrain.at(position_chunk_adjacent)->block_type(position_block_adjacent);
-						if(!determine_block_passable(type) && (position_relative.z < 0.f)) {
+						if(!nomic::utility::block_passable(type) && (position_relative.z < 0.f)) {
 							position.z += -std::modf(position_relative.z, &position_int);
 							break;
 						}

@@ -596,7 +596,7 @@ namespace nomic {
 							}
 
 							chunk.set_block(glm::uvec3(position.x, position.y + iter, position.z), type,
-								BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+								BLOCK_ATTRIBUTES_DEFAULT);
 						}
 					}
 				}
@@ -752,11 +752,16 @@ namespace nomic {
 			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
 				result = true;
 
-				uint8_t type = chunk_block_pick_uniform(BLOCK_CORAL_ORANGE, BLOCK_SEAGRASS_GREEN);
+				uint8_t type = chunk_block_pick(BLOCK_CORAL_ORANGE, BLOCK_SEAGRASS_GREEN);
 				if(type == BLOCK_CORAL_ORANGE) { // coral
-					type = chunk_block_pick(chunk_block_pick(chunk_block_pick_uniform(BLOCK_CORAL_ORANGE, BLOCK_CORAL_PINK),
-						chunk_block_pick_uniform(BLOCK_CORAL_PURPLE, BLOCK_CORAL_BLUE)), BLOCK_CORAL_BROWN);
-					chunk.set_block(position, type, BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+					type = chunk_block_pick_uniform(BLOCK_WATER, chunk_block_pick(chunk_block_pick(chunk_block_pick_uniform(
+						BLOCK_CORAL_ORANGE, BLOCK_CORAL_PINK), chunk_block_pick_uniform(BLOCK_CORAL_PURPLE, BLOCK_CORAL_BLUE)),
+						BLOCK_CORAL_BROWN));
+
+					result = (type != BLOCK_WATER);
+					if(result) {
+						chunk.set_block(position, type, BLOCK_ATTRIBUTES_DEFAULT & ~BLOCK_ATTRIBUTE_BREAKABLE);
+					}
 				} else { // sea-grass
 					type = chunk_block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
 

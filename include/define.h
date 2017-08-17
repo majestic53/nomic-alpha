@@ -65,13 +65,13 @@ namespace nomic {
 	#define BACKDROP_WIDTH_DEFAULT 16
 
 	#define BLOCK_ATTRIBUTES_DEFAULT (BLOCK_ATTRIBUTE_STATIC | BLOCK_ATTRIBUTE_BREAKABLE)
-	#define BLOCK_DECORATION_CACTUS_MAX 4
-	#define BLOCK_DECORATION_CACTUS_AVERAGE 1
 	#define BLOCK_CLOUD_THICKNESS 1
 	#define BLOCK_CLOUD_THRESHOLD 0.48f
 	#define BLOCK_CLOUD_THRESHOLD_STEP 0.04f
 	#define BLOCK_COLOR_DEFAULT glm::vec4(BLOCK_COLOR_RGBA_DEFAULT)
 	#define BLOCK_COLOR_RGBA_DEFAULT 1.f, 1.f, 1.f, 1.f
+	#define BLOCK_DECORATION_CACTUS_MAX 2
+	#define BLOCK_DECORATION_CACTUS_AVERAGE 1
 	#define BLOCK_DECORATION_CORAL_REEF_PAD 2
 	#define BLOCK_DECORATION_FLOWER_HEIGHT_MAX BLOCK_LEVEL_GRASS_STEP
 	#define BLOCK_DECORATION_FLOWER_HEIGHT_MIN BLOCK_LEVEL_GRASS
@@ -102,6 +102,7 @@ namespace nomic {
 	#define BLOCK_RADIUS (BLOCK_WIDTH / 2.f)
 	#define BLOCK_SCALE_DEFAULT 1.f
 	#define BLOCK_SCALE_MIN 0.f
+	#define BLOCK_SMALL_OFFSET 0.065f
 	#define BLOCK_WIDTH 1.f
 	#define BLOCK_WRAP_S_DEFAULT GL_CLAMP_TO_EDGE
 	#define BLOCK_WRAP_T_DEFAULT GL_CLAMP_TO_EDGE
@@ -238,14 +239,14 @@ namespace nomic {
 	#define NOISE_SCALE 480.0
 	#define NOISE_SCALE_CLOUD 180.0
 
-	#define NOISE_SEED_DEFAULT 0
+	#define NOISE_SEED_DEFAULT 1058700859 //0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 3
+	#define NOMIC_VERSION_REVISION 4
 	#define NOMIC_VERSION_WEEK 1733
 
 	#define OBJECT_COUNT 1
@@ -481,6 +482,8 @@ namespace nomic {
 		BLOCK_FLOWER_YELLOW,
 		BLOCK_SHRUB,
 		BLOCK_CACTUS,
+		BLOCK_CACTUS_BOTTOM,
+		BLOCK_CACTUS_SIDE,
 		BLOCK_SUGAR_CANE,
 		BLOCK_SEAGRASS_GREEN,
 		BLOCK_SEAGRASS_BROWN,
@@ -499,8 +502,9 @@ namespace nomic {
 		"Gravel", "Sand", "Sandstone", "Sandstone-Side", "Cobblestone", "Cobblestone-Mossy", "Obsidian",
 		"Ore-Gold", "Ore-Iron", "Ore-Coal", "Ore-Diamond", "Clay", "Brick", "Glass", "Wood", "Wood-Side",
 		"Plank", "Wood-Pine", "Wood-Side-Pine", "Plank-Pine", "Leaves", "Leaves-Pine", "Grass-Short",
-		"Grass-Tall", "Flower-Red", "Flower-Yellow", "Shrub", "Cactus", "Sugar-Cane", "Seagrass-Green",
-		"Seagrass-Brown", "Coral-Orange", "Coral-Pink", "Coral-Purple", "Coral-Blue", "Coral-Brown", "Water",
+		"Grass-Tall", "Flower-Red", "Flower-Yellow", "Shrub", "Cactus", "Cactus-Bottom", "Cactus-Side",
+		"Sugar-Cane", "Seagrass-Green", "Seagrass-Brown", "Coral-Orange", "Coral-Pink", "Coral-Purple",
+		"Coral-Blue", "Coral-Brown", "Water",
 		};
 
 	#define BLOCK_STRING(_TYPE_) \
@@ -637,6 +641,40 @@ namespace nomic {
 			static glm::vec3 block_as_position(
 				__in const glm::ivec2 &chunk,
 				__in const glm::uvec3 &block
+				);
+
+			static bool block_decoration(
+				__in uint8_t type
+				);
+
+			static uint8_t block_face_type(
+				__in uint8_t type,
+				__in uint32_t face,
+				__inout uint8_t &attributes
+				);
+
+			static uint8_t block_face_type_rotated(
+				__in uint32_t face,
+				__in uint8_t attributes,
+				__in uint8_t type_top,
+				__in uint8_t type_bottom,
+				__in uint8_t type_side
+				);
+
+			static bool block_passable(
+				__in uint8_t type
+				);
+
+			static bool block_selectable(
+				__in uint8_t type
+				);
+
+			static bool block_small(
+				__in uint8_t type
+				);
+
+			static bool block_transparent(
+				__in uint8_t type
 				);
 
 			static std::string format_as_string(

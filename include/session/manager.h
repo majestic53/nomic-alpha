@@ -137,14 +137,6 @@ namespace nomic {
 					__in const manager &other
 					) = delete;
 
-				bool determine_block_decoration(
-					__in uint8_t type
-					);
-
-				bool determine_block_selectable(
-					__in uint8_t type
-					);
-
 				void generate_chunks_runtime(void);
 
 				void generate_chunks_spawn(void);
