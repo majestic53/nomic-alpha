@@ -152,9 +152,9 @@ namespace nomic {
 			BLOCK_COBBLESTONE,
 			BLOCK_SAND,
 			BLOCK_GLASS,
-			BLOCK_PLANK,
-			BLOCK_WOOD,
-			BLOCK_LEAVES,
+			BLOCK_WOOD_OAK,
+			BLOCK_LEAVES_OAK,
+			BLOCK_PLANK_OAK,
 			};
 
 		static const std::map<SDL_GLattr, GLint> SDL_ATTRIBUTE = {
@@ -1337,8 +1337,7 @@ namespace nomic {
 
 			nomic::entity::chunk *chunk = m_manager_terrain.at(m_block_selected_chunk);
 			if(chunk && (chunk->block_attributes(m_block_selected_block) & BLOCK_ATTRIBUTE_BREAKABLE)) {
-				glm::uvec3 position_above;
-				uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE), offset = 1, type = BLOCK_AIR;
+				uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE), type = BLOCK_AIR;
 
 				TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Removing block. Chunk={%i, %i}, Block={%u, %u, %u}",
 					m_block_selected_chunk.x, m_block_selected_chunk.y, m_block_selected_block.x,
@@ -1393,18 +1392,6 @@ namespace nomic {
 							&& (chunk->block_type(m_block_selected_block + glm::uvec3(0, 1, 0)) != BLOCK_AIR)) { // top
 						attributes |= BLOCK_ATTRIBUTE_HIDDEN;
 					}
-				}
-
-				while((m_block_selected_block.y + offset) < CHUNK_HEIGHT) {
-					position_above = glm::uvec3(m_block_selected_block.x, m_block_selected_block.y + offset,
-						m_block_selected_block.z);
-
-					if(!nomic::utility::block_decoration(chunk->block_type(position_above))) { // remove decoration
-						break;
-					}
-
-					chunk->set_block(position_above, m_underwater ? BLOCK_WATER : BLOCK_AIR, attributes);
-					++offset;
 				}
 
 				chunk->set_block(m_block_selected_block, type, attributes);

@@ -19,9 +19,9 @@
 #ifndef NOMIC_TERRAIN_CHUNK_H_
 #define NOMIC_TERRAIN_CHUNK_H_
 
-#include <mutex>
 #include <queue>
 #include <tuple>
+#include <vector>
 #include "../define.h"
 
 namespace nomic {
@@ -68,9 +68,17 @@ namespace nomic {
 					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT
 					);
 
+				void set_spawn(
+					__in const glm::uvec3 &position,
+					__in uint8_t type,
+					__in_opt uint32_t timeout = SPAWN_TIMEOUT_DEFAULT
+					);
+
 				void set_position(
 					__in const glm::ivec2 &position
 					);
+
+				std::vector<std::pair<glm::uvec3, uint8_t>> spawn(void);
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
@@ -101,6 +109,8 @@ namespace nomic {
 				glm::ivec2 m_position;
 
 				std::queue<std::tuple<glm::uvec3, uint8_t, uint8_t>> m_queue;
+
+				std::vector<std::tuple<glm::uvec3, uint32_t, uint8_t>> m_spawn;
 		};
 	}
 }

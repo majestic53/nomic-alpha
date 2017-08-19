@@ -31,6 +31,12 @@ namespace nomic {
 			BLOCK_ATTRIBUTES,
 		};
 
+		enum {
+			SPAWN_POSITION = 0,
+			SPAWN_TIMEOUT,
+			SPAWN_TYPE,
+		};
+
 		chunk::chunk(
 			__in_opt const glm::ivec2 &position
 			) :
@@ -49,7 +55,8 @@ namespace nomic {
 			) :
 				m_active(other.m_active),
 				m_position(other.m_position),
-				m_queue(other.m_queue)
+				m_queue(other.m_queue),
+				m_spawn(other.m_spawn)
 		{
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}", other.m_position.x, other.m_position.y);
 
@@ -75,6 +82,7 @@ namespace nomic {
 				m_active = other.m_active;
 				m_position = other.m_position;
 				m_queue = other.m_queue;
+				m_spawn = other.m_spawn;
 				copy(other);
 			}
 
@@ -109,6 +117,7 @@ namespace nomic {
 			memset(&m_block, BLOCK_AIR, CHUNK_BLOCK_COUNT);
 			memset(&m_block_attributes, BLOCK_ATTRIBUTES_DEFAULT, CHUNK_BLOCK_COUNT);
 			memset(&m_height, 0, CHUNK_BLOCK_SURFACE_COUNT);
+			m_spawn.clear();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -191,9 +200,7 @@ namespace nomic {
 			m_block_attributes[position.x][position.y][position.z] = attributes;
 
 			result = (CHUNK_HEIGHT - 1);
-			while((m_block[position.x][result][position.z] == BLOCK_AIR)
-					|| (m_block[position.x][result][position.z] == BLOCK_CLOUD)
-					|| (m_block[position.x][result][position.z] == BLOCK_WATER)) {
+			while(!nomic::utility::block_selectable(m_block[position.x][result][position.z])) {
 				--result;
 			}
 
@@ -201,6 +208,21 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return (uint8_t) result;
+		}
+
+		void 
+		chunk::set_spawn(
+			__in const glm::uvec3 &position,
+			__in uint8_t type,
+			__in_opt uint32_t timeout
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Type=%x, Timeout=%u", position.x, position.y, position.z,
+				type, timeout);
+
+			m_spawn.push_back(std::make_tuple(position, timeout, type));
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -213,6 +235,35 @@ namespace nomic {
 			m_position = position;
 
 			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
+		std::vector<std::pair<glm::uvec3, uint8_t>> 
+		chunk::spawn(void)
+		{
+			std::vector<std::pair<glm::uvec3, uint8_t>> result;
+			std::vector<std::vector<std::tuple<glm::uvec3, uint32_t, uint8_t>>::iterator> complete;
+
+			TRACE_ENTRY(LEVEL_VERBOSE);
+
+			for(std::vector<std::tuple<glm::uvec3, uint32_t, uint8_t>>::iterator iter = m_spawn.begin(); iter != m_spawn.end();
+					++iter) {
+
+				uint32_t &timeout = std::get<SPAWN_TIMEOUT>(*iter);
+				if(!timeout) {
+					complete.push_back(iter);
+					result.push_back(std::make_pair(std::get<SPAWN_POSITION>(*iter), std::get<SPAWN_TYPE>(*iter)));
+				} else {
+					--timeout;
+				}
+			}
+
+			for(std::vector<std::vector<std::tuple<glm::uvec3, uint32_t, uint8_t>>::iterator>::iterator iter = complete.begin();
+					iter != complete.end(); ++iter) {
+				m_spawn.erase(*iter);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+			return result;
 		}
 
 		std::string 

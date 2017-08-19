@@ -425,6 +425,39 @@ namespace nomic {
 			return result;
 		}
 
+		void 
+		chunk::add_tree(
+			__in const glm::uvec3 &position,
+			__in uint8_t type,
+			__in uint32_t attributes
+			)
+		{
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Type=%x, Attributes=%x", position.x, position.y, position.z,
+				type, attributes);
+
+			switch(type) {
+				case BLOCK_WOOD_OAK: // oak
+
+					// TODO: generate oak tree
+					set_block(position, BLOCK_WOOD_OAK);
+					// ---
+
+					break;
+				case BLOCK_WOOD_SPRUCE: // spruce
+
+					// TODO: generate spruce tree
+					set_block(position, BLOCK_WOOD_SPRUCE);
+					// ---
+
+					break;
+				default:
+					THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_TYPE_INVALID,
+						"Type=%x", type);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
+		}
+
 		uint8_t 
 		chunk::block_attributes(
 			__in const glm::uvec3 &position
@@ -565,8 +598,30 @@ namespace nomic {
 			)
 		{
 			bool shown = true;
+			std::vector<std::pair<glm::uvec3, uint8_t>> spawn;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Runtime=%p, Camera=%p", runtime, camera);
+
+			spawn = nomic::terrain::chunk::spawn();
+			if(!spawn.empty()) {
+				m_changed = true;
+
+				for(std::vector<std::pair<glm::uvec3, uint8_t>>::iterator iter = spawn.begin(); iter != spawn.end(); ++iter) {
+					uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT, type = iter->second;
+
+					switch(type) {
+						case BLOCK_WOOD_OAK:
+						case BLOCK_WOOD_SPRUCE:
+							add_tree(iter->first, type, attributes);
+							break;
+						default:
+							set_block(iter->first, type, attributes);
+							break;
+					}
+				}
+
+				spawn.clear();
+			}
 
 			nomic::terrain::chunk::update();
 
@@ -619,7 +674,6 @@ namespace nomic {
 			int32_t dx = (position_chunk.x - camera_position_chunk.x), dz = (position_chunk.y - camera_position_chunk.y);
 			shown = ((std::abs(dx * dx) + std::abs(dz * dz)) <= (VIEW_RADIUS_RUNTIME * VIEW_RADIUS_RUNTIME));
 #endif // VIEW_SELECTIVE_SHOW
-
 			show(shown);
 
 			TRACE_EXIT(LEVEL_VERBOSE);

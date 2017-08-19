@@ -33,9 +33,6 @@ const float AMBIENT_DARK_MIN = 0.1f;
 const float AMBIENT_DARK_MAX = 0.9f;
 const float AMBIENT_DARK_START = 0.95f;
 
-const vec4 CLOUD_COLOR = vec4(0.8f, 0.83f, 0.84f, 1.f);
-const float CLOUD_FALLOFF = 0.08f;
-
 const vec4 FOG_COLOR_DEFAULT = vec4(0.34f, 0.71f, 0.88f, 1.f);
 const vec4 FOG_COLOR_MC = vec4(0.54f, 0.70f, 1.f, 1.f);
 const float FOG_FALLOFF = 0.004f;
@@ -84,9 +81,7 @@ main(void)
 
 	color *= add_light_ambient(cycle, ambient_background);
 
-	if(clouds) { // clouds
-		color = add_fog_constant(color, add_light_ambient(cycle, CLOUD_COLOR), CLOUD_FALLOFF, SKYBOX_DISTANCE);
-	} else if(underwater) { // underwater
+	if(underwater) { // underwater
 		color = add_fog_constant(color, add_light_ambient(cycle, WATER_COLOR), WATER_FALLOFF, SKYBOX_DISTANCE);
 	}
 

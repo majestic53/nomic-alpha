@@ -109,17 +109,24 @@ namespace nomic {
 					__in nomic::terrain::chunk &chunk
 					);
 
+				bool chunk_decoration_cloud(
+					__in const glm::uvec3 &position,
+					__in nomic::terrain::chunk &chunk,
+					__inout int32_t &height,
+					__in double scale
+					);
+
 				bool chunk_decoration_grassland(
 					__in const glm::uvec3 &position,
 					__in nomic::terrain::chunk &chunk
 					);
 
-				bool chunk_decoration_tree(
+				bool chunk_decoration_tree_oak(
 					__in const glm::uvec3 &position,
 					__in nomic::terrain::chunk &chunk
 					);
 
-				bool chunk_decoration_tree_alpine(
+				bool chunk_decoration_tree_spruce(
 					__in const glm::uvec3 &position,
 					__in nomic::terrain::chunk &chunk
 					);

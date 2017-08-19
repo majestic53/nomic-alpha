@@ -107,15 +107,15 @@ namespace nomic {
 			case BLOCK_GRASS_SHORT:
 			case BLOCK_GRASS_TALL:
 			case BLOCK_GRAVEL:
-			case BLOCK_LEAVES:
-			case BLOCK_LEAVES_PINE:
+			case BLOCK_LEAVES_OAK:
+			case BLOCK_LEAVES_SPRUCE:
 			case BLOCK_OBSIDIAN:
 			case BLOCK_ORE_GOLD:
 			case BLOCK_ORE_IRON:
 			case BLOCK_ORE_COAL:
 			case BLOCK_ORE_DIAMOND:
-			case BLOCK_PLANK:
-			case BLOCK_PLANK_PINE:
+			case BLOCK_PLANK_OAK:
+			case BLOCK_PLANK_SPRUCE:
 			case BLOCK_SAND:
 			case BLOCK_SEAGRASS_GREEN:
 			case BLOCK_SEAGRASS_BROWN:
@@ -203,14 +203,15 @@ namespace nomic {
 							"Face=%x", face);
 				}
 				break;
-			case BLOCK_WOOD:
+			case BLOCK_WOOD_OAK:
 				attributes |= BLOCK_ATTRIBUTE_ROTATABLE;
-				result = nomic::utility::block_face_type_rotated(face, attributes, BLOCK_WOOD, BLOCK_WOOD, BLOCK_WOOD_SIDE);
+				result = nomic::utility::block_face_type_rotated(face, attributes, BLOCK_WOOD_OAK, BLOCK_WOOD_OAK,
+					BLOCK_WOOD_OAK_SIDE);
 				break;
-			case BLOCK_WOOD_PINE:
+			case BLOCK_WOOD_SPRUCE:
 				attributes |= BLOCK_ATTRIBUTE_ROTATABLE;
-				result = nomic::utility::block_face_type_rotated(face, attributes, BLOCK_WOOD_PINE, BLOCK_WOOD_PINE,
-					BLOCK_WOOD_PINE_SIDE);
+				result = nomic::utility::block_face_type_rotated(face, attributes, BLOCK_WOOD_SPRUCE, BLOCK_WOOD_SPRUCE,
+					BLOCK_WOOD_SPRUCE_SIDE);
 				break;
 			default:
 				THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_TYPE_INVALID,
@@ -333,6 +334,7 @@ namespace nomic {
 			case BLOCK_SEAGRASS_GREEN:
 			case BLOCK_SEAGRASS_BROWN:
 			case BLOCK_SHRUB:
+			case BLOCK_SUGAR_CANE:
 			case BLOCK_WATER:
 				result = true;
 				break;
@@ -356,19 +358,6 @@ namespace nomic {
 		switch(type) {
 			case BLOCK_AIR:
 			case BLOCK_CLOUD:
-			case BLOCK_CORAL_BLUE:
-			case BLOCK_CORAL_BROWN:
-			case BLOCK_CORAL_ORANGE:
-			case BLOCK_CORAL_PINK:
-			case BLOCK_CORAL_PURPLE:
-			case BLOCK_FLOWER_RED:
-			case BLOCK_FLOWER_YELLOW:
-			case BLOCK_GRASS_SHORT:
-			case BLOCK_GRASS_TALL:
-			case BLOCK_SEAGRASS_GREEN:
-			case BLOCK_SEAGRASS_BROWN:
-			case BLOCK_SHRUB:
-			case BLOCK_SUGAR_CANE:
 			case BLOCK_WATER:
 				result = false;
 				break;
@@ -424,8 +413,8 @@ namespace nomic {
 			case BLOCK_GLASS:
 			case BLOCK_GRASS_SHORT:
 			case BLOCK_GRASS_TALL:
-			case BLOCK_LEAVES:
-			case BLOCK_LEAVES_PINE:
+			case BLOCK_LEAVES_OAK:
+			case BLOCK_LEAVES_SPRUCE:
 			case BLOCK_SEAGRASS_GREEN:
 			case BLOCK_SEAGRASS_BROWN:
 			case BLOCK_SHRUB:

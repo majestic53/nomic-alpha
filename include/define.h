@@ -135,7 +135,7 @@ namespace nomic {
 	#define CAMERA_STRAFE_NORMAL 0.1f
 	#define CAMERA_STRAFE_NORMAL_SPRINT 0.15f
 	#define CAMERA_STRAFE_UNDERWATER 0.07f
-	#define CAMERA_SWIM_MAX 0.1f
+	#define CAMERA_SWIM_MAX 0.2f
 	#define CAMERA_UP_DEFAULT glm::vec3(0.f, 1.f, 0.f)
 	#define CAMERA_YAW_MAX 360.f
 	#define CAMERA_YAW_MIN 0.f
@@ -239,14 +239,14 @@ namespace nomic {
 	#define NOISE_SCALE 480.0
 	#define NOISE_SCALE_CLOUD 180.0
 
-	#define NOISE_SEED_DEFAULT 1058700859 //0
+	#define NOISE_SEED_DEFAULT 0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
 	#define NOMIC_VERSION_MAJOR 0
 	#define NOMIC_VERSION_MINOR 1
 	#define NOMIC_VERSION_RELEASE "alpha"
-	#define NOMIC_VERSION_REVISION 4
+	#define NOMIC_VERSION_REVISION 5
 	#define NOMIC_VERSION_WEEK 1733
 
 	#define OBJECT_COUNT 1
@@ -287,7 +287,7 @@ namespace nomic {
 	#define RETICLE_HORIZONTAL_LEFT 2
 	#define RETICLE_HORIZONTAL_RIGHT 3
 	#define RETICLE_LINE_WIDTH 2.f
-	#define RETICLE_WIDTH 0.02f
+	#define RETICLE_WIDTH 0.025f
 
 	#define RUNTIME_PAUSE_DELAY 200
 	#define RUNTIME_TICKS_PER_SECOND 60
@@ -304,8 +304,8 @@ namespace nomic {
 	#define SDL_FLAGS_INIT (SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
 	//#define SELECTOR_BOUNDS_DEBUG_CONTROL
-	#define SELECTOR_COLOR_ALPHA 0.08f
-	#define SELECTOR_COLOR_DEFAULT glm::vec4(1.f, 1.f, 1.f, 0.9f)
+	#define SELECTOR_COLOR_ALPHA 0.0f
+	#define SELECTOR_COLOR_DEFAULT glm::vec4(0.2f, 0.2f, 0.2f, 0.9f)
 	#define SELECTOR_DISTANCE_MAX 60.f
 	#define SELECTOR_DISTANCE_STEP 0.1f
 	#define SELECTOR_DISTANCE_SCALE glm::vec3(SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP, SELECTOR_DISTANCE_STEP)
@@ -329,6 +329,7 @@ namespace nomic {
 
 	#define SPAWN_RADIUS 6
 	#define SPAWN_RANDOM
+	#define SPAWN_TIMEOUT_DEFAULT 0
 
 	#define STRING_EMPTY "<EMPTY>"
 	#define STRING_INVALID "<INVALID>"
@@ -377,7 +378,7 @@ namespace nomic {
 	#define THROW_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		nomic::exception::generate(_EXCEPT_, __FILE__, __FUNCTION__, __LINE__, FORMAT_STRING(_FORMAT_, __VA_ARGS__))
 
-	#define TICKS_PER_CYCLE 2000 //32000
+	#define TICKS_PER_CYCLE 32000
 
 	#define TIMEOUT_UNDEFINED SCALAR_INVALID(uint32_t)
 
@@ -468,14 +469,14 @@ namespace nomic {
 		BLOCK_CLAY,
 		BLOCK_BRICK,
 		BLOCK_GLASS,
-		BLOCK_WOOD,
-		BLOCK_WOOD_SIDE,
-		BLOCK_PLANK,
-		BLOCK_WOOD_PINE,
-		BLOCK_WOOD_PINE_SIDE,
-		BLOCK_PLANK_PINE,
-		BLOCK_LEAVES,
-		BLOCK_LEAVES_PINE,
+		BLOCK_WOOD_OAK,
+		BLOCK_WOOD_OAK_SIDE,
+		BLOCK_PLANK_OAK,
+		BLOCK_WOOD_SPRUCE,
+		BLOCK_WOOD_SPRUCE_SIDE,
+		BLOCK_PLANK_SPRUCE,
+		BLOCK_LEAVES_OAK,
+		BLOCK_LEAVES_SPRUCE,
 		BLOCK_GRASS_SHORT,
 		BLOCK_GRASS_TALL,
 		BLOCK_FLOWER_RED,
@@ -500,8 +501,8 @@ namespace nomic {
 	static const std::string BLOCK_STR[] = {
 		"Air", "Cloud", "Boundary", "Dirt", "Dirt-Grass-Side", "Grass", "Stone", "Stone-Snow-Side", "Snow",
 		"Gravel", "Sand", "Sandstone", "Sandstone-Side", "Cobblestone", "Cobblestone-Mossy", "Obsidian",
-		"Ore-Gold", "Ore-Iron", "Ore-Coal", "Ore-Diamond", "Clay", "Brick", "Glass", "Wood", "Wood-Side",
-		"Plank", "Wood-Pine", "Wood-Side-Pine", "Plank-Pine", "Leaves", "Leaves-Pine", "Grass-Short",
+		"Ore-Gold", "Ore-Iron", "Ore-Coal", "Ore-Diamond", "Clay", "Brick", "Glass", "Wood-Oak", "Wood-Oak-Side",
+		"Plank-Oak", "Wood-Spruce", "Wood-Spruce-Side", "Plank-Spruce", "Leaves-Oak", "Leaves-Spruce", "Grass-Short",
 		"Grass-Tall", "Flower-Red", "Flower-Yellow", "Shrub", "Cactus", "Cactus-Bottom", "Cactus-Side",
 		"Sugar-Cane", "Seagrass-Green", "Seagrass-Brown", "Coral-Orange", "Coral-Pink", "Coral-Purple",
 		"Coral-Blue", "Coral-Brown", "Water",

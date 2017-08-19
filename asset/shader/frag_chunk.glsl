@@ -43,9 +43,6 @@ const float AMBIENT_DARK_MAX = 1.f;
 const float AMBIENT_DARK_START = 0.9f;
 const float AMBIENT_FOG_BLEND = 0.6f;
 
-const vec4 CLOUD_COLOR = vec4(0.8f, 0.83f, 0.84f, 1.f);
-const float CLOUD_FALLOFF = 0.08f;
-
 const float DIFFUSE_SCALE = 0.2f;
 
 const vec4 FOG_COLOR_DEFAULT = vec4(0.34f, 0.71f, 0.88f, 1.f);
@@ -138,13 +135,11 @@ main(void)
 
 	color *= (add_light_ambient(cycle, ambient) + add_light_diffuse(cycle, out_normal, out_normal_position, ambient, ambient_position));
 
-	if(clouds) { // clouds
-		color = add_fog_constant(color, add_light_ambient(cycle, CLOUD_COLOR), CLOUD_FALLOFF, out_distance);
-	} else if(underwater) { // underwater
-		color = add_fog_constant(color, add_light_ambient(cycle, WATER_COLOR), WATER_FALLOFF, out_distance);
-	} else { // above water
+	if(!underwater) { // clouds/above water
 		color = add_fog_non_constant(color, add_light_ambient(cycle, FOG_COLOR_DEFAULT), FOG_FALLOFF, out_distance,
 				position, rotation);
+	} else { // underwater
+		color = add_fog_constant(color, add_light_ambient(cycle, WATER_COLOR), WATER_FALLOFF, out_distance);
 	}
 
 	gl_FragColor = color;

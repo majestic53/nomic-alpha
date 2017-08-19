@@ -140,6 +140,12 @@ namespace nomic {
 					__inout uint8_t &attributes
 					);
 
+				void add_tree(
+					__in const glm::uvec3 &position,
+					__in uint8_t type,
+					__in uint32_t attributes
+					);
+
 				bool m_changed;
 
 				nomic::entity::chunk *m_chunk_back;
