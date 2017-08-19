@@ -50,8 +50,6 @@ namespace nomic {
 	{
 		bool result = false;
 
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
-
 		switch(type) {
 			case BLOCK_CORAL_BLUE:
 			case BLOCK_CORAL_BROWN:
@@ -72,7 +70,6 @@ namespace nomic {
 				break;
 		}
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
 
@@ -84,8 +81,6 @@ namespace nomic {
 		)
 	{
 		uint8_t result = BLOCK_AIR;
-
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x, Face=%x, Attributes=%x", type, face, attributes);
 
 		switch(type) {
 			case BLOCK_AIR:
@@ -141,8 +136,7 @@ namespace nomic {
 						result = BLOCK_CACTUS;
 						break;
 					default:
-						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID,
-							"Face=%x", face);
+						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID, "Face=%x", face);
 				}
 				break;
 			case BLOCK_GRASS:
@@ -161,8 +155,7 @@ namespace nomic {
 						result = BLOCK_GRASS;
 						break;
 					default:
-						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID,
-							"Face=%x", face);
+						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID, "Face=%x", face);
 				}
 				break;
 			case BLOCK_SANDSTONE:
@@ -179,8 +172,7 @@ namespace nomic {
 						result = BLOCK_SANDSTONE;
 						break;
 					default:
-						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID,
-							"Face=%x", face);
+						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID, "Face=%x", face);
 				}
 				break;
 			case BLOCK_SNOW:
@@ -199,8 +191,7 @@ namespace nomic {
 						result = BLOCK_SNOW;
 						break;
 					default:
-						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID,
-							"Face=%x", face);
+						THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID, "Face=%x", face);
 				}
 				break;
 			case BLOCK_WOOD_OAK:
@@ -214,11 +205,9 @@ namespace nomic {
 					BLOCK_WOOD_SPRUCE_SIDE);
 				break;
 			default:
-				THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_TYPE_INVALID,
-					"Type=%x", type);
+				THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_TYPE_INVALID, "Type=%x", type);
 		}
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
 
@@ -233,9 +222,6 @@ namespace nomic {
 	{
 		uint8_t result = type_top;
 		bool back, front, left, right;
-
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type={%x, %x, %x}, Face=%x, Attributes=%x", type_bottom, type_top, type_side,
-			face, attributes);
 
 		back = (attributes & BLOCK_ATTRIBUTE_ROTATED_BACK);
 		front = (attributes & BLOCK_ATTRIBUTE_ROTATED_FRONT);
@@ -302,11 +288,9 @@ namespace nomic {
 				}
 				break;
 			default:
-				THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID,
-					"Face=%x", face);
+				THROW_NOMIC_UTILITY_EXCEPTION_FORMAT(NOMIC_UTILITY_EXCEPTION_FACE_INVALID, "Face=%x", face);
 		}
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
 
@@ -316,8 +300,6 @@ namespace nomic {
 		)
 	{
 		bool result = false;
-
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
 
 		switch(type) {
 			case BLOCK_AIR:
@@ -342,7 +324,6 @@ namespace nomic {
 				break;
 		}
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
 
@@ -352,8 +333,6 @@ namespace nomic {
 		)
 	{
 		bool result = true;
-
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
 
 		switch(type) {
 			case BLOCK_AIR:
@@ -365,7 +344,6 @@ namespace nomic {
 				break;
 		}
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
 
@@ -376,8 +354,6 @@ namespace nomic {
 	{
 		bool result = false;
 
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
-
 		switch(type) {
 			case BLOCK_CACTUS:
 				result = true;
@@ -386,7 +362,6 @@ namespace nomic {
 				break;
 		}
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
 
@@ -396,8 +371,6 @@ namespace nomic {
 		)
 	{
 		bool result = false;
-
-		TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Type=%x", type);
 
 		switch(type) {
 			case BLOCK_AIR:
@@ -426,7 +399,6 @@ namespace nomic {
 				break;
 		}
 
-		TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 		return result;
 	}
 
