@@ -591,32 +591,59 @@ namespace nomic {
 			)
 		{
 			uint32_t iter = 0;
-			bool result = true;
+			bool result = false;
 			float threshold = BLOCK_CLOUD_THRESHOLD;
 			uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE);
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Height=%u, Chunk=%p, Scale=%f", position.x, position.y, position.z,
 				height, &chunk, scale);
 
-			for(; iter < BLOCK_CLOUD_THICKNESS; ++iter, threshold -= BLOCK_CLOUD_THRESHOLD_STEP) {
+			if(!(position.x % BLOCK_WIDTH_CLOUD) && !(position.z % BLOCK_WIDTH_CLOUD)
+					&& (position.x <= (CHUNK_WIDTH - BLOCK_WIDTH_CLOUD))
+					&& (position.z <= (CHUNK_WIDTH - BLOCK_WIDTH_CLOUD))) {
+				result = true;
 
-				if(scale >= threshold) {
-					uint32_t iter_layer = 0;
+				for(; iter < BLOCK_CLOUD_THICKNESS; ++iter, threshold -= BLOCK_CLOUD_THRESHOLD_STEP) {
 
-					for(; iter_layer < (BLOCK_CLOUD_THICKNESS - iter - 1); ++iter_layer) { // cloud
-						chunk.set_block(glm::uvec3(position.x, position.y - iter_layer, position.z), BLOCK_CLOUD,
-							attributes | BLOCK_ATTRIBUTE_HIDDEN);
+					if(scale >= threshold) {
+						uint32_t iter_layer = 0;
+
+						for(; iter_layer < (BLOCK_CLOUD_THICKNESS - iter - 1); ++iter_layer) { // cloud
+
+							for(uint32_t offset_z = 0; offset_z < BLOCK_WIDTH_CLOUD; ++offset_z) {
+
+								for(uint32_t offset_x = 0; offset_x < BLOCK_WIDTH_CLOUD; ++offset_x) {
+									chunk.set_block(glm::uvec3(position.x + offset_x, position.y - iter_layer,
+										position.z + offset_z),
+										BLOCK_CLOUD, attributes | BLOCK_ATTRIBUTE_HIDDEN);
+								}
+							}
+						}
+
+						for(uint32_t offset_z = 0; offset_z < BLOCK_WIDTH_CLOUD; ++offset_z) {
+
+							for(uint32_t offset_x = 0; offset_x < BLOCK_WIDTH_CLOUD; ++offset_x) {
+								chunk.set_block(glm::uvec3(position.x + offset_x, position.y - iter_layer,
+									position.z + offset_z), BLOCK_CLOUD, attributes);
+							}
+						}
+
+						height -= iter_layer;
+						break;
 					}
-
-					chunk.set_block(glm::uvec3(position.x, position.y - iter_layer, position.z), BLOCK_CLOUD, attributes);
-					height -= iter_layer;
-					break;
 				}
-			}
 
-			if(iter == BLOCK_CLOUD_THICKNESS) { // air
-				result = false;
-				chunk.set_block(position, BLOCK_AIR, attributes | BLOCK_ATTRIBUTE_HIDDEN);
+				if(iter == BLOCK_CLOUD_THICKNESS) { // air
+					result = false;
+
+					for(uint32_t offset_z = 0; offset_z < BLOCK_WIDTH_CLOUD; ++offset_z) {
+
+						for(uint32_t offset_x = 0; offset_x < BLOCK_WIDTH_CLOUD; ++offset_x) {
+							chunk.set_block(glm::uvec3(position.x + offset_x, position.y, position.z + offset_z),
+								BLOCK_AIR, attributes | BLOCK_ATTRIBUTE_HIDDEN);
+						}
+					}
+				}
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);

@@ -186,7 +186,7 @@ namespace nomic {
 			__in_opt uint8_t attributes
 			)
 		{
-			int8_t result;
+			uint8_t result;
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Type=%x, Attributes=%x", position.x, position.y, position.z,
 				type, attributes);
@@ -201,6 +201,11 @@ namespace nomic {
 
 			result = (CHUNK_HEIGHT - 1);
 			while(!nomic::utility::block_selectable(m_block[position.x][result][position.z])) {
+
+				if(!result) {
+					break;
+				}
+
 				--result;
 			}
 
