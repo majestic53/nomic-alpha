@@ -30,6 +30,12 @@ make release
 Changelog
 =========
 
+Version 0.1.1734
+----------------
+*Updated: 8/22/2017*
+
+* Added tree generation (incomplete)
+
 Version 0.1.1733
 ----------------
 *Updated: 8/14-16/2017*

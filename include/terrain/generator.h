@@ -48,6 +48,30 @@ namespace nomic {
 					__in const generator &other
 					);
 
+				uint32_t block_blend(
+					__in uint32_t position,
+					__in uint32_t min,
+					__in uint32_t max,
+					__in uint32_t a,
+					__in uint32_t b
+					);
+
+				uint32_t block_pick(
+					__in uint32_t a,
+					__in uint32_t b
+					);
+
+				uint32_t block_pick(
+					__in uint32_t a,
+					__in uint32_t b,
+					__in uint32_t c
+					);
+
+				uint32_t block_pick_uniform(
+					__in uint32_t a,
+					__in uint32_t b
+					);
+
 				void chunk(
 					__in const glm::ivec2 &position,
 					__inout nomic::terrain::chunk &chunk
@@ -69,30 +93,6 @@ namespace nomic {
 					) const;
 
 			protected:
-
-				uint32_t chunk_block_blend(
-					__in uint32_t position,
-					__in uint32_t min,
-					__in uint32_t max,
-					__in uint32_t a,
-					__in uint32_t b
-					);
-
-				uint32_t chunk_block_pick(
-					__in uint32_t a,
-					__in uint32_t b
-					);
-
-				uint32_t chunk_block_pick(
-					__in uint32_t a,
-					__in uint32_t b,
-					__in uint32_t c
-					);
-
-				uint32_t chunk_block_pick_uniform(
-					__in uint32_t a,
-					__in uint32_t b
-					);
 
 				void chunk_column(
 					__in const glm::uvec3 &position,

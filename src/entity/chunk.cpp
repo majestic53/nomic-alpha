@@ -19,6 +19,7 @@
 #include "../../include/entity/chunk.h"
 #include "../../include/entity/camera.h"
 #include "../../include/graphic/atlas.h"
+#include "../../include/terrain/manager.h"
 #include "../../include/trace.h"
 #include "./chunk_type.h"
 
@@ -432,28 +433,190 @@ namespace nomic {
 			__in uint32_t attributes
 			)
 		{
+			uint8_t offset = 0;
+
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Type=%x, Attributes=%x", position.x, position.y, position.z,
 				type, attributes);
 
-			switch(type) {
-				case BLOCK_WOOD_OAK: // oak
+			nomic::terrain::manager &instance = nomic::terrain::manager::acquire();
+			if(instance.initialized()) {
+				int32_t radius, start;
 
-					// TODO: generate oak tree
-					set_block(position, BLOCK_WOOD_OAK);
-					// ---
+				nomic::terrain::generator &generator = instance.generator();
 
-					break;
-				case BLOCK_WOOD_SPRUCE: // spruce
+				switch(type) {
+					case BLOCK_WOOD_OAK: { // oak
+							glm::uvec3 back(0, 0, 1), front(0, 0, -1), left(-1, 0, 0), right(1, 0, 0);
 
-					// TODO: generate spruce tree
-					set_block(position, BLOCK_WOOD_SPRUCE);
-					// ---
+							radius = BLOCK_TREE_OAK_RADIUS_DEFAULT;
 
-					break;
-				default:
-					THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_TYPE_INVALID,
-						"Type=%x", type);
+							for(; offset <= BLOCK_TREE_OAK_MAX; ++offset) { // trunk
+
+								if((offset >= BLOCK_TREE_OAK_MIN)
+										&& (generator.block_pick(BLOCK_WOOD_OAK, BLOCK_AIR) == BLOCK_AIR)) {
+									break;
+								} else if((offset > BLOCK_TREE_OAK_AVERAGE)
+										&& (generator.block_pick(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_AIR)) {
+									break;
+								}
+
+								if((offset >= BLOCK_TREE_OAK_SPLIT_MIN) && (offset < BLOCK_TREE_OAK_AVERAGE)) {
+
+									if(generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_WOOD_OAK) {
+										// right
+										right.y = (generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK)
+												== BLOCK_WOOD_OAK) ? -1 : 0;
+
+										set_block_adjacent(position + glm::uvec3(0, offset, 0) + right,
+											BLOCK_WOOD_OAK);
+										++right.x;
+									}
+
+									if(generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_WOOD_OAK) {
+										// left
+										left.y = (generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK)
+												== BLOCK_WOOD_OAK) ? -1 : 0;
+
+										set_block_adjacent(position + glm::uvec3(0, offset, 0) + left,
+											BLOCK_WOOD_OAK);
+										--left.x;
+									}
+
+									if(generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_WOOD_OAK) {
+										// back
+										back.y = (generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK)
+												== BLOCK_WOOD_OAK) ? -1 : 0;
+
+										set_block_adjacent(position + glm::uvec3(0, offset, 0) + back,
+											BLOCK_WOOD_OAK);
+										++back.z;
+									}
+
+									if(generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_WOOD_OAK) {
+										// front
+										front.y = (generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK)
+												== BLOCK_WOOD_OAK) ? -1 : 0;
+
+										set_block_adjacent(position + glm::uvec3(0, offset, 0) + front,
+											BLOCK_WOOD_OAK);
+										--front.z;
+									}
+								}
+
+								set_block(position + glm::uvec3(0, offset, 0), BLOCK_WOOD_OAK);
+							}
+
+							radius = std::max((int32_t) right.x, radius);
+							radius = std::max(std::abs((int32_t) left.x), radius);
+							radius = std::max((int32_t) back.z, radius);
+							radius = std::max(std::abs((int32_t) front.z), radius);
+							++radius;
+
+							start = BLOCK_TREE_OAK_LEAVES_START;
+							if(generator.block_pick(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_WOOD_OAK) {
+								--start;	
+							}
+
+							for(int32_t y = start; y <= offset; ++y) { // leaves
+								int32_t layer_radius = radius;
+
+								float delta = ((offset - y) / (float) (offset - start));
+								if(delta <= 0.5f) {
+									layer_radius *= delta;
+								} else {
+									layer_radius *= (1.f - delta);
+								}
+
+								layer_radius += BLOCK_TREE_OAK_RADIUS_DEFAULT;
+
+								for(int32_t z = -radius; z < radius; ++z) {
+
+									for(int32_t x = -radius; x < radius; ++x) {
+
+										if((std::abs(x * x) + std::abs(z * z))
+												<= (layer_radius * layer_radius)) {
+											set_block_adjacent(position + glm::uvec3(x, y, z),
+												BLOCK_LEAVES_OAK);
+										}
+									}
+								}
+							}
+						} break;
+					case BLOCK_WOOD_SPRUCE: { // spruce
+							int8_t end, layer_radius = 1, layer_radius_previous;
+
+							radius = BLOCK_TREE_SPRUCE_RADIUS_DEFAULT;
+
+							for(; offset <= BLOCK_TREE_SPRUCE_MAX; ++offset) { // trunk
+
+								if((offset >= BLOCK_TREE_SPRUCE_MIN)
+										&& (generator.block_pick(BLOCK_WOOD_SPRUCE, BLOCK_AIR) == BLOCK_AIR)) {
+									break;
+								} else if((offset > BLOCK_TREE_SPRUCE_AVERAGE)
+										&& (generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_SPRUCE)
+											== BLOCK_AIR)) {
+									break;
+								}
+
+								set_block(position + glm::uvec3(0, offset, 0), BLOCK_WOOD_SPRUCE);
+							}
+
+							set_block_adjacent(position + glm::uvec3(0, offset, 0), BLOCK_LEAVES_SPRUCE); // leaves
+
+							start = (int32_t) offset;
+							if(generator.block_pick(BLOCK_AIR, BLOCK_WOOD_SPRUCE) == BLOCK_AIR) {
+								--start;
+							}
+
+							end = BLOCK_TREE_SPRUCE_LEAVES_END;
+							if(generator.block_pick(BLOCK_AIR, BLOCK_WOOD_SPRUCE) == BLOCK_WOOD_SPRUCE) {
+								--end;
+							}
+
+							for(int32_t y = start; y >= end; --y) {
+
+								if(!(y % 2)) {
+									layer_radius_previous = layer_radius;
+									layer_radius = ((generator.block_pick(BLOCK_AIR, BLOCK_WOOD_SPRUCE)
+										== BLOCK_AIR) ? 1 : 0);
+
+									if(layer_radius && ((generator.block_pick(BLOCK_AIR, BLOCK_WOOD_SPRUCE)
+											== BLOCK_WOOD_SPRUCE))) {
+										layer_radius = (layer_radius_previous + 1);
+									}
+								}
+
+								if(layer_radius) {
+
+									for(int32_t z = -radius; z < radius; ++z) {
+
+										for(int32_t x = -radius; x < radius; ++x) {
+
+											if((std::abs(x * x) + std::abs(z * z))
+													<= (layer_radius * layer_radius)) {
+												set_block_adjacent(position + glm::uvec3(x, y, z),
+													BLOCK_LEAVES_SPRUCE);
+											}
+
+
+										}
+									}
+								}
+
+								if(!(y % 2)) {
+									layer_radius = layer_radius_previous;
+								} else {
+									++layer_radius;
+								}
+							}
+						} break;
+					default:
+						THROW_NOMIC_ENTITY_CHUNK_EXCEPTION_FORMAT(NOMIC_ENTITY_CHUNK_EXCEPTION_TYPE_INVALID,
+							"Type=%x", type);
+				}
 			}
+
+			instance.release();
 
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
@@ -1141,16 +1304,99 @@ namespace nomic {
 		chunk::set_block(
 			__in const glm::uvec3 &position,
 			__in uint8_t type,
-			__in_opt uint8_t attributes
+			__in_opt uint8_t attributes,
+			__in_opt bool insert
 			)
 		{
-			uint8_t result;
+			uint8_t result = BLOCK_AIR;
 
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Type=%x, Attributes=%x(%u)", position.x, position.y, position.z,
-				type, attributes);
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Type=%x, Attributes=%x(%u), Insert=%x", position.x, position.y,
+				position.z, type, attributes, insert);
 
-			result = nomic::terrain::chunk::set_block(position, type, attributes);
-			m_changed = true;
+			result = nomic::terrain::chunk::type(position);
+			if(!insert) {
+
+				if(!nomic::utility::block_selectable(result)) {
+					result = nomic::terrain::chunk::set_block(position, type, attributes);
+					m_changed = true;
+				}
+			} else {
+				result = nomic::terrain::chunk::set_block(position, type, attributes);
+				m_changed = true;
+			}
+
+			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x(%u)", (uint16_t) result, (uint16_t) result);
+			return result;
+		}
+
+		uint8_t 
+		chunk::set_block_adjacent(
+			__in const glm::ivec3 &position,
+			__in uint8_t type,
+			__in_opt uint8_t attributes,
+			__in_opt bool insert
+			)
+		{
+			glm::uvec3 position_block;
+			uint8_t result = BLOCK_AIR;
+			nomic::entity::chunk *chunk = nullptr;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%i, %i, %i}, Type=%x, Attributes=%x(%u), Insert=%x", position.x, position.y,
+				position.z, type, attributes, insert);
+
+			if(position.x >= CHUNK_WIDTH) { // right
+
+				chunk = m_chunk_right;
+				if(chunk) {
+					position_block = glm::uvec3(std::abs(position.x % CHUNK_WIDTH), position.y, position.z);
+
+					if(position.z >= CHUNK_WIDTH) { // upper-right
+						chunk = chunk->m_chunk_back;
+						position_block.z = std::abs(position.z % CHUNK_WIDTH);
+					} else if(position.z < 0) { // lower-right
+						chunk = chunk->m_chunk_front;
+						position_block.z = (CHUNK_WIDTH - std::abs(position.z % CHUNK_WIDTH) - 1);
+					}
+				}
+			} else if(position.x < 0) { // left
+
+				chunk = m_chunk_left;
+				if(chunk) {
+					position_block = glm::uvec3(CHUNK_WIDTH - std::abs(position.x % CHUNK_WIDTH) - 1, position.y, position.z);
+
+					if(position.z >= CHUNK_WIDTH) { // upper-left
+						chunk = chunk->m_chunk_back;
+						position_block.z = std::abs(position.z % CHUNK_WIDTH);
+					} else if(position.z < 0) { // lower-left
+						chunk = chunk->m_chunk_front;
+						position_block.z = (CHUNK_WIDTH - std::abs(position.z % CHUNK_WIDTH) - 1);
+					}
+				}
+			} else if(position.z >= CHUNK_WIDTH) { // back
+				chunk = m_chunk_back;
+				position_block = glm::uvec3(position.x, position.y, std::abs(position.z % CHUNK_WIDTH));
+			} else if(position.z < 0) { // front
+				chunk = m_chunk_front;
+				position_block = glm::uvec3(position.x, position.y, CHUNK_WIDTH - std::abs(position.z % CHUNK_WIDTH) - 1);
+			} else {
+				chunk = this;
+				position_block = position;
+			}
+
+			if(chunk) {
+
+				result = ((nomic::terrain::chunk *) chunk)->type(position);
+				if(!insert) {
+
+					if(!nomic::utility::block_selectable(result)) {
+						result = ((nomic::terrain::chunk *) chunk)->set_block(position_block, type, attributes);
+						m_changed = true;
+					}
+				} else {
+					result = ((nomic::terrain::chunk *) chunk)->set_block(position_block, type, attributes);
+					m_changed = true;
+				}
+			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x(%u)", (uint16_t) result, (uint16_t) result);
 			return result;

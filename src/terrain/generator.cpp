@@ -73,58 +73,8 @@ namespace nomic {
 			return *this;
 		}
 
-		void 
-		generator::chunk(
-			__in const glm::ivec2 &position,
-			__inout nomic::terrain::chunk &chunk
-			)
-		{
-			double scale;
-			uint32_t height;
-			uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE);
-
-			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}, Chunk=%p", position.x, position.y, &chunk);
-
-			chunk.set_position(position);
-
-			for(int32_t z = (CHUNK_WIDTH - 1); z >= 0; --z) {
-
-				for(int32_t x = 0; x < CHUNK_WIDTH; ++x) {
-					scale = std::abs(m_noise_terrain.generate(((position.x * CHUNK_WIDTH) + x) / NOISE_SCALE,
-						((position.y * CHUNK_WIDTH) + z) / NOISE_SCALE));
-
-					height = (((BLOCK_HEIGHT_MAX - BLOCK_HEIGHT_MIN) * scale) + BLOCK_HEIGHT_MIN);
-					if(height < BLOCK_HEIGHT_MIN) {
-						height = BLOCK_HEIGHT_MIN;
-					}
-
-					if(height > BLOCK_HEIGHT_MAX) {
-						height = BLOCK_HEIGHT_MAX;
-					}
-
-					for(int32_t y = (CHUNK_HEIGHT - 1); y >= 0; --y) {
-
-						if(!y) { // boundary
-							chunk.set_block(glm::uvec3(x, y, z), BLOCK_BOUNDARY, attributes);
-						} else if(y == BLOCK_HEIGHT_CLOUD) { // cloud
-							chunk_decoration_cloud(glm::uvec3(x, y, z), chunk, y, std::abs(m_noise_cloud.generate(
-								((position.x * CHUNK_WIDTH) + x) / NOISE_SCALE_CLOUD,
-								((position.y * CHUNK_WIDTH) + z) / NOISE_SCALE_CLOUD)));
-						} else if(y > height) { // air
-							chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes | BLOCK_ATTRIBUTE_HIDDEN);
-						} else { // other
-							chunk_column(glm::vec3(x, y, z), chunk);
-							break;
-						}
-					}
-				}
-			}
-
-			TRACE_EXIT(LEVEL_VERBOSE);
-		}
-
 		uint32_t 
-		generator::chunk_block_blend(
+		generator::block_blend(
 			__in uint32_t position,
 			__in uint32_t min,
 			__in uint32_t max,
@@ -175,7 +125,7 @@ namespace nomic {
 							lower : upper);
 					}
 				} else { // granularity <= 2
-					result = chunk_block_pick_uniform(a, b);
+					result = block_pick_uniform(a, b);
 				}
 			}
 
@@ -184,7 +134,7 @@ namespace nomic {
 		}
 
 		uint32_t 
-		generator::chunk_block_pick(
+		generator::block_pick(
 			__in uint32_t a,
 			__in uint32_t b
 			)
@@ -213,7 +163,7 @@ namespace nomic {
 		}
 
 		uint32_t 
-		generator::chunk_block_pick(
+		generator::block_pick(
 			__in uint32_t a,
 			__in uint32_t b,
 			__in uint32_t c
@@ -246,7 +196,7 @@ namespace nomic {
 		}
 
 		uint32_t 
-		generator::chunk_block_pick_uniform(
+		generator::block_pick_uniform(
 			__in uint32_t a,
 			__in uint32_t b
 			)
@@ -264,6 +214,56 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%u", result);
 			return result;
+		}
+
+		void 
+		generator::chunk(
+			__in const glm::ivec2 &position,
+			__inout nomic::terrain::chunk &chunk
+			)
+		{
+			double scale;
+			uint32_t height;
+			uint8_t attributes = (BLOCK_ATTRIBUTE_STATIC & ~BLOCK_ATTRIBUTE_BREAKABLE);
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%i, %i}, Chunk=%p", position.x, position.y, &chunk);
+
+			chunk.set_position(position);
+
+			for(int32_t z = (CHUNK_WIDTH - 1); z >= 0; --z) {
+
+				for(int32_t x = 0; x < CHUNK_WIDTH; ++x) {
+					scale = std::abs(m_noise_terrain.generate(((position.x * CHUNK_WIDTH) + x) / NOISE_SCALE,
+						((position.y * CHUNK_WIDTH) + z) / NOISE_SCALE));
+
+					height = (((BLOCK_HEIGHT_MAX - BLOCK_HEIGHT_MIN) * scale) + BLOCK_HEIGHT_MIN);
+					if(height < BLOCK_HEIGHT_MIN) {
+						height = BLOCK_HEIGHT_MIN;
+					}
+
+					if(height > BLOCK_HEIGHT_MAX) {
+						height = BLOCK_HEIGHT_MAX;
+					}
+
+					for(int32_t y = (CHUNK_HEIGHT - 1); y >= 0; --y) {
+
+						if(!y) { // boundary
+							chunk.set_block(glm::uvec3(x, y, z), BLOCK_BOUNDARY, attributes);
+						} else if(y == BLOCK_HEIGHT_CLOUD) { // cloud
+							chunk_decoration_cloud(glm::uvec3(x, y, z), chunk, y, std::abs(m_noise_cloud.generate(
+								((position.x * CHUNK_WIDTH) + x) / NOISE_SCALE_CLOUD,
+								((position.y * CHUNK_WIDTH) + z) / NOISE_SCALE_CLOUD)));
+						} else if(y > height) { // air
+							chunk.set_block(glm::uvec3(x, y, z), BLOCK_AIR, attributes | BLOCK_ATTRIBUTE_HIDDEN);
+						} else { // other
+							chunk_column(glm::vec3(x, y, z), chunk);
+							break;
+						}
+					}
+				}
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		void 
@@ -288,7 +288,7 @@ namespace nomic {
 				type = BLOCK_SNOW;
 			} else if((y < BLOCK_LEVEL_ALPINE_PEAK) && (y >= BLOCK_LEVEL_ALPINE)) { // stone/gravel
 				zone = BLOCK_ZONE_ALPINE;
-				type = chunk_block_blend(y, ((BLOCK_LEVEL_ALPINE_PEAK - 1) - ((BLOCK_LEVEL_ALPINE_PEAK - 1) - BLOCK_LEVEL_ALPINE)),
+				type = block_blend(y, ((BLOCK_LEVEL_ALPINE_PEAK - 1) - ((BLOCK_LEVEL_ALPINE_PEAK - 1) - BLOCK_LEVEL_ALPINE)),
 					BLOCK_LEVEL_ALPINE_PEAK - 1, BLOCK_STONE, BLOCK_GRAVEL);
 
 				if(top) {
@@ -300,7 +300,7 @@ namespace nomic {
 				}
 			} else if((y < BLOCK_LEVEL_ALPINE) && (y >= BLOCK_LEVEL_GRASS_STEP)) { // gravel/dirt
 				zone = BLOCK_ZONE_ALPINE;
-				type = chunk_block_blend(y, ((BLOCK_LEVEL_ALPINE - 1) - ((BLOCK_LEVEL_ALPINE - 1) - BLOCK_LEVEL_GRASS_STEP)),
+				type = block_blend(y, ((BLOCK_LEVEL_ALPINE - 1) - ((BLOCK_LEVEL_ALPINE - 1) - BLOCK_LEVEL_GRASS_STEP)),
 					BLOCK_LEVEL_ALPINE - 1, BLOCK_GRAVEL, BLOCK_DIRT);
 
 				if(top) {
@@ -326,12 +326,17 @@ namespace nomic {
 					type = BLOCK_GRASS;
 
 					if(!chunk_decoration_grassland(glm::uvec3(position.x, y + 1, position.z), chunk)) { // grass decoration
-						chunk_decoration_tree_oak(glm::uvec3(position.x, y + 1, position.z), chunk);
+
+						if(block_pick(BLOCK_WOOD_OAK, BLOCK_WOOD_SPRUCE) == BLOCK_WOOD_OAK) {
+							chunk_decoration_tree_oak(glm::uvec3(position.x, y + 1, position.z), chunk);
+						} else {
+							chunk_decoration_tree_spruce(glm::uvec3(position.x, y + 1, position.z), chunk);
+						}
 					}
 				}
 			} else if((y < BLOCK_LEVEL_GRASS) && (y >= BLOCK_LEVEL_BEACH_ROCKS)) { // dirt/stone
 				zone = BLOCK_ZONE_GRASS;
-				type = chunk_block_blend(y, ((BLOCK_LEVEL_GRASS - 1) - ((BLOCK_LEVEL_GRASS - 1) - BLOCK_LEVEL_BEACH_ROCKS)),
+				type = block_blend(y, ((BLOCK_LEVEL_GRASS - 1) - ((BLOCK_LEVEL_GRASS - 1) - BLOCK_LEVEL_BEACH_ROCKS)),
 					BLOCK_LEVEL_GRASS - 1, BLOCK_DIRT, BLOCK_STONE);
 
 				if(top && (type == BLOCK_DIRT)) { // grass
@@ -344,24 +349,24 @@ namespace nomic {
 				}
 			} else if((y < BLOCK_LEVEL_BEACH_ROCKS) && (y >= BLOCK_LEVEL_BEACH_GRAVEL)) { // stone/gravel
 				zone = BLOCK_ZONE_BEACH;
-				type = chunk_block_blend(y, ((BLOCK_LEVEL_BEACH_ROCKS - 1) - ((BLOCK_LEVEL_BEACH_ROCKS - 1) - BLOCK_LEVEL_BEACH_GRAVEL)),
+				type = block_blend(y, ((BLOCK_LEVEL_BEACH_ROCKS - 1) - ((BLOCK_LEVEL_BEACH_ROCKS - 1) - BLOCK_LEVEL_BEACH_GRAVEL)),
 					BLOCK_LEVEL_BEACH_ROCKS - 1, BLOCK_STONE, BLOCK_GRAVEL);
 
 				if(top && (type == BLOCK_GRAVEL)) {
 					top = false;
-					type = chunk_block_pick_uniform(BLOCK_GRAVEL, BLOCK_CLAY);
+					type = block_pick_uniform(BLOCK_GRAVEL, BLOCK_CLAY);
 					chunk_decoration_beach(glm::uvec3(position.x, y + 1, position.z), chunk); // beach decoration
 				}
 			} else { // sand/gravel/stone (underwater)
 				zone = BLOCK_ZONE_SEA;
-				type = chunk_block_blend(y, BLOCK_LEVEL_BEACH_SAND - (BLOCK_LEVEL_BEACH_SAND - BLOCK_HEIGHT_MIN),
-					BLOCK_LEVEL_BEACH_SAND, BLOCK_SAND, chunk_block_pick(BLOCK_STONE, BLOCK_CLAY));
+				type = block_blend(y, BLOCK_LEVEL_BEACH_SAND - (BLOCK_LEVEL_BEACH_SAND - BLOCK_HEIGHT_MIN),
+					BLOCK_LEVEL_BEACH_SAND, BLOCK_SAND, block_pick(BLOCK_STONE, BLOCK_CLAY));
 
 				if(top) { // gravel/stone
 					top = false;
 
 					if(type == BLOCK_STONE) {
-						type = chunk_block_blend(y, BLOCK_LEVEL_BEACH_SAND - (BLOCK_LEVEL_BEACH_SAND - BLOCK_HEIGHT_MIN),
+						type = block_blend(y, BLOCK_LEVEL_BEACH_SAND - (BLOCK_LEVEL_BEACH_SAND - BLOCK_HEIGHT_MIN),
 							BLOCK_LEVEL_BEACH_SAND, BLOCK_SAND, BLOCK_STONE);
 
 						if(type == BLOCK_STONE) {
@@ -388,9 +393,9 @@ namespace nomic {
 								case BLOCK_DIRT: // dirt/gravel/stone
 								case BLOCK_GRASS:
 
-									type = chunk_block_pick(BLOCK_DIRT, BLOCK_GRAVEL, BLOCK_STONE);
+									type = block_pick(BLOCK_DIRT, BLOCK_GRAVEL, BLOCK_STONE);
 									if((type == BLOCK_DIRT) && (depth >= BLOCK_DEPTH_DIRT_MAX)) {
-										type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
+										type = block_pick(BLOCK_GRAVEL, BLOCK_STONE);
 										depth = 0;
 									} else {
 										++depth;
@@ -398,7 +403,7 @@ namespace nomic {
 									break;
 								case BLOCK_GRAVEL: // gravel/stone
 
-									type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
+									type = block_pick(BLOCK_GRAVEL, BLOCK_STONE);
 									if((type == BLOCK_GRAVEL) && (depth >= BLOCK_DEPTH_GRAVEL_MAX)) {
 										type = BLOCK_STONE;
 										depth = 0;
@@ -416,9 +421,9 @@ namespace nomic {
 							switch(type) {
 								case BLOCK_SAND: // sand/sandstone/gravel
 
-									type = chunk_block_pick(BLOCK_SAND, BLOCK_SANDSTONE, BLOCK_GRAVEL);
+									type = block_pick(BLOCK_SAND, BLOCK_SANDSTONE, BLOCK_GRAVEL);
 									if((type == BLOCK_SAND) && (depth >= BLOCK_DEPTH_SAND_MAX)) {
-										type = chunk_block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL);
+										type = block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL);
 										depth = 0;
 									} else {
 										++depth;
@@ -426,9 +431,9 @@ namespace nomic {
 									break;
 								case BLOCK_SANDSTONE: // sandstone/gravel/stone
 
-									type = chunk_block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL, BLOCK_STONE);
+									type = block_pick(BLOCK_SANDSTONE, BLOCK_GRAVEL, BLOCK_STONE);
 									if((type == BLOCK_SANDSTONE) && (depth >= BLOCK_DEPTH_SANDSTONE_MAX)) {
-										type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
+										type = block_pick(BLOCK_GRAVEL, BLOCK_STONE);
 										depth = 0;
 									} else {
 										++depth;
@@ -436,7 +441,7 @@ namespace nomic {
 									break;
 								case BLOCK_GRAVEL: // gravel/stone
 
-									type = chunk_block_pick(BLOCK_GRAVEL, BLOCK_STONE);
+									type = block_pick(BLOCK_GRAVEL, BLOCK_STONE);
 									if((type == BLOCK_GRAVEL) && (depth >= BLOCK_DEPTH_GRAVEL_MAX)) {
 										type = BLOCK_STONE;
 										depth = 0;
@@ -464,7 +469,7 @@ namespace nomic {
 					if(y <= (BLOCK_HEIGHT_BOUNDARY + BLOCK_DEPTH_BOUNDARY_MAX)) { // stone/boundary
 
 						if(!bottom) {
-							type = chunk_block_blend(y, BLOCK_HEIGHT_BOUNDARY,
+							type = block_blend(y, BLOCK_HEIGHT_BOUNDARY,
 								BLOCK_HEIGHT_BOUNDARY + BLOCK_DEPTH_BOUNDARY_MAX,
 								BLOCK_STONE, BLOCK_BOUNDARY);
 							bottom = (type == BLOCK_BOUNDARY);
@@ -514,7 +519,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
 			if(chunk.type(position) == BLOCK_AIR) {
-				uint8_t type = chunk_block_pick(BLOCK_AIR, BLOCK_SHRUB); // shrub
+				uint8_t type = block_pick(BLOCK_AIR, BLOCK_SHRUB); // shrub
 
 				result = (type == BLOCK_SHRUB);
 				if(result) {
@@ -539,7 +544,7 @@ namespace nomic {
 			if(chunk.type(position) == BLOCK_AIR) {
 
 				if(position.y == BLOCK_LEVEL_BEACH_SAND) { // sugar-cane
-					uint8_t type = chunk_block_pick(BLOCK_AIR, chunk_block_pick(BLOCK_AIR, BLOCK_SUGAR_CANE));
+					uint8_t type = block_pick(BLOCK_AIR, block_pick(BLOCK_AIR, BLOCK_SUGAR_CANE));
 
 					result = (type == BLOCK_SUGAR_CANE);
 					if(result) {
@@ -549,7 +554,7 @@ namespace nomic {
 							if(chunk.type(glm::uvec3(position.x, position.y + iter + 1, position.z)) != BLOCK_AIR) {
 								break;
 							} else if((iter >= BLOCK_DECORATION_SUGAR_CANE_AVERAGE)
-									&& (chunk_block_pick(BLOCK_AIR, BLOCK_SUGAR_CANE) == BLOCK_AIR)) {
+									&& (block_pick(BLOCK_AIR, BLOCK_SUGAR_CANE) == BLOCK_AIR)) {
 								break;
 							}
 
@@ -557,7 +562,7 @@ namespace nomic {
 						}
 					}
 				} else if((position.y < BLOCK_LEVEL_BEACH_ROCKS) && (position.y >= BLOCK_LEVEL_BEACH_GRAVEL)) { // cactus
-					uint8_t type = chunk_block_pick(BLOCK_AIR, chunk_block_pick(BLOCK_AIR, BLOCK_CACTUS));
+					uint8_t type = block_pick(BLOCK_AIR, block_pick(BLOCK_AIR, BLOCK_CACTUS));
 
 					result = (type == BLOCK_CACTUS);
 					if(result) {
@@ -567,7 +572,7 @@ namespace nomic {
 							if(chunk.type(glm::uvec3(position.x, position.y + iter + 1, position.z)) != BLOCK_AIR) {
 								break;
 							} else if((iter >= BLOCK_DECORATION_CACTUS_AVERAGE)
-									&& (chunk_block_pick(BLOCK_AIR, BLOCK_CACTUS) == BLOCK_AIR)) {
+									&& (block_pick(BLOCK_AIR, BLOCK_CACTUS) == BLOCK_AIR)) {
 								break;
 							}
 
@@ -661,16 +666,16 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
 			if(chunk.type(position) == BLOCK_AIR) {
-				uint8_t type = chunk_block_pick(BLOCK_AIR, BLOCK_GRASS_TALL);
+				uint8_t type = block_pick(BLOCK_AIR, BLOCK_GRASS_TALL);
 
 				result = (type == BLOCK_GRASS_TALL);
 				if(result) { // grass
-					type = chunk_block_pick(BLOCK_GRASS_TALL, BLOCK_GRASS_SHORT);
+					type = block_pick(BLOCK_GRASS_TALL, BLOCK_GRASS_SHORT);
 
 					if((position.y >= BLOCK_DECORATION_FLOWER_HEIGHT_MIN)
 							&& (position.y < BLOCK_DECORATION_FLOWER_HEIGHT_MAX)) { // flower
 
-						type = chunk_block_pick(type, chunk_block_pick_uniform(BLOCK_FLOWER_RED, BLOCK_FLOWER_YELLOW));
+						type = block_pick(type, block_pick_uniform(BLOCK_FLOWER_RED, BLOCK_FLOWER_YELLOW));
 					}
 
 					chunk.set_block(position, type);
@@ -692,7 +697,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
 			if(chunk.type(position) == BLOCK_AIR) {
-				uint8_t type = chunk_block_pick(BLOCK_AIR, chunk_block_pick(BLOCK_AIR, BLOCK_WOOD_OAK));
+				uint8_t type = block_pick(BLOCK_AIR, block_pick(BLOCK_AIR, BLOCK_WOOD_OAK));
 
 				result = (type == BLOCK_WOOD_OAK);
 				if(result) { // tree
@@ -715,7 +720,7 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
 			if(chunk.type(position) == BLOCK_AIR) {
-				uint8_t type = chunk_block_pick(BLOCK_AIR, chunk_block_pick(BLOCK_AIR, BLOCK_WOOD_SPRUCE));
+				uint8_t type = block_pick(BLOCK_AIR, block_pick(BLOCK_AIR, BLOCK_WOOD_SPRUCE));
 
 				result = (type == BLOCK_WOOD_SPRUCE);
 				if(result) { // spruce-tree
@@ -738,14 +743,14 @@ namespace nomic {
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
 			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
-				uint8_t type = chunk_block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN);
+				uint8_t type = block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN);
 
 				result = (type == BLOCK_SEAGRASS_GREEN);
 				if(result) {
 
-					type = chunk_block_pick_uniform(BLOCK_SEAGRASS_GREEN, BLOCK_CORAL_ORANGE);
+					type = block_pick_uniform(BLOCK_SEAGRASS_GREEN, BLOCK_CORAL_ORANGE);
 					if(type == BLOCK_SEAGRASS_GREEN) { // sea-grass
-						type = chunk_block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
+						type = block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
 
 						for(uint32_t iter = 0; iter < BLOCK_DECORATION_SEAGRASS_MAX; ++iter) {
 
@@ -753,15 +758,15 @@ namespace nomic {
 									position.z)) != BLOCK_WATER) {
 								break;
 							} else if((iter >= BLOCK_DECORATION_SEAGRASS_AVERAGE)
-									&& (chunk_block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN) == BLOCK_WATER)) {
+									&& (block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN) == BLOCK_WATER)) {
 								break;
 							}
 
 							chunk.set_block(glm::uvec3(position.x, position.y + iter, position.z), type);
 						}
 					} else { // coral
-						type = chunk_block_pick(chunk_block_pick(chunk_block_pick_uniform(BLOCK_CORAL_ORANGE, BLOCK_CORAL_PINK),
-							chunk_block_pick_uniform(BLOCK_CORAL_PURPLE, BLOCK_CORAL_BLUE)), BLOCK_CORAL_BROWN);
+						type = block_pick(block_pick(block_pick_uniform(BLOCK_CORAL_ORANGE, BLOCK_CORAL_PINK),
+							block_pick_uniform(BLOCK_CORAL_PURPLE, BLOCK_CORAL_BLUE)), BLOCK_CORAL_BROWN);
 						chunk.set_block(position, type);
 					}
 				}
@@ -784,10 +789,10 @@ namespace nomic {
 			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
 				result = true;
 
-				uint8_t type = chunk_block_pick(BLOCK_CORAL_ORANGE, BLOCK_SEAGRASS_GREEN);
+				uint8_t type = block_pick(BLOCK_CORAL_ORANGE, BLOCK_SEAGRASS_GREEN);
 				if(type == BLOCK_CORAL_ORANGE) { // coral
-					type = chunk_block_pick_uniform(BLOCK_WATER, chunk_block_pick(chunk_block_pick(chunk_block_pick_uniform(
-						BLOCK_CORAL_ORANGE, BLOCK_CORAL_PINK), chunk_block_pick_uniform(BLOCK_CORAL_PURPLE, BLOCK_CORAL_BLUE)),
+					type = block_pick_uniform(BLOCK_WATER, block_pick(block_pick(block_pick_uniform(
+						BLOCK_CORAL_ORANGE, BLOCK_CORAL_PINK), block_pick_uniform(BLOCK_CORAL_PURPLE, BLOCK_CORAL_BLUE)),
 						BLOCK_CORAL_BROWN));
 
 					result = (type != BLOCK_WATER);
@@ -795,7 +800,7 @@ namespace nomic {
 						chunk.set_block(position, type);
 					}
 				} else { // sea-grass
-					type = chunk_block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
+					type = block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
 
 					for(uint32_t iter = 0; iter < BLOCK_DECORATION_SEAGRASS_MAX; ++iter) {
 
@@ -803,7 +808,7 @@ namespace nomic {
 								position.z)) != BLOCK_WATER) {
 							break;
 						} else if((iter >= BLOCK_DECORATION_SEAGRASS_AVERAGE)
-								&& (chunk_block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN) == BLOCK_WATER)) {
+								&& (block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN) == BLOCK_WATER)) {
 							break;
 						}
 

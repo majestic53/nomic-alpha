@@ -1319,7 +1319,7 @@ namespace nomic {
 						TRACE_MESSAGE_FORMAT(LEVEL_INFORMATION, "Adding block. Type=%x Chunk={%i, %i}, Block={%u, %u, %u}",
 							type, chunk.x, chunk.y, block.x, block.y, block.z);
 
-						m_manager_terrain.at(chunk)->set_block(block, type, attribute);
+						m_manager_terrain.at(chunk)->set_block(block, type, attribute, true);
 						m_block_selected = false;
 						m_block_selected_face = BLOCK_FACE_UNDEFINED;
 					}
@@ -1394,7 +1394,7 @@ namespace nomic {
 					}
 				}
 
-				chunk->set_block(m_block_selected_block, type, attributes);
+				chunk->set_block(m_block_selected_block, type, attributes, true);
 				m_block_selected = false;
 				m_block_selected_face = BLOCK_FACE_UNDEFINED;
 

@@ -93,7 +93,15 @@ namespace nomic {
 				uint8_t set_block(
 					__in const glm::uvec3 &position,
 					__in uint8_t type,
-					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT
+					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT,
+					__in_opt bool insert = false
+					);
+
+				uint8_t set_block_adjacent(
+					__in const glm::ivec3 &position,
+					__in uint8_t type,
+					__in_opt uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT,
+					__in_opt bool insert = false
 					);
 
 				void teardown(void);
