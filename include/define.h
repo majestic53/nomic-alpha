@@ -107,7 +107,7 @@ namespace nomic {
 	#define BLOCK_TREE_OAK_LEAVES_START 2
 	#define BLOCK_TREE_OAK_MAX 8
 	#define BLOCK_TREE_OAK_MIN 4
-	#define BLOCK_TREE_OAK_RADIUS_DEFAULT 2
+	#define BLOCK_TREE_OAK_RADIUS_DEFAULT 3
 	#define BLOCK_TREE_OAK_SPLIT_MIN 4
 	#define BLOCK_TREE_SPRUCE_AVERAGE 10
 	#define BLOCK_TREE_SPRUCE_LEAVES_END 2
@@ -252,7 +252,7 @@ namespace nomic {
 	#define NOISE_SCALE 480.0
 	#define NOISE_SCALE_CLOUD 180.0
 
-	#define NOISE_SEED_DEFAULT 0
+	#define NOISE_SEED_DEFAULT 1073491874 //0
 
 	#define NOMIC "Nomic"
 	#define NOMIC_COPYRIGHT "Copyright (C) 2017 David Jolly"
