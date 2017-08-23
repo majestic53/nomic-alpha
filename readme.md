@@ -32,9 +32,9 @@ Changelog
 
 Version 0.1.1734
 ----------------
-*Updated: 8/22/2017*
+*Updated: 8/22-23/2017*
 
-* Added tree generation (incomplete)
+* Added tree generation <s>(incomplete)</s>
 
 ![Alt](https://github.com/majestic53/nomic-alpha/blob/master/asset/sample/nomic_1734_1_3.png "Spruce trees at sunrise")
 ![Alt](https://github.com/majestic53/nomic-alpha/blob/master/asset/sample/nomic_1734_1_4.png "Looking to the horizon")

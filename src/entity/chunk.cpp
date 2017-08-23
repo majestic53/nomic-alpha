@@ -767,7 +767,6 @@ namespace nomic {
 
 			spawn = nomic::terrain::chunk::spawn();
 			if(!spawn.empty()) {
-				m_changed = true;
 
 				for(std::vector<std::pair<glm::uvec3, uint8_t>>::iterator iter = spawn.begin(); iter != spawn.end(); ++iter) {
 					uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT, type = iter->second;
@@ -775,7 +774,21 @@ namespace nomic {
 					switch(type) {
 						case BLOCK_WOOD_OAK:
 						case BLOCK_WOOD_SPRUCE:
-							add_tree(iter->first, type, attributes);
+
+							if(m_chunk_back && m_chunk_front && m_chunk_left && m_chunk_right
+									&& m_chunk_left->m_chunk_back && m_chunk_left->m_chunk_front
+									&& m_chunk_right->m_chunk_back && m_chunk_right->m_chunk_front
+									&& m_chunk_back->shown() && m_chunk_front->shown()
+									&& m_chunk_left->shown() && m_chunk_right->shown()
+									&& m_chunk_left->m_chunk_back->shown()
+									&& m_chunk_left->m_chunk_front->shown()
+									&& m_chunk_right->m_chunk_back->shown()
+									&& m_chunk_right->m_chunk_front->shown()) {
+								add_tree(iter->first, type, attributes);
+							} else {
+								nomic::terrain::chunk::set_spawn(iter->first, iter->second,
+									CHUNK_SPAWN_DEFERRED_TIMEOUT);
+							}
 							break;
 						default:
 							set_block(iter->first, type, attributes);
@@ -1348,54 +1361,44 @@ namespace nomic {
 
 				chunk = m_chunk_right;
 				if(chunk) {
-					position_block = glm::uvec3(std::abs(position.x % CHUNK_WIDTH), position.y, position.z);
+					position_block = glm::uvec3((std::abs(position.x) % CHUNK_WIDTH), position.y, position.z);
 
 					if(position.z >= CHUNK_WIDTH) { // upper-right
 						chunk = chunk->m_chunk_back;
-						position_block.z = std::abs(position.z % CHUNK_WIDTH);
+						position_block.z = (std::abs(position.z) % CHUNK_WIDTH);
 					} else if(position.z < 0) { // lower-right
 						chunk = chunk->m_chunk_front;
-						position_block.z = (CHUNK_WIDTH - std::abs(position.z % CHUNK_WIDTH) - 1);
+						position_block.z = (CHUNK_WIDTH - (std::abs(position.z) % CHUNK_WIDTH));
 					}
 				}
 			} else if(position.x < 0) { // left
 
 				chunk = m_chunk_left;
 				if(chunk) {
-					position_block = glm::uvec3(CHUNK_WIDTH - std::abs(position.x % CHUNK_WIDTH) - 1, position.y, position.z);
+					position_block = glm::uvec3(CHUNK_WIDTH - (std::abs(position.x) % CHUNK_WIDTH),
+						position.y, position.z);
 
 					if(position.z >= CHUNK_WIDTH) { // upper-left
 						chunk = chunk->m_chunk_back;
-						position_block.z = std::abs(position.z % CHUNK_WIDTH);
+						position_block.z = (std::abs(position.z) % CHUNK_WIDTH);
 					} else if(position.z < 0) { // lower-left
 						chunk = chunk->m_chunk_front;
-						position_block.z = (CHUNK_WIDTH - std::abs(position.z % CHUNK_WIDTH) - 1);
+						position_block.z = (CHUNK_WIDTH - (std::abs(position.z) % CHUNK_WIDTH));
 					}
 				}
 			} else if(position.z >= CHUNK_WIDTH) { // back
 				chunk = m_chunk_back;
-				position_block = glm::uvec3(position.x, position.y, std::abs(position.z % CHUNK_WIDTH));
+				position_block = glm::uvec3(position.x, position.y, (std::abs(position.z) % CHUNK_WIDTH));
 			} else if(position.z < 0) { // front
 				chunk = m_chunk_front;
-				position_block = glm::uvec3(position.x, position.y, CHUNK_WIDTH - std::abs(position.z % CHUNK_WIDTH) - 1);
+				position_block = glm::uvec3(position.x, position.y, CHUNK_WIDTH - (std::abs(position.z) % CHUNK_WIDTH));
 			} else {
 				chunk = this;
 				position_block = position;
 			}
 
 			if(chunk) {
-
-				result = ((nomic::terrain::chunk *) chunk)->type(position);
-				if(!insert) {
-
-					if(!nomic::utility::block_selectable(result)) {
-						result = ((nomic::terrain::chunk *) chunk)->set_block(position_block, type, attributes);
-						m_changed = true;
-					}
-				} else {
-					result = ((nomic::terrain::chunk *) chunk)->set_block(position_block, type, attributes);
-					m_changed = true;
-				}
+				result = chunk->set_block(position_block, type, attributes, insert);
 			}
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x(%u)", (uint16_t) result, (uint16_t) result);

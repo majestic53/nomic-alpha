@@ -340,9 +340,12 @@ namespace nomic {
 					delta_previous = delta;
 					on_render(delta);
 					++frame;
-				} else {
+				}
+#ifdef RUNTIME_DELAY_RENDERING
+				else {
 					SDL_Delay(RUNTIME_DELAY_RENDER);
 				}
+#endif // RUNTIME_DELAY_RENDERING
 			} else {
 
 				if(m_paused_change) {
