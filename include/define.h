@@ -301,7 +301,8 @@ namespace nomic {
 	#define RETICLE_LINE_WIDTH 2.f
 	#define RETICLE_WIDTH 0.025f
 
-	#define RUNTIME_PAUSE_DELAY 200
+	#define RUNTIME_DELAY_PAUSE 200
+	#define RUNTIME_DELAY_RENDER 10
 	#define RUNTIME_TICKS_PER_SECOND 60
 	#define RUNTIME_TICK_SKIP 5
 
@@ -448,7 +449,7 @@ namespace nomic {
 	#define VIEW_RADIUS_RUNTIME (VIEW_WIDTH / 2)
 	#define VIEW_RADIUS_SPAWN (VIEW_WIDTH / 2)
 	#define VIEW_SELECTIVE_SHOW
-	#define VIEW_WIDTH 20 //38
+	#define VIEW_WIDTH 38
 
 	enum {
 		BITMAP_DEPTH_8 = 1,
