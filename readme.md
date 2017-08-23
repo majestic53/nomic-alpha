@@ -36,6 +36,9 @@ Version 0.1.1734
 
 * Added tree generation (incomplete)
 
+![Alt](https://github.com/majestic53/nomic-alpha/blob/master/asset/sample/nomic_1734_1_3.png "Spruce trees at sunrise")
+![Alt](https://github.com/majestic53/nomic-alpha/blob/master/asset/sample/nomic_1734_1_4.png "Looking to the horizon")
+
 Version 0.1.1733
 ----------------
 *Updated: 8/14-16/2017*
