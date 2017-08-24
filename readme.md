@@ -32,6 +32,10 @@ Changelog
 
 Version 0.1.1734
 ----------------
+*Updated: 8/24/2017*
+
+* Added ore generation (incomplete)
+
 *Updated: 8/22-23/2017*
 
 * Added tree generation <s>(incomplete)</s>

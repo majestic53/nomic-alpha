@@ -263,6 +263,8 @@ namespace nomic {
 				}
 			}
 
+			//chunk_decoration_ore(chunk); // ore
+
 			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
@@ -497,7 +499,7 @@ namespace nomic {
 							(y == BLOCK_HEIGHT_WATER) ? attributes : (attributes | BLOCK_ATTRIBUTE_HIDDEN));
 					}
 
-					if(position.y <= (BLOCK_HEIGHT_MIN + BLOCK_DECORATION_CORAL_REEF_PAD)) { // sea decoration
+					if(position.y <= (BLOCK_HEIGHT_MIN + BLOCK_CORAL_REEF_PAD)) { // sea decoration
 						chunk_decoration_underwater_reef(glm::uvec3(position.x, y + 1, position.z), chunk);
 					} else {
 						chunk_decoration_underwater(glm::uvec3(position.x, y + 1, position.z), chunk);
@@ -549,11 +551,11 @@ namespace nomic {
 					result = (type == BLOCK_SUGAR_CANE);
 					if(result) {
 
-						for(uint32_t iter = 0; iter < BLOCK_DECORATION_SUGAR_CANE_MAX; ++iter) {
+						for(uint32_t iter = 0; iter < BLOCK_SUGAR_CANE_MAX; ++iter) {
 
 							if(chunk.type(glm::uvec3(position.x, position.y + iter + 1, position.z)) != BLOCK_AIR) {
 								break;
-							} else if((iter >= BLOCK_DECORATION_SUGAR_CANE_AVERAGE)
+							} else if((iter >= BLOCK_SUGAR_CANE_AVERAGE)
 									&& (block_pick(BLOCK_AIR, BLOCK_SUGAR_CANE) == BLOCK_AIR)) {
 								break;
 							}
@@ -567,11 +569,11 @@ namespace nomic {
 					result = (type == BLOCK_CACTUS);
 					if(result) {
 
-						for(uint32_t iter = 0; iter < BLOCK_DECORATION_CACTUS_MAX; ++iter) {
+						for(uint32_t iter = 0; iter < BLOCK_CACTUS_MAX; ++iter) {
 
 							if(chunk.type(glm::uvec3(position.x, position.y + iter + 1, position.z)) != BLOCK_AIR) {
 								break;
-							} else if((iter >= BLOCK_DECORATION_CACTUS_AVERAGE)
+							} else if((iter >= BLOCK_CACTUS_AVERAGE)
 									&& (block_pick(BLOCK_AIR, BLOCK_CACTUS) == BLOCK_AIR)) {
 								break;
 							}
@@ -672,9 +674,8 @@ namespace nomic {
 				if(result) { // grass
 					type = block_pick(BLOCK_GRASS_TALL, BLOCK_GRASS_SHORT);
 
-					if((position.y >= BLOCK_DECORATION_FLOWER_HEIGHT_MIN)
-							&& (position.y < BLOCK_DECORATION_FLOWER_HEIGHT_MAX)) { // flower
-
+					if((position.y >= BLOCK_FLOWER_HEIGHT_MIN)
+							&& (position.y < BLOCK_FLOWER_HEIGHT_MAX)) { // flower
 						type = block_pick(type, block_pick_uniform(BLOCK_FLOWER_RED, BLOCK_FLOWER_YELLOW));
 					}
 
@@ -684,6 +685,71 @@ namespace nomic {
 
 			TRACE_EXIT_FORMAT(LEVEL_VERBOSE, "Result=%x", result);
 			return result;
+		}
+
+		void 
+		generator::chunk_decoration_ore(
+			__in nomic::terrain::chunk &chunk
+			)
+		{
+			uint32_t count;
+			glm::uvec3 position;
+
+			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Chunk=%p", &chunk);
+
+			count = std::uniform_int_distribution<uint32_t>(BLOCK_ORE_COAL_MIN, BLOCK_ORE_COAL_MAX)(m_random.generator()); // coal
+			for(uint32_t iter = 0; iter < count; ++iter) {
+
+				do {
+					position.x = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+					position.y = std::uniform_int_distribution<uint32_t>(BLOCK_HEIGHT_ORE_MIN, BLOCK_HEIGHT_ORE_COAL)(
+							m_random.generator());
+					position.z = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+				} while(chunk.type(position) != BLOCK_STONE);
+
+				chunk.set_spawn(position, BLOCK_ORE_COAL);
+			}
+
+			count = std::uniform_int_distribution<uint32_t>(BLOCK_ORE_IRON_MIN, BLOCK_ORE_IRON_MAX)(m_random.generator()); // iron
+			for(uint32_t iter = 0; iter < count; ++iter) {
+
+				do {
+					position.x = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+					position.y = std::uniform_int_distribution<uint32_t>(BLOCK_HEIGHT_ORE_MIN, BLOCK_HEIGHT_ORE_IRON)(
+							m_random.generator());
+					position.z = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+				} while(chunk.type(position) != BLOCK_STONE);
+
+				chunk.set_spawn(position, BLOCK_ORE_IRON);
+			}
+
+			count = std::uniform_int_distribution<uint32_t>(BLOCK_ORE_GOLD_MIN, BLOCK_ORE_GOLD_MAX)(m_random.generator()); // gold
+			for(uint32_t iter = 0; iter < count; ++iter) {
+
+				do {
+					position.x = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+					position.y = std::uniform_int_distribution<uint32_t>(BLOCK_HEIGHT_ORE_MIN, BLOCK_HEIGHT_ORE_GOLD)(
+							m_random.generator());
+					position.z = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+				} while(chunk.type(position) != BLOCK_STONE);
+
+				chunk.set_spawn(position, BLOCK_ORE_GOLD);
+			}
+
+			count = std::uniform_int_distribution<uint32_t>(BLOCK_ORE_DIAMOND_MIN, BLOCK_ORE_DIAMOND_MAX)(m_random.generator()); // diamond
+			for(uint32_t iter = 0; iter < count; ++iter) {
+
+				do {
+					position.x = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+					position.y = std::uniform_int_distribution<uint32_t>(BLOCK_HEIGHT_ORE_MIN, BLOCK_HEIGHT_ORE_DIAMOND)(
+							m_random.generator());
+					position.z = std::uniform_int_distribution<uint32_t>(0, CHUNK_WIDTH - 1)(m_random.generator());
+				} while(chunk.type(position) != BLOCK_STONE);
+
+				chunk.set_spawn(position, BLOCK_ORE_DIAMOND);
+			}
+
+			TRACE_EXIT(LEVEL_VERBOSE);
 		}
 
 		bool 
@@ -742,7 +808,7 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
-			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
+			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
 				uint8_t type = block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN);
 
 				result = (type == BLOCK_SEAGRASS_GREEN);
@@ -752,12 +818,12 @@ namespace nomic {
 					if(type == BLOCK_SEAGRASS_GREEN) { // sea-grass
 						type = block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
 
-						for(uint32_t iter = 0; iter < BLOCK_DECORATION_SEAGRASS_MAX; ++iter) {
+						for(uint32_t iter = 0; iter < BLOCK_SEAGRASS_MAX; ++iter) {
 
-							if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD + iter + 1,
+							if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_UNDERWATER_PAD + iter + 1,
 									position.z)) != BLOCK_WATER) {
 								break;
-							} else if((iter >= BLOCK_DECORATION_SEAGRASS_AVERAGE)
+							} else if((iter >= BLOCK_SEAGRASS_AVERAGE)
 									&& (block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN) == BLOCK_WATER)) {
 								break;
 							}
@@ -786,7 +852,7 @@ namespace nomic {
 
 			TRACE_ENTRY_FORMAT(LEVEL_VERBOSE, "Position={%u, %u, %u}, Chunk=%p", position.x, position.y, position.z, &chunk);
 
-			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
+			if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_UNDERWATER_PAD, position.z)) == BLOCK_WATER) {
 				result = true;
 
 				uint8_t type = block_pick(BLOCK_CORAL_ORANGE, BLOCK_SEAGRASS_GREEN);
@@ -802,12 +868,12 @@ namespace nomic {
 				} else { // sea-grass
 					type = block_pick(BLOCK_SEAGRASS_GREEN, BLOCK_SEAGRASS_BROWN);
 
-					for(uint32_t iter = 0; iter < BLOCK_DECORATION_SEAGRASS_MAX; ++iter) {
+					for(uint32_t iter = 0; iter < BLOCK_SEAGRASS_MAX; ++iter) {
 
-						if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_DECORATION_UNDERWATER_PAD + iter + 1,
+						if(chunk.type(glm::uvec3(position.x, position.y + BLOCK_UNDERWATER_PAD + iter + 1,
 								position.z)) != BLOCK_WATER) {
 							break;
-						} else if((iter >= BLOCK_DECORATION_SEAGRASS_AVERAGE)
+						} else if((iter >= BLOCK_SEAGRASS_AVERAGE)
 								&& (block_pick(BLOCK_WATER, BLOCK_SEAGRASS_GREEN) == BLOCK_WATER)) {
 							break;
 						}

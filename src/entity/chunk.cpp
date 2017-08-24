@@ -446,6 +446,7 @@ namespace nomic {
 
 				switch(type) {
 					case BLOCK_WOOD_OAK: { // oak
+							int32_t y;
 							glm::uvec3 back(0, 0, 1), front(0, 0, -1), left(-1, 0, 0), right(1, 0, 0);
 
 							radius = BLOCK_TREE_OAK_RADIUS_DEFAULT;
@@ -517,7 +518,7 @@ namespace nomic {
 								--start;	
 							}
 
-							for(int32_t y = start; y <= offset; ++y) { // leaves
+							for(y = start; y <= offset; ++y) { // leaves
 								int32_t layer_radius = radius;
 
 								float delta = ((offset - y) / (float) (offset - start));
@@ -539,6 +540,25 @@ namespace nomic {
 												BLOCK_LEAVES_OAK);
 										}
 									}
+								}
+							}
+
+							if(generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_WOOD_OAK) {
+								for(; y < (offset + BLOCK_TREE_OAK_CAP_WIDTH); ++y) {
+
+									for(int32_t z = -BLOCK_TREE_OAK_CAP_RADIUS; z < BLOCK_TREE_OAK_CAP_RADIUS;
+											++z) {
+
+										for(int32_t x = -BLOCK_TREE_OAK_CAP_RADIUS;
+												x < BLOCK_TREE_OAK_CAP_RADIUS; ++x) {
+											set_block_adjacent(position + glm::uvec3(x, y, z),
+												BLOCK_LEAVES_OAK);
+										}
+									}
+								}
+
+								if(generator.block_pick_uniform(BLOCK_AIR, BLOCK_WOOD_OAK) == BLOCK_WOOD_OAK) {
+									set_block_adjacent(position + glm::uvec3(0, y, 0), BLOCK_LEAVES_OAK);
 								}
 							}
 						} break;
@@ -597,8 +617,6 @@ namespace nomic {
 												set_block_adjacent(position + glm::uvec3(x, y, z),
 													BLOCK_LEAVES_SPRUCE);
 											}
-
-
 										}
 									}
 								}
@@ -771,28 +789,28 @@ namespace nomic {
 				for(std::vector<std::pair<glm::uvec3, uint8_t>>::iterator iter = spawn.begin(); iter != spawn.end(); ++iter) {
 					uint8_t attributes = BLOCK_ATTRIBUTES_DEFAULT, type = iter->second;
 
-					switch(type) {
-						case BLOCK_WOOD_OAK:
-						case BLOCK_WOOD_SPRUCE:
+					if(m_chunk_back && m_chunk_front && m_chunk_left && m_chunk_right
+							&& m_chunk_left->m_chunk_back && m_chunk_left->m_chunk_front
+							&& m_chunk_right->m_chunk_back && m_chunk_right->m_chunk_front
+							&& m_chunk_back->shown() && m_chunk_front->shown()
+							&& m_chunk_left->shown() && m_chunk_right->shown()
+							&& m_chunk_left->m_chunk_back->shown()
+							&& m_chunk_left->m_chunk_front->shown()
+							&& m_chunk_right->m_chunk_back->shown()
+							&& m_chunk_right->m_chunk_front->shown()) {
 
-							if(m_chunk_back && m_chunk_front && m_chunk_left && m_chunk_right
-									&& m_chunk_left->m_chunk_back && m_chunk_left->m_chunk_front
-									&& m_chunk_right->m_chunk_back && m_chunk_right->m_chunk_front
-									&& m_chunk_back->shown() && m_chunk_front->shown()
-									&& m_chunk_left->shown() && m_chunk_right->shown()
-									&& m_chunk_left->m_chunk_back->shown()
-									&& m_chunk_left->m_chunk_front->shown()
-									&& m_chunk_right->m_chunk_back->shown()
-									&& m_chunk_right->m_chunk_front->shown()) {
+						switch(type) {
+							case BLOCK_WOOD_OAK:
+							case BLOCK_WOOD_SPRUCE:
 								add_tree(iter->first, type, attributes);
-							} else {
-								nomic::terrain::chunk::set_spawn(iter->first, iter->second,
-									CHUNK_SPAWN_DEFERRED_TIMEOUT);
-							}
-							break;
-						default:
-							set_block(iter->first, type, attributes);
-							break;
+								break;
+							default:
+								set_block(iter->first, type, attributes, true);
+								break;
+						}
+					} else {
+						nomic::terrain::chunk::set_spawn(iter->first, iter->second,
+							CHUNK_SPAWN_DEFERRED_TIMEOUT);
 					}
 				}
 

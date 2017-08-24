@@ -121,6 +121,10 @@ namespace nomic {
 					__in nomic::terrain::chunk &chunk
 					);
 
+				void chunk_decoration_ore(
+					__in nomic::terrain::chunk &chunk
+					);
+
 				bool chunk_decoration_tree_oak(
 					__in const glm::uvec3 &position,
 					__in nomic::terrain::chunk &chunk

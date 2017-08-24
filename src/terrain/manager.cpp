@@ -58,8 +58,8 @@ namespace nomic {
 
 					nomic::entity::chunk *entry = new nomic::entity::chunk(position, m_generator);
 					if(!entry) {
-						THROW_NOMIC_TERRAIN_MANAGER_EXCEPTION_FORMAT(NOMIC_TERRAIN_MANAGER_EXCEPTION_ALLOCATE, "Position={%i, %i}",
-							position.x, position.y);
+						THROW_NOMIC_TERRAIN_MANAGER_EXCEPTION_FORMAT(NOMIC_TERRAIN_MANAGER_EXCEPTION_ALLOCATE,
+							"Position={%i, %i}", position.x, position.y);
 					}
 
 					m_chunk.insert(std::make_pair(std::make_pair(position.x, position.y), entry));
